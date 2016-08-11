@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Util : MonoBehaviour {
+public static class Util {
 
-    public static enum Direction {LEFT,
-                                  RIGHT,
-                                  STRAIGHT };
+    public enum Direction {LEFT,
+                           RIGHT,
+                           STRAIGHT };
 }
