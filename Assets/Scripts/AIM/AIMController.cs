@@ -33,6 +33,11 @@ public class AIMController : SimpleHeuristicController {
             driving = false;
             StartCoroutine("Turn");
         }
+
+        if (col.gameObject.tag == "SourcePoint")
+        {
+            Destroy(gameObject);
+        }
     }
     //TODO: Fix interpolation, possible use of Tweens
     IEnumerator Turn() 
