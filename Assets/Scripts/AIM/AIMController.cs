@@ -55,8 +55,7 @@ public class AIMController : SimpleHeuristicController {
         {
             currLane = currLane.GetComponent<Lane>().straight;
             driving = true;
-            Debug.Log("Left IM");
-
+            Debug.Log("Going Straight");
             yield break;
         }
         int steps = 5; //Number of points on the Bezier curve
