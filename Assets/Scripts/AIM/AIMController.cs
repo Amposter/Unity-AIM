@@ -4,6 +4,8 @@ using System.Collections;
 
 public class AIMController : SimpleHeuristicController {
 
+    private bool requestGranted;
+
     public enum Direction //TODO: Put into a Util file
     {
         LEFT,
@@ -20,6 +22,7 @@ public class AIMController : SimpleHeuristicController {
     protected override void Start () {
         base.Start();
         nextDir = 0;
+        requestGranted = false;
 	}
 	
 	// Update is called once per frame

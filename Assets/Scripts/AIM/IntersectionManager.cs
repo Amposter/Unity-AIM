@@ -20,7 +20,25 @@ public class IntersectionManager : MonoBehaviour {
 
     bool Reserve(KeyValuePair<float, Vector3>[] positions)
     {
+        if (!CheckReservation(positions)) //Check for clashes first
+            return false;
+
+        //No clashes, add positions
+        for (int i = 0; i < positions.Length; ++i)
+        {
+            float time = positions[i].Key;
+            Vector3 pos = positions[i].Value;
+
+            if (!reservations.ContainsKey(time)) //If there are no bookings for the time, create a new list and add the booking
+            {
+                reservations[time] = new List<Vector3>();
+                reservations[time].Add(pos);
+            }
+            else
+                reservations[time].Add(pos);
+        }
         return true;
+
     }
 
     //Check if a reservation can be made - i.e. the list of times and positions do not clash with those booked already
