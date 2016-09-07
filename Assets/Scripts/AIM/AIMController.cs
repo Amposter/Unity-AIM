@@ -61,6 +61,12 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerEnter(Collider col)
     {
+        if (col.gameObject.tag == "Pedestrian1")
+        {
+            Debug.Log("Stopped for pedestrian/obstacle");
+            driving = false;
+        }
+
         if (col.gameObject.tag == "IntersectionManager") //TODO: Store types in a config file
         {
             Debug.Log("Entered IM");
@@ -82,6 +88,16 @@ public class AIMController : SimpleHeuristicController {
         if (col.gameObject.tag == "SourcePoint")
         {
             Destroy(gameObject);
+        }
+    }
+
+    void OnTriggerExit(Collider col)
+    {
+        if (col.gameObject.tag == "Pedestrian1")
+        {
+            driving = true;
+            Debug.Log("Continued");
+            StartCoroutine("Drive");
         }
     }
     //TODO: Fix interpolation, possible use of Tweens

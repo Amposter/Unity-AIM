@@ -5,9 +5,9 @@ public class SimpleHeuristicController : MonoBehaviour {
 
     public GameObject BZ;
     public float speed = 5f;
+    public bool driving;
 
     protected BezierCurve[] curves;
-    protected bool driving;
     protected bool endOfCurve;
     protected int resolution; //Number of points to sample on each path curve
 
