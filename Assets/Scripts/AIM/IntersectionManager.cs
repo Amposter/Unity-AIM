@@ -18,7 +18,7 @@ public class IntersectionManager : MonoBehaviour {
 	
 	}
 
-    bool Reserve(KeyValuePair<float, Vector3>[] positions)
+    public bool Reserve(KeyValuePair<float, Vector3>[] positions)
     {
         if (!CheckReservation(positions)) //Check for clashes first
             return false;

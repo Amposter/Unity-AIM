@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 using System.Collections;
 
 public class AIMController : SimpleHeuristicController {
 
+    public float requestCooldown = 2.0f;
     private bool requestGranted;
+    private PathManager pm;
+    private Action action;
 
     public enum Direction //TODO: Put into a Util file
     {
@@ -13,17 +17,42 @@ public class AIMController : SimpleHeuristicController {
         STRAIGHT
     };
 
-    public Direction[] path;
+    public enum Action
+    {
+        IDLE,
+        DRIVE,
+        TURN
+    };
+
+    public BezierCurve[] path;
     public GameObject currLane;
     private int nextDir; //Next direction index in the 'path' list to take
-    private int steps = 5; //Number of bezier points to sample 
+    private int steps = 4; //Number of bezier points to sample 
 
     // Use this for initialization
     protected override void Start () {
         base.Start();
         nextDir = 0;
         requestGranted = false;
-	}
+        action = Action.DRIVE;
+        BezierCurve[] allPaths = GameObject.Find("PathManager").GetComponent<PathManager>().getRandomPathCurves();
+        BezierCurve[] heuristicPath = new BezierCurve[allPaths.Length/2 + 1];
+        BezierCurve[] AIMPath = new BezierCurve[allPaths.Length/2];
+        for (int i = 0; i < allPaths.Length; ++i)
+        {
+            if (i % 2 == 0)
+                heuristicPath[i / 2] = allPaths[i];
+            else
+                AIMPath[i / 2] = allPaths[i];
+        }
+        path = AIMPath;
+        curves = heuristicPath;
+        StartCoroutine("Drive");
+        /*        Vector3 startPoint = path[0].GetPointAt(0.0f);
+                startPoint.y = 0;
+                transform.position = startPoint;
+                transform.LookAt(startPoint); */
+    }
 	
 	// Update is called once per frame
 	protected override void Update () {
@@ -35,9 +64,19 @@ public class AIMController : SimpleHeuristicController {
         if (col.gameObject.tag == "IntersectionManager") //TODO: Store types in a config file
         {
             Debug.Log("Entered IM");
+            endOfCurve = true;
             driving = false;
-            SimulatePath();
-            StartCoroutine("Turn");
+            IntersectionManager im = col.gameObject.GetComponent<IntersectionManager>();
+            KeyValuePair<float, Vector3>[] requestPath = SimulatePath();
+       //     Debug.Log(path[nextDir]);
+            Action action;
+       /*     if (path[nextDir] == Direction.STRAIGHT)
+                action = Action.DRIVE;
+            else*/
+                action = Action.TURN;
+            object[] parameters = new object[] {requestPath, im, action};
+            //StartCoroutine(MakeRequest, path, im, Action.TURN);
+            StartCoroutine("MakeRequest", parameters);
         }
 
         if (col.gameObject.tag == "SourcePoint")
@@ -48,11 +87,11 @@ public class AIMController : SimpleHeuristicController {
     //TODO: Fix interpolation, possible use of Tweens
     IEnumerator Turn() 
     {
-        Direction dir = path[nextDir];
+       // Direction dir = path[nextDir];
+       // ++nextDir;
+        BezierCurve curve = path[nextDir]; //TODO: Fix unassigned ref error (not by making this null)
         ++nextDir;
-        BezierCurve curve = null; //TODO: Fix unassigned ref error (not by making this null)
-
-        if (dir == Direction.RIGHT)
+  /*      if (dir == Direction.RIGHT)
         {
             curve = currLane.GetComponent<Lane>().rightPath.GetComponent<BezierCurve>();
             currLane = currLane.GetComponent<Lane>().right;
@@ -68,10 +107,11 @@ public class AIMController : SimpleHeuristicController {
             driving = true;
             Debug.Log("Going Straight");
             yield break;
-        }
+        }*/
+
         int counter = 1;
         Debug.Log("Initial Time Actual: " + Time.time);
-        Vector3 toPoint = curve.GetPointAt((float)(steps - counter) / (steps));
+        Vector3 toPoint = curve.GetPointAt(counter/(float)steps);
         toPoint.y = transform.position.y;
         transform.LookAt(toPoint);
         while (counter <= steps)
@@ -88,27 +128,31 @@ public class AIMController : SimpleHeuristicController {
             if (transform.position == toPoint)
             {
                // GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                 Debug.Log("CurrTime: " + Time.time + " " + transform.position);
+               //  Debug.Log("CurrTime: " + Math.Round(Time.time,1) + " " + transform.position);
                 //cube.transform.position = new Vector3(toPoint.x, transform.position.y, toPoint.z);
                 ++counter;
-                toPoint = curve.GetPointAt((float)(steps - counter) / (steps));
+                toPoint = curve.GetPointAt((float)counter/steps);
                 toPoint.y = transform.position.y;
                 transform.LookAt(toPoint);
             }
-            //Debug.Log(toPoint);
             yield return null;
         }
         driving = true;
         Debug.Log("Left IM");
+        StartCoroutine("Drive");
     }
 
     KeyValuePair<float, Vector3>[] SimulatePath()
     {
         KeyValuePair<float, Vector3>[] output = new KeyValuePair<float, Vector3>[steps];
-        Direction dir = path[nextDir];
-        BezierCurve curve = null; //TODO: Fix unassigned ref error (not by making this null)
+        //Direction dir = path[nextDir];
+        //BezierCurve curve = null; //TODO: Fix unassigned ref error (not by making this null)
 
-        if (dir == Direction.RIGHT)
+        BezierCurve curve = path[nextDir]; //TODO: Fix unassigned ref error (not by making this null)
+                                           //++nextDir;
+        Debug.Log(curve.GetPointAt(0) + ", " + curve.GetPointAt(1));
+
+        /*if (dir == Direction.RIGHT)
         {
             curve = currLane.GetComponent<Lane>().rightPath.GetComponent<BezierCurve>();
         }
@@ -121,9 +165,9 @@ public class AIMController : SimpleHeuristicController {
             driving = true;
             Debug.Log("Going Straight");
             return null;
-        }
+        }*/
 
-        float initialTime = Time.time;
+        float initialTime = (float)Time.time;
         Debug.Log("Initial time simulation: " + initialTime);
         float distance = 0;
         Vector3 curr = transform.position; // curve.GetPointAt(0.8f);
@@ -132,10 +176,11 @@ public class AIMController : SimpleHeuristicController {
         for (int s = 1; s < steps+1; ++s)
         {
 
-            float segment = (1.0f - (s/ (float)steps)); // s -> (s-1)
+            float segment = (s/ (float)steps); // s -> (s-1)
             Vector3 point = curve.GetPointAt(segment); 
             point.y = transform.position.y;
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.GetComponent<BoxCollider>().isTrigger = true;
             cube.transform.position = point;
             /*  for (int i = 1; i < res + 1; ++i)
               {
@@ -150,15 +195,45 @@ public class AIMController : SimpleHeuristicController {
             curr = next;
 
             float elapsedTime = distance / speed;
+            float totalTime = initialTime + elapsedTime;
          //   Debug.Log(elapsedTime + initialTime);
-            output[s - 1] = new KeyValuePair<float, Vector3>(initialTime+elapsedTime, point);
+            output[s - 1] = new KeyValuePair<float, Vector3>((float)Math.Round(totalTime, 1), point);
           //  Debug.Log("Predicted time: " + (Time.time + time));
         }
-        Debug.Log(output[0].ToString());
+     /*   Debug.Log(output[0].ToString());
         Debug.Log(output[1].ToString());
         Debug.Log(output[2].ToString());
-        Debug.Log(output[3].ToString());
-        Debug.Log(output[4].ToString());
+        Debug.Log(output[3].ToString());*/
+       // Debug.Log(output[4].ToString());
         return output;
+    }
+
+
+    IEnumerator MakeRequest(object[] parameters)//(KeyValuePair<float, Vector3>[] path, IntersectionManager im, Action action)
+    {
+        KeyValuePair<float, Vector3>[] requestPath = (KeyValuePair<float, Vector3>[])parameters[0];
+        IntersectionManager im = (IntersectionManager)parameters[1];
+        Action action = (Action)parameters[2];
+
+        while (true)
+        {
+            requestGranted = im.Reserve(requestPath);
+            Debug.Log("FROM MR: " + requestGranted);
+            if (requestGranted)
+                break;
+            yield return new WaitForSeconds(requestCooldown);
+        }
+
+        if (action == Action.TURN)
+        {
+            Debug.Log("turning");
+            requestGranted = false;
+            StartCoroutine("Turn");
+        }
+        else if (action == Action.DRIVE)
+        {
+            driving = true;
+        }
+        yield return null;
     }
 }
