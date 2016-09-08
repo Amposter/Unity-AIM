@@ -47,15 +47,16 @@ public class AIMController : SimpleHeuristicController {
         }
         path = AIMPath;
         curves = heuristicPath;
+        Vector3 startPoint = path[0].GetPointAt(0.0f);
+        startPoint.y = 0.5f;
+        transform.position = startPoint;
+        transform.LookAt(startPoint);
         StartCoroutine("Drive");
-        /*        Vector3 startPoint = path[0].GetPointAt(0.0f);
-                startPoint.y = 0;
-                transform.position = startPoint;
-                transform.LookAt(startPoint); */
+
     }
-	
-	// Update is called once per frame
-	protected override void Update () {
+
+    // Update is called once per frame
+    protected override void Update () {
         base.Update();
     }
 
@@ -195,9 +196,9 @@ public class AIMController : SimpleHeuristicController {
             float segment = (s/ (float)steps); // s -> (s-1)
             Vector3 point = curve.GetPointAt(segment); 
             point.y = transform.position.y;
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.GetComponent<BoxCollider>().isTrigger = true;
-            cube.transform.position = point;
+          //  GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+          //  cube.GetComponent<BoxCollider>().isTrigger = true;
+          //  cube.transform.position = point;
             /*  for (int i = 1; i < res + 1; ++i)
               {
                   next = curve.GetPointAt(segment - ((i / (float)res) * (1/(float)steps)));

@@ -55,7 +55,7 @@ public class PathManager : MonoBehaviour
 
 	public BezierCurve[] getRandomPathCurves()
 	{
-        TrackWayPoint pathStart = startPoints[3];//startPoints [Random.Range (0, startPoints.Count)]; //get random start node
+        TrackWayPoint pathStart = startPoints [Random.Range (0, startPoints.Count)]; //get random start node
 		TrackWayPoint pathEnd = endPoints [Random.Range (0, endPoints.Count)]; //get random end node
 
 		Transform[] transformPathList = getPathBetweenNodes (pathStart, pathEnd);
