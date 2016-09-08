@@ -61,7 +61,7 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "Pedestrian1")
+        if (col.gameObject.tag == "Obstacle")
         {
             Debug.Log("Stopped for pedestrian/obstacle");
             driving = false;
@@ -93,7 +93,7 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerExit(Collider col)
     {
-        if (col.gameObject.tag == "Pedestrian1")
+        if (col.gameObject.tag == "Obstacle")
         {
             driving = true;
             Debug.Log("Continued");

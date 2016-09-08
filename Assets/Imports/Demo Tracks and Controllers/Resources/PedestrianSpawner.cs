@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PedestrianSpawner : MonoBehaviour
 {
 
+    public GameObject pedestrianPrefab;
 	public int maxPedestrians;
 	public float periodInterval;
 	public float periodClusterSize;
@@ -78,9 +79,9 @@ public class PedestrianSpawner : MonoBehaviour
 			float zPos = transform.GetChild (1).position.z - transform.GetChild (1).gameObject.GetComponent<BoxCollider> ().bounds.extents.z + 
 				Random.value * (transform.GetChild (1).gameObject.GetComponent<BoxCollider> ().bounds.extents.z * 2);
 
-			pedestrian = (GameObject) GameObject.Instantiate (Resources.Load ("Pedestrian"), new Vector3 (xPos, transform.GetChild (1).position.y , zPos), new Quaternion ());
-
-			pedestrian.GetComponent<Pedestrian> ().walk (gameObject.name, 2, moveVector);
+			//pedestrian = (GameObject) GameObject.Instantiate (Resources.Load ("Pedestrian"), new Vector3 (xPos, transform.GetChild (1).position.y , zPos), new Quaternion ());
+            pedestrian = (GameObject)Instantiate(pedestrianPrefab, new Vector3(xPos, transform.GetChild(1).position.y, zPos), new Quaternion());
+            pedestrian.GetComponent<Pedestrian> ().walk (gameObject.name, 2, moveVector);
 
 		}
 		pedestrianList.Add (pedestrian);
