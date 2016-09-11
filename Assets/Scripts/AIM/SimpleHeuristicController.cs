@@ -18,9 +18,9 @@ public class SimpleHeuristicController : MonoBehaviour {
 	protected virtual void Start () {
         driving = true;
         endOfCurve = false;
-        offset = 1;
+        offset = 5;
         currCuve = 0;
-        resolution = 5;
+        resolution = 20;
 	}
 
     // Update is called once per frame
@@ -60,7 +60,7 @@ public class SimpleHeuristicController : MonoBehaviour {
             driving = false;
             endOfCurve = false;
             ++currCuve;
-            offset = 1;
+            offset = 5;
         }
     }
 

@@ -12,23 +12,15 @@ public class CarSpawnear : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        Debug.Log("hey");
         Debug.Assert(spawnPoints.Length == spawnDirections.Length);
-        InvokeRepeating("Spawn", 1.0f, 1.5f);
-	  /*  for (int i = 0; i < spawnPoints.Length; ++i)
-        {
-            Instantiate(car, transform.position + spawnPoints[i], spawnDirections[i]);
-        }*/
+        Invoke("Spawn", 1.0f);// InvokeRepeating("Spawn", 1.0f, 1.5f);
 	}
 	
     void Spawn()
     {
-     //   while (true)
-        {
-            Instantiate(car);
-           // yield Wait
-        }
+        Instantiate(car);
     }
+
 	// Update is called once per frame
 	void Update () {
 	
