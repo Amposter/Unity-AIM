@@ -36,7 +36,7 @@ public class AIMController : SimpleHeuristicController {
         requestGranted = false;
         debugTime = new float[steps];
         int val = debugIM.debugSpawnCounter;
-        path = GameObject.Find("PathManager").GetComponent<PathManager>().getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val+1]); //.getRandomPathCurves();
+        path = GameObject.Find("PathManager").GetComponent<PathManager>().getRandomPathCurves(); //.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val+1]);
         debugIM.debugSpawnCounter += 2;
         Vector3 startPoint = path[0].GetPointAt(0.0f);
         startPoint.y = 0.5f;
@@ -50,9 +50,9 @@ public class AIMController : SimpleHeuristicController {
     }
 
     // Update is called once per frame
-    protected override void Update () {
+    protected override void Update ()
+    {
         base.Update();
-        Debug.Log(nextDir);
     }
 
     void OnTriggerEnter(Collider col)
@@ -64,11 +64,11 @@ public class AIMController : SimpleHeuristicController {
             nextIM = col.gameObject.GetComponent<IntersectionManager>();
 
         if (col.gameObject.tag == "WayPoint")
+        {
+            Debug.Log(col.gameObject.GetComponent<TrackWayPoint>().type);
             nextWayPointType = col.gameObject.GetComponent<TrackWayPoint>().type;
-
-        if (col.gameObject.tag == "SourcePoint")
-            Destroy(gameObject);
-    }
+        }
+       }
 
     void OnTriggerExit(Collider col)
     {
@@ -79,16 +79,21 @@ public class AIMController : SimpleHeuristicController {
     protected override IEnumerator Drive()
     {
         yield return StartCoroutine(base.Drive());
-        //Debug.Log("finished");
         Act();
     }
 
     void Act()
     {
-        if (nextWayPointType == default(TrackWayPoint.Type))
+        if (nextWayPointType == TrackWayPoint.Type.END)
+        {
+            Destroy(gameObject);
+        }
+
+        else if (nextWayPointType == default(TrackWayPoint.Type))
         {
             Debug.LogError("ERROR: End of curve but no next way point set!");
         }
+
         else if (nextWayPointType == TrackWayPoint.Type.NORMAL)
         {
             controller = Controller.HEURISTIC;
@@ -100,6 +105,7 @@ public class AIMController : SimpleHeuristicController {
         {
             if (controller == Controller.AIM) //If we're leaving intersection
             {
+                controller = Controller.HEURISTIC;
                 setCurve(path[nextDir]);
                 ++nextDir;
                 StartCoroutine("Drive");
@@ -112,10 +118,8 @@ public class AIMController : SimpleHeuristicController {
                 StartCoroutine("MakeRequest", parameters);
             }
         }
-        else if (nextWayPointType == TrackWayPoint.Type.INTERSECTION_BORDER)
-        {
-            Destroy(this);
-        }
+   
+        nextWayPointType = default(TrackWayPoint.Type);
     }
 
     IEnumerator Turn() 
@@ -123,7 +127,10 @@ public class AIMController : SimpleHeuristicController {
         bool debugCorectPositions = true;
         BezierCurve curve = path[nextDir]; 
         ++nextDir;
-
+        
+        //float t = (float)Math.Round(Time.time);
+        //float tOffset = 0.1f;
+        //Debug.Log(t + " + " + tOffset + " + " + (t + tOffset));
         int counter = 1;
         //Debug.Log("Initial Time Actual: " + Time.time);
         Vector3 toPoint = curve.GetPointAt(counter/(float)steps);
@@ -134,7 +141,12 @@ public class AIMController : SimpleHeuristicController {
             Vector3 travelVector = (toPoint - transform.position);
             Vector3 dir = travelVector.normalized;
             Vector3 newPos = transform.position + speed * dir * Time.deltaTime;
-
+         /*   if (Mathf.Approximately((float)Math.Round(Time.time,2), (float)Math.Round(t + tOffset,2)))
+            {
+                Debug.Log(t + tOffset + " and " + Time.time);
+                t = (float)Math.Round(t+tOffset,1);
+                
+            }*/
             float excessTime = 0f;
             float distanceToTravel = travelVector.magnitude;
             if (distanceToTravel <= speed*Time.deltaTime)
@@ -152,10 +164,10 @@ public class AIMController : SimpleHeuristicController {
             {
                 if ((distanceToTravel - speed * Time.deltaTime) < speed * Time.deltaTime * 0.2f)
                 {
-                    Debug.Log("Correct: " + debugTime[counter - 1] + " Curr time: " + Time.time + " Rounded: " + Math.Round(Time.time, 1));
+                    //Debug.Log("Correct: " + debugTime[counter - 1] + " Curr time: " + Time.time + " Rounded: " + Math.Round(Time.time, 1));
                     if (Mathf.Approximately(debugTime[counter - 1], (float)Math.Round(Time.time, 1)))
                     {
-                        Debug.Log("Corrected");
+                       // Debug.Log("Corrected");
                         newPos = toPoint;
                         //Debug.Log("Excess dist: " +  (distanceToTravel - speed * Time.deltaTime));
                     }
@@ -166,7 +178,7 @@ public class AIMController : SimpleHeuristicController {
             if (transform.position == toPoint)
             {
                 //Debug.Log("CurrTime: " + Math.Round(Time.time,1) + " " + transform.position);
-                Debug.Log(debugTime[counter - 1] + " " + (float)Math.Round(Time.time,1));
+               // Debug.Log(debugTime[counter - 1] + " " + (float)Math.Round(Time.time,1));
                 if (!Mathf.Approximately(debugTime[counter - 1], (float)Math.Round(Time.time, 1)))
                     debugCorectPositions = false;
  
@@ -177,13 +189,12 @@ public class AIMController : SimpleHeuristicController {
             }
             yield return null;
         }
-        //driving = true;
-        //StartCoroutine("Drive");
+
         Act();
-        Debug.Log("Positions correct: " + debugCorectPositions);
+        //Debug.Log("Positions correct: " + debugCorectPositions);
     }
 
-    KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] SimulatePath()
+ /*   KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] SimulatePath()
     {
         KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] output = new KeyValuePair<float, KeyValuePair< Vector3, Quaternion >>[steps];
 
@@ -224,7 +235,7 @@ public class AIMController : SimpleHeuristicController {
             }
         }
         return output;*/
-        Vector3 curr = transform.position;
+      /*  Vector3 curr = transform.position;
         Vector3 next;
         for (int s = 1; s < steps+1; ++s)
         {
@@ -247,6 +258,51 @@ public class AIMController : SimpleHeuristicController {
         }
         Debug.Log("*******************");
         return output;
+    } */
+
+    KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] SimulatePath()
+    {
+        List<KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>> output = new List<KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>>();
+        BezierCurve curve = path[nextDir];
+        Debug.Log("Simulating Path");
+
+        float time = (float)Math.Round(Time.time,1);
+        float timeOffset = 0.1f;
+        float landmarkDistance = timeOffset * speed;
+
+        Vector3 simulatedPos = transform.position;
+        int counter = 1;
+        Vector3 toPoint = curve.GetPointAt(counter / (float)steps);
+        toPoint.y = simulatedPos.y;
+        while (counter <= steps)
+        {
+            Vector3 travelVector = (toPoint - simulatedPos);
+            Vector3 dir = travelVector.normalized;
+            float distToPointStep = travelVector.magnitude;
+            float distToTimeStep = timeOffset * speed;
+
+            if (distToTimeStep < distToPointStep) //The position we are looking for is in the next segment of the curve
+            {
+                Quaternion rotation = Quaternion.LookRotation(toPoint - simulatedPos);
+                simulatedPos += dir * distToTimeStep; //Move to the point of interest
+                time = (float)Math.Round(time + timeOffset, 1);
+                //Debug.Log(time);
+                output.Add(new KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>(time, new KeyValuePair<Vector3, Quaternion>(simulatedPos,rotation)));
+               /* GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.transform.position = simulatedPos;
+                cube.transform.rotation = rotation;*/
+
+            }
+            else
+            {
+                simulatedPos = toPoint;
+                ++counter;
+                toPoint = curve.GetPointAt(counter / (float)steps);
+            }
+        }
+        //return new KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[0];
+        Debug.Log("Positions recorded: " + output.Count);
+        return output.ToArray();
     }
 
 

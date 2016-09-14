@@ -1,0 +1,125 @@
+[33mcommit c62282b90150bbf68dde7f42cbf28db61c3b355c[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Wed Sep 14 12:56:07 2016 +0200
+
+    Refactored. Cleaned up some unneccessary code.
+
+[33mcommit a40046185174bc2682f3925fee89334a54a0bdd2[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Wed Sep 14 12:36:32 2016 +0200
+
+    Updated the driving behaviours to not be dependent on collisions with the intersection manager, i.e it follows the curves completely instead of switching controllers when entering (colliding) with an IM.
+
+[33mcommit 9395701c19b4b642fd139752b1b37e604f84b1be[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Wed Sep 14 11:00:45 2016 +0200
+
+    Changed the simulate path method to produce more accurate results
+
+[33mcommit 79260fba9138db4bd9a1fbcee751701793c5f549[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Sun Sep 11 14:40:36 2016 +0200
+
+    Started working on debugging the driving behaviour
+
+[33mcommit 7982984feda0c4e3aaff8f904e0df2e51a9ed81a[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Thu Sep 8 15:28:16 2016 +0200
+
+    Forgot to save scene.
+
+[33mcommit d2efb49ffc69f1edb719053e194633d1d6dd7d11[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Thu Sep 8 15:27:54 2016 +0200
+
+    Got the most of the main aim stuff working. Need to debug.
+
+[33mcommit 35962dccac750a5ac31dbe531a04f337951377d3[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Thu Sep 8 14:06:18 2016 +0200
+
+    Added a basic spawner for the cars.
+
+[33mcommit 5a934b35be381457ec96ef633b20de8d128ab5ca[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Wed Sep 7 16:31:33 2016 +0200
+
+    Added functionality to stop for obstacles
+
+[33mcommit e1c48dde5eaf67f394499fc87bb287a4e5d2638e[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Wed Sep 7 15:33:53 2016 +0200
+
+    Integrated @Jonathan-Schoeman 's tracks to work with a rough version of AIM.
+
+[33mcommit 491d1dbc2452047249ccd5378840e502dc32c1ba[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Tue Sep 6 11:33:49 2016 +0200
+
+    Added the intersection manager methods for requesting a path
+
+[33mcommit c0da094bf56b68ccd121f96cd834b8e777765225[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Mon Sep 5 12:53:40 2016 +0200
+
+    Added the method for checking if a car can reserve space.
+
+[33mcommit 198a3b1a147738860db6880a6c445faae7b2a782[m
+Author: Amposter <Amp940703@gmail.com>
+Date:   Mon Sep 5 11:25:34 2016 +0200
+
+    Added the functionality to simulate  intersection driving internally. Started putting together the pieces for the IntersectionManager.
+
+[33mcommit d1c89ea714e2f30daae19896cd064e12bf64135a[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Thu Aug 11 17:17:30 2016 +0200
+
+    Added origin points for spawning and destination reaches.
+
+[33mcommit d939c5b4319b9016c24b88809c2bb779bd1752f2[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Thu Aug 11 16:53:53 2016 +0200
+
+    Added more waypoints for testing. Works well. Added tags for to denote different objects.
+
+[33mcommit b84af7ca925836ead47ae9dd38bb039ec332626b[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Thu Aug 11 15:58:35 2016 +0200
+
+    Added waypoint functionality in the form of a path. All you need to do is specify the directions to take in order.
+
+[33mcommit b40921b69de04fa5fe41ec734aca55fb92e1247b[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Thu Aug 11 15:23:59 2016 +0200
+
+    Added some references to other Lanes in the Lane script. Added a Util script for general methods and other stuff.
+
+[33mcommit c045d8eff3455e4717afaf12b9ccfe845db3d69b[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Thu Aug 11 15:04:04 2016 +0200
+
+    Added basic turning functionality. Separated the method into the AIMController script.
+
+[33mcommit a59e786e004e2fb0962b95a93fe248afd7203ee1[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Wed Aug 10 21:43:15 2016 +0200
+
+    Imported a Bezier Curve library for creating the turning paths at intersections. Added basic functionality for turning.
+
+[33mcommit c6ad3c3335ee142920fee7a891c24bcfcce7447b[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Wed Aug 10 12:51:08 2016 +0200
+
+    Added skeleton file for the AIM Controller
+
+[33mcommit f0fa157e51afecd7216f58c5b1d6f22d67da826a[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Mon Aug 8 17:10:54 2016 +0200
+
+    Added some of the demo tracks and related resources
+
+[33mcommit 9183f07b74ba410c09be6d64b3ff5b5b49c541bd[m
+Author: Aashiq Parker <Aashiq Parker>
+Date:   Mon Aug 8 16:52:54 2016 +0200
+
+    Initial commit. Added skeleton project.

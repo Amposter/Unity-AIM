@@ -51,10 +51,7 @@ public class IntersectionManager : MonoBehaviour {
             Quaternion rot = positions[i].Value.Value;
 
             if (!reservations.ContainsKey(time)) //Check if there are any booking for the time
-            {
-                Debug.Log("continued");
                 continue;
-            }
 
             List<KeyValuePair<Vector3,Quaternion>> reservedPositions = reservations[time];
             Bounds b = new Bounds(pos, carDimensions); //Bounding box centered on the car's position

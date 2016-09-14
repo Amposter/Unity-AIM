@@ -7,7 +7,7 @@ public class SimpleHeuristicController : MonoBehaviour {
     public float speed = 5f;
 
     //Private variables
-    private bool paused;
+    public bool paused;
     private BezierCurve curve;
 
 
@@ -20,7 +20,8 @@ public class SimpleHeuristicController : MonoBehaviour {
 	}
 
     // Update is called once per frame
-    protected virtual void Update () {
+    protected virtual void Update ()
+    {
         
 	}
 
@@ -31,6 +32,7 @@ public class SimpleHeuristicController : MonoBehaviour {
 
     protected virtual IEnumerator Drive ()
     {
+        Debug.Log("Driving normally");
         int offset = 1;
         Vector3 toPoint = curve.GetPointAt(offset /(float)resolution);
         toPoint.y = transform.position.y;
