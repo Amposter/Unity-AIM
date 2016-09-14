@@ -45,7 +45,6 @@ public class AIMController : SimpleHeuristicController {
         setCurve(path[nextDir]);
         nextDir++;
         controller = Controller.HEURISTIC;
-        base.driving = true;
         StartCoroutine("Drive");
 
     }
@@ -58,48 +57,23 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "Obstacle")
-        {
-            if (driving)
-            {
-                Debug.Log("Stopped for pedestrian/obstacle");
-                driving = false;
-            }
-        }
+        if (col.gameObject.tag == "Obstacle" && controller != Controller.AIM) 
+            Pause();  //This assumes you won't collide while turning i.e., no pedestrian spawners going through intersections
 
         if (col.gameObject.tag == "IntersectionManager")
-        {
             nextIM = col.gameObject.GetComponent<IntersectionManager>();
-        }
-            /*  if (col.gameObject.tag == "IntersectionManager") //TODO: Store types in a config file
-              {
-                  endOfCurve = true;
-                  driving = false;
-                  IntersectionManager im = col.gameObject.GetComponent<IntersectionManager>();
-                  KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = SimulatePath();
-                  Action action;
-                  action = Action.TURN;
-                  object[] parameters = new object[] {requestPath, im, action};
-                  StartCoroutine("MakeRequest", parameters);
-              }*/
-            if (col.gameObject.tag == "WayPoint")
-        {
+
+        if (col.gameObject.tag == "WayPoint")
             nextWayPointType = col.gameObject.GetComponent<TrackWayPoint>().type;
-        }
 
         if (col.gameObject.tag == "SourcePoint")
-        {
             Destroy(gameObject);
-        }
     }
 
     void OnTriggerExit(Collider col)
     {
         if (col.gameObject.tag == "Obstacle")
-        {
-            driving = true;
-            //StartCoroutine("Drive");
-        }
+            Unpause();
     }
 
     protected override IEnumerator Drive()
@@ -130,7 +104,7 @@ public class AIMController : SimpleHeuristicController {
                 ++nextDir;
                 StartCoroutine("Drive");
             }
-            else
+            else //We're entering the intersection
             {
                 controller = Controller.AIM;
                 KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = SimulatePath();

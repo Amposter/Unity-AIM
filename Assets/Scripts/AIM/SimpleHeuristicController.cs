@@ -3,8 +3,11 @@ using System.Collections;
 
 public class SimpleHeuristicController : MonoBehaviour {
 
+    //Public variabes
     public float speed = 5f;
-    public bool driving;
+
+    //Private variables
+    private bool paused;
     private BezierCurve curve;
 
 
@@ -12,7 +15,7 @@ public class SimpleHeuristicController : MonoBehaviour {
 
 	// Use this for initialization
 	protected virtual void Start () {
-        driving = true;
+        paused = false;
         resolution = 20;
 	}
 
@@ -35,12 +38,8 @@ public class SimpleHeuristicController : MonoBehaviour {
 
         while (offset <= resolution)
         {
-            while (!driving) //Do nothing while paused
+            while (paused) //Do nothing
             {
-
-                /*if (endOfCurve) //Don't continue with the same curve
-                    driving = true;
-                break;*/
                 yield return null;
             }
             Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
@@ -55,14 +54,21 @@ public class SimpleHeuristicController : MonoBehaviour {
             }
             yield return null;
         }
-        /* if (driving) //You've reached the end of the curve
-         {
-             driving = false;
-             endOfCurve = false;
-             ++currCuve;
-             offset = 5;
-         }*/
     }
 
-   
+    //Methods for pausing
+    public void Pause()
+    {
+        paused = true;
+    }
+
+    public void Unpause()
+    {
+        paused = false;
+    }
+
+    public bool Paused()
+    {
+        return paused;
+    }
 }
