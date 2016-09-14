@@ -5,62 +5,47 @@ using System.Collections;
 
 public class AIMController : SimpleHeuristicController {
 
+    //Private variables
     private float requestCooldown = 2.0f;
+    private TrackWayPoint.Type nextWayPointType;
+    private IntersectionManager nextIM;
     private bool requestGranted;
     private PathManager pm;
     private int VIN;
     private Action action;
+    private IntersectionManager debugIM;
+    private BezierCurve[] path;
+    private int nextDir; //Current curve
+    private int steps = 7; //Number of bezier points to sample 
+    private float[] debugTime;
+
+    //Public variables
     public int debugStart;
     public int debugEnd;
     public GameObject debugIMObject;
-    private IntersectionManager debugIM;
-
-    public enum Direction //TODO: Put into a Util file
-    {
-        LEFT,
-        RIGHT,
-        STRAIGHT
-    };
-
-    public enum Action
-    {
-        IDLE,
-        DRIVE,
-        TURN
-    };
-
-    public BezierCurve[] path;
-    public GameObject currLane;
-    private int nextDir; //Next direction index in the 'path' list to take
-    private int steps = 7; //Number of bezier points to sample 
-    private float[] debugTime;
+    public enum Controller {AIM, HEURISTIC};
+    public Controller controller;
+   
     // Use this for initialization
-    protected override void Start () {
+    protected override void Start ()
+    {
         base.Start();
         debugIM = debugIMObject.GetComponent<IntersectionManager>();
         //VIN = ++Config.lastVIN;
         nextDir = 0;
         requestGranted = false;
         debugTime = new float[steps];
-        action = Action.DRIVE;
         int val = debugIM.debugSpawnCounter;
-        BezierCurve[] allPaths = GameObject.Find("PathManager").GetComponent<PathManager>().getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val+1]); //.getRandomPathCurves();
+        path = GameObject.Find("PathManager").GetComponent<PathManager>().getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val+1]); //.getRandomPathCurves();
         debugIM.debugSpawnCounter += 2;
-        BezierCurve[] heuristicPath = new BezierCurve[allPaths.Length/2 + 1];
-        BezierCurve[] AIMPath = new BezierCurve[allPaths.Length/2];
-        for (int i = 0; i < allPaths.Length; ++i)
-        {
-            if (i % 2 == 0)
-                heuristicPath[i / 2] = allPaths[i];
-            else
-                AIMPath[i / 2] = allPaths[i];
-        }
-        path = AIMPath;
-        curves = heuristicPath;
-        Vector3 startPoint = curves[0].GetPointAt(0.0f);
+        Vector3 startPoint = path[0].GetPointAt(0.0f);
         startPoint.y = 0.5f;
         transform.position = startPoint;
         transform.LookAt(startPoint);
+        setCurve(path[nextDir]);
+        nextDir++;
+        controller = Controller.HEURISTIC;
+        base.driving = true;
         StartCoroutine("Drive");
 
     }
@@ -68,8 +53,7 @@ public class AIMController : SimpleHeuristicController {
     // Update is called once per frame
     protected override void Update () {
         base.Update();
-        if (nextDir > path.Length)
-            Destroy(this);
+        Debug.Log(nextDir);
     }
 
     void OnTriggerEnter(Collider col)
@@ -83,16 +67,24 @@ public class AIMController : SimpleHeuristicController {
             }
         }
 
-        if (col.gameObject.tag == "IntersectionManager") //TODO: Store types in a config file
+        if (col.gameObject.tag == "IntersectionManager")
         {
-            endOfCurve = true;
-            driving = false;
-            IntersectionManager im = col.gameObject.GetComponent<IntersectionManager>();
-            KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = SimulatePath();
-            Action action;
-            action = Action.TURN;
-            object[] parameters = new object[] {requestPath, im, action};
-            StartCoroutine("MakeRequest", parameters);
+            nextIM = col.gameObject.GetComponent<IntersectionManager>();
+        }
+            /*  if (col.gameObject.tag == "IntersectionManager") //TODO: Store types in a config file
+              {
+                  endOfCurve = true;
+                  driving = false;
+                  IntersectionManager im = col.gameObject.GetComponent<IntersectionManager>();
+                  KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = SimulatePath();
+                  Action action;
+                  action = Action.TURN;
+                  object[] parameters = new object[] {requestPath, im, action};
+                  StartCoroutine("MakeRequest", parameters);
+              }*/
+            if (col.gameObject.tag == "WayPoint")
+        {
+            nextWayPointType = col.gameObject.GetComponent<TrackWayPoint>().type;
         }
 
         if (col.gameObject.tag == "SourcePoint")
@@ -106,9 +98,52 @@ public class AIMController : SimpleHeuristicController {
         if (col.gameObject.tag == "Obstacle")
         {
             driving = true;
-            StartCoroutine("Drive");
+            //StartCoroutine("Drive");
         }
     }
+
+    protected override IEnumerator Drive()
+    {
+        yield return StartCoroutine(base.Drive());
+        //Debug.Log("finished");
+        Act();
+    }
+
+    void Act()
+    {
+        if (nextWayPointType == default(TrackWayPoint.Type))
+        {
+            Debug.LogError("ERROR: End of curve but no next way point set!");
+        }
+        else if (nextWayPointType == TrackWayPoint.Type.NORMAL)
+        {
+            controller = Controller.HEURISTIC;
+            setCurve(path[nextDir]);
+            ++nextDir;
+            StartCoroutine("Drive");
+        }
+        else if (nextWayPointType == TrackWayPoint.Type.INTERSECTION_BORDER)
+        {
+            if (controller == Controller.AIM) //If we're leaving intersection
+            {
+                setCurve(path[nextDir]);
+                ++nextDir;
+                StartCoroutine("Drive");
+            }
+            else
+            {
+                controller = Controller.AIM;
+                KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = SimulatePath();
+                object[] parameters = new object[] { requestPath, nextIM};
+                StartCoroutine("MakeRequest", parameters);
+            }
+        }
+        else if (nextWayPointType == TrackWayPoint.Type.INTERSECTION_BORDER)
+        {
+            Destroy(this);
+        }
+    }
+
     IEnumerator Turn() 
     {
         bool debugCorectPositions = true;
@@ -168,8 +203,9 @@ public class AIMController : SimpleHeuristicController {
             }
             yield return null;
         }
-        driving = true;
-        StartCoroutine("Drive");
+        //driving = true;
+        //StartCoroutine("Drive");
+        Act();
         Debug.Log("Positions correct: " + debugCorectPositions);
     }
 
@@ -244,7 +280,6 @@ public class AIMController : SimpleHeuristicController {
     {
         KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = (KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[])parameters[0];
         IntersectionManager im = (IntersectionManager)parameters[1];
-        Action action = (Action)parameters[2];
 
         while (true)
         {
@@ -256,15 +291,9 @@ public class AIMController : SimpleHeuristicController {
             requestPath = SimulatePath(); //Update times if rejected
         }
 
-        if (action == Action.TURN)
-        {
-            requestGranted = false;
-            StartCoroutine("Turn");
-        }
-        else if (action == Action.DRIVE)
-        {
-            driving = true;
-        }
+        requestGranted = false;
+        StartCoroutine("Turn");
+
         yield return null;
     }
 }

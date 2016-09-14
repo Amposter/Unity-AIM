@@ -3,23 +3,16 @@ using System.Collections;
 
 public class SimpleHeuristicController : MonoBehaviour {
 
-    public GameObject BZ;
     public float speed = 5f;
     public bool driving;
+    private BezierCurve curve;
 
-    protected BezierCurve[] curves;
-    protected bool endOfCurve;
+
     protected int resolution; //Number of points to sample on each path curve
-
-    private int currCuve;
-    private float offset;
 
 	// Use this for initialization
 	protected virtual void Start () {
         driving = true;
-        endOfCurve = false;
-        offset = 5;
-        currCuve = 0;
         resolution = 20;
 	}
 
@@ -28,20 +21,27 @@ public class SimpleHeuristicController : MonoBehaviour {
         
 	}
 
-    IEnumerator Drive ()
+    public void setCurve(BezierCurve curve)
     {
-        BezierCurve curve = curves[currCuve];
+        this.curve = curve;
+    }
+
+    protected virtual IEnumerator Drive ()
+    {
+        int offset = 1;
         Vector3 toPoint = curve.GetPointAt(offset /(float)resolution);
         toPoint.y = transform.position.y;
         transform.LookAt(toPoint);
 
         while (offset <= resolution)
         {
-            if (!driving) //You haven't reached end of the curve but you need to stop e.g. - pedestrians
+            while (!driving) //Do nothing while paused
             {
-                if (endOfCurve) //Don't continue with the same curve
+
+                /*if (endOfCurve) //Don't continue with the same curve
                     driving = true;
-                break;
+                break;*/
+                yield return null;
             }
             Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
             transform.LookAt(newPos);
@@ -55,13 +55,13 @@ public class SimpleHeuristicController : MonoBehaviour {
             }
             yield return null;
         }
-        if (driving) //You've reached the end of the curve
-        {
-            driving = false;
-            endOfCurve = false;
-            ++currCuve;
-            offset = 5;
-        }
+        /* if (driving) //You've reached the end of the curve
+         {
+             driving = false;
+             endOfCurve = false;
+             ++currCuve;
+             offset = 5;
+         }*/
     }
 
    
