@@ -13,9 +13,11 @@ public class CarSpawnear : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         Debug.Assert(spawnPoints.Length == spawnDirections.Length);
-        Invoke("Spawn", 1.0f);// InvokeRepeating("Spawn", 1.0f, 1.5f);
-	}
-	
+        //InvokeRepeating("Spawn", 1.0f, 1.5f); //Invoke("Spawn", 1.0f);
+        Invoke("Spawn", 0.0f);
+        Invoke("Spawn", 9.5f);
+    }
+
     void Spawn()
     {
         Instantiate(car);

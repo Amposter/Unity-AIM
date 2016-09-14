@@ -53,7 +53,37 @@ public class PathManager : MonoBehaviour
 		SceneView.RepaintAll ();
 	}
 
-	public BezierCurve[] getRandomPathCurves()
+    public BezierCurve[] getDebugPathCurves(int start, int end)
+    {
+        TrackWayPoint pathStart = startPoints[start]; 
+        TrackWayPoint pathEnd = endPoints[end]; 
+
+        Transform[] transformPathList = getPathBetweenNodes(pathStart, pathEnd);
+        BezierCurve[] curvePathList = new BezierCurve[transformPathList.Length - 1];
+
+        for (int i = 0; i < transformPathList.Length - 1; ++i)
+        {
+
+            for (int j = 0; j < transformPathList[i].gameObject.GetComponent<TrackWayPoint>().nextPoints.Length; j++)
+            {
+                if (transformPathList[i].gameObject.GetComponent<TrackWayPoint>().nextPoints[j] == transformPathList[i + 1].gameObject.GetComponent<TrackWayPoint>())
+                {
+                    curvePathList[i] = transformPathList[i].gameObject.GetComponent<TrackWayPoint>().curveList[j];
+                }
+            }
+        }
+            /***/
+            foreach (BezierCurve curve in curvePathList)
+            {
+                curve.drawColor = Color.blue;
+            }
+            SceneView.RepaintAll();
+
+            /***/
+            return curvePathList;
+    }
+
+    public BezierCurve[] getRandomPathCurves()
 	{
         TrackWayPoint pathStart = startPoints [Random.Range (0, startPoints.Count)]; //get random start node
 		TrackWayPoint pathEnd = endPoints [Random.Range (0, endPoints.Count)]; //get random end node
