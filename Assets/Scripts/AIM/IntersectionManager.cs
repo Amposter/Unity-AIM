@@ -44,13 +44,21 @@ public class IntersectionManager : MonoBehaviour {
     //Check if a reservation can be made - i.e. the list of times and positions do not clash with those booked already
     bool CheckReservation(KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] positions)
     {
+        //Check if the lane is not fully occupied already
+        Collider[] colliders = Physics.OverlapSphere(positions[positions.Length-1].Value.Key, 1);
+        foreach (Collider col in colliders)
+        {
+            if (col.gameObject.tag == "Obstacle")
+                return false;
+        }
+
         for (int i = 0; i < positions.Length; ++i)
         {
             float time = positions[i].Key;
             Vector3 pos = positions[i].Value.Key;
             Quaternion rot = positions[i].Value.Value;
 
-            if (!reservations.ContainsKey(time)) //Check if there are any booking for the time
+            if (!reservations.ContainsKey(time)) //Check if there are any bookings for the time
                 continue;
 
             List<KeyValuePair<Vector3,Quaternion>> reservedPositions = reservations[time];
