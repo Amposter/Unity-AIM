@@ -1,26 +1,43 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CarSpawnear : MonoBehaviour {
 
-    //Spawn points + Angles
-    public Vector3[] spawnPoints;
-    public Quaternion[] spawnDirections;
+    private List<TrackWayPoint> startPoints;
 
     //Car prefab to be used
     public GameObject car;
 
+    //Spawn variables
+    public float spawnInterval = 1.0f;
+    private int counter;
+
 	// Use this for initialization
-	void Start () {
-        Debug.Assert(spawnPoints.Length == spawnDirections.Length);
-        InvokeRepeating("Spawn", 1.0f, 1.0f); //Invoke("Spawn", 1.0f);
-        //Invoke("Spawn", 0.0f);
-        //Invoke("Spawn", 10f);
+	void Start ()
+    {
+
+        counter = 0;
+        GameObject[] wayPoints = GameObject.FindGameObjectsWithTag("WayPoint");
+        startPoints = new List<TrackWayPoint>();
+        foreach (GameObject obj in wayPoints)
+        {
+            if (obj.GetComponent<TrackWayPoint>().type == TrackWayPoint.Type.START)
+                startPoints.Add(obj.GetComponent<TrackWayPoint>());
+        }
+
+        StartCoroutine("Spawn"); 
     }
 
-    void Spawn()
+    IEnumerator Spawn()
     {
-        Instantiate(car);
+        while (true)
+        {
+            GameObject instance = Instantiate(car);
+            Debug.Log(counter);
+            car.GetComponent<AIMController>().start = startPoints[counter++ % startPoints.Count];
+            yield return new WaitForSeconds(spawnInterval);
+        }
     }
 
 	// Update is called once per frame

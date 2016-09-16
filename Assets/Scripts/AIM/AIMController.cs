@@ -20,6 +20,7 @@ public class AIMController : SimpleHeuristicController {
     private float[] debugTime;
 
     //Public variables
+    public TrackWayPoint start;
     public int debugStart;
     public int debugEnd;
     public GameObject debugIMObject;
@@ -36,7 +37,7 @@ public class AIMController : SimpleHeuristicController {
         requestGranted = false;
         debugTime = new float[steps];
         int val = debugIM.debugSpawnCounter;
-        path = GameObject.Find("PathManager").GetComponent<PathManager>().getRandomPathCurves(); //.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val+1]);
+        path = GameObject.Find("PathManager").GetComponent<PathManager>().getStartPathCurves(start); //.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val+1]);
         debugIM.debugSpawnCounter += 2;
         Vector3 startPoint = path[0].GetPointAt(0.0f);
         startPoint.y = 0.5f;
@@ -57,8 +58,14 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "Obstacle" && controller != Controller.AIM) 
-            Pause();  //This assumes you won't collide while turning i.e., no pedestrian spawners going through intersections
+        if (col.gameObject.tag == "Obstacle" && controller != Controller.AIM)
+        {
+            Vector3 otherPosCentre = col.gameObject.transform.position;
+            Vector3 dir = otherPosCentre - transform.position;
+            //Debug.Log(Vector3.Dot(dir, transform.forward));
+            if (Vector3.Dot(dir, transform.forward) > 0)
+                Pause();  //This assumes you won't collide while turning i.e., no pedestrian spawners going through intersections
+        }
 
         if (col.gameObject.tag == "IntersectionManager")
             nextIM = col.gameObject.GetComponent<IntersectionManager>();
