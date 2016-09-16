@@ -29,6 +29,7 @@ public class CarSpawnear : MonoBehaviour {
         StartCoroutine("Spawn"); 
     }
 
+    //Spawns a car every spawnInterval seconds alternating amongst the start way points.
     IEnumerator Spawn()
     {
         while (true)
@@ -40,8 +41,20 @@ public class CarSpawnear : MonoBehaviour {
         }
     }
 
-	// Update is called once per frame
-	void Update () {
+    //Spawns a car every spawnInterval seconds alternating amongst the start way points.
+    IEnumerator SpawnRandom()
+    {
+        while (true)
+        {
+            GameObject instance = Instantiate(car);
+            Debug.Log(counter);
+            car.GetComponent<AIMController>().start = startPoints[Random.Range(0, startPoints.Count)];
+            yield return new WaitForSeconds(spawnInterval);
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
 	
 	}
 }
