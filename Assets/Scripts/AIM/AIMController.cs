@@ -6,6 +6,7 @@ using System.Collections;
 public class AIMController : SimpleHeuristicController {
 
     //For Debugging
+    public GameObject _colliderObject;
     public string _colliderName;
     public float _colliderDotAngle;
 
@@ -60,7 +61,7 @@ public class AIMController : SimpleHeuristicController {
         base.Update();
     }
 
-    void OnTriggerStay(Collider col)
+    void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.tag == "Vehicle" && controller != Controller.AIM)
         {
@@ -70,19 +71,18 @@ public class AIMController : SimpleHeuristicController {
             if (Vector3.Dot(dir, transform.forward) > 0)
             {
                 _colliderDotAngle = Vector3.Dot(dir, transform.forward);
+                _colliderObject = col.gameObject;
                 _colliderName = col.gameObject.name;
                 Pause();  //This assumes you won't collide while turning i.e., no pedestrian spawners going through intersections
             }
         }
-    }
-    void OnTriggerEnter(Collider col)
-    {
+
         if (col.gameObject.tag == "IntersectionManager")
             nextIM = col.gameObject.GetComponent<IntersectionManager>();
 
         if (col.gameObject.tag == "WayPoint")
         {
-            Debug.Log(col.gameObject.GetComponent<TrackWayPoint>().type);
+            //Debug.Log(col.gameObject.GetComponent<TrackWayPoint>().type);
             nextWayPointType = col.gameObject.GetComponent<TrackWayPoint>().type;
         }
        }
@@ -98,6 +98,7 @@ public class AIMController : SimpleHeuristicController {
             {
                 _colliderDotAngle = -999.0f;
                 _colliderName = "";
+                _colliderObject = new GameObject();
                 Unpause();
             }
         }
@@ -113,7 +114,8 @@ public class AIMController : SimpleHeuristicController {
     {
         if (nextWayPointType == TrackWayPoint.Type.END)
         {
-            Destroy(gameObject);
+            transform.position += transform.forward.normalized * 5; //To ensure OnTriggerExit is called of vehicles that may have been paused due to this one
+            Destroy(gameObject,0.1f);
         }
 
         else if (nextWayPointType == default(TrackWayPoint.Type))
@@ -173,9 +175,9 @@ public class AIMController : SimpleHeuristicController {
             float distanceToTravel = travelVector.magnitude;
             if (distanceToTravel <= speed*Time.deltaTime)
             {
-               /* if (distanceToTravel / (speed * Time.deltaTime) > 0.75)
+                if (distanceToTravel / (speed * Time.deltaTime) > 0.75)
                 { }
-                else*/
+                else
                 {
                     excessTime = speed * Time.deltaTime - distanceToTravel;
                     //Debug.Log(excessTime);
@@ -283,7 +285,7 @@ public class AIMController : SimpleHeuristicController {
     {
         List<KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>> output = new List<KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>>();
         BezierCurve curve = path[nextDir];
-        Debug.Log("Simulating Path");
+        //Debug.Log("Simulating Path");
 
         float time = (float)Math.Round(Time.time,1);
         float timeOffset = 0.1f;
@@ -320,7 +322,7 @@ public class AIMController : SimpleHeuristicController {
             }
         }
         //return new KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[0];
-        Debug.Log("Positions recorded: " + output.Count);
+        //Debug.Log("Positions recorded: " + output.Count);
         return output.ToArray();
     }
 
@@ -335,7 +337,7 @@ public class AIMController : SimpleHeuristicController {
             requestGranted = im.Reserve(requestPath);
             if (requestGranted)
                 break;
-            Debug.Log("Request not granted");
+            //Debug.Log("Request not granted");
             yield return new WaitForSeconds(requestCooldown);
             requestPath = SimulatePath(); //Update times if rejected
         }

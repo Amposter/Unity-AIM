@@ -32,7 +32,6 @@ public class SimpleHeuristicController : MonoBehaviour {
 
     protected virtual IEnumerator Drive ()
     {
-        Debug.Log("Driving normally");
         int offset = 1;
         Vector3 toPoint = curve.GetPointAt(offset /(float)resolution);
         toPoint.y = transform.position.y;

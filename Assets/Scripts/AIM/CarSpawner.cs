@@ -10,6 +10,7 @@ public class CarSpawner : MonoBehaviour {
 
     //Spawn variables
     private List<TrackWayPoint> startPoints;
+    private int vin;
     public float spawnInterval = 1.0f;
     private int counter;
 
@@ -17,7 +18,7 @@ public class CarSpawner : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-
+        vin = 0;
         GameObject[] wayPoints = GameObject.FindGameObjectsWithTag("WayPoint");
         startPoints = new List<TrackWayPoint>();
         foreach (GameObject obj in wayPoints)
@@ -48,6 +49,8 @@ public class CarSpawner : MonoBehaviour {
             if (!full)
             {
                 GameObject instance = Instantiate(car);
+                instance.name = "Car #" + vin;
+                ++vin;
                 car.GetComponent<AIMController>().start = startPoints[counter%startPoints.Count];
             }
             ++counter;
