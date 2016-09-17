@@ -85,10 +85,17 @@ public class PathManager : MonoBehaviour
 
     public BezierCurve[] getRandomPathCurves()
 	{
-        TrackWayPoint pathStart = startPoints [Random.Range (0, startPoints.Count)]; //get random start node
-		TrackWayPoint pathEnd = endPoints [Random.Range (0, endPoints.Count)]; //get random end node
 
-		Transform[] transformPathList = getPathBetweenNodes (pathStart, pathEnd);
+        Transform[] transformPathList;
+        do
+        {
+            TrackWayPoint pathStart = startPoints[Random.Range(0, startPoints.Count)]; //get random start node
+            TrackWayPoint pathEnd = endPoints[Random.Range(0, endPoints.Count)]; //get random end node
+            transformPathList = getPathBetweenNodes(pathStart, pathEnd);
+        }
+        while (transformPathList == null); //if there is no path between the start and end nodes then choose new start/end points
+		
+        
 		BezierCurve[] curvePathList = new BezierCurve[transformPathList.Length-1];
 
 		for (int i = 0; i < transformPathList.Length-1; ++i)
@@ -122,6 +129,12 @@ public class PathManager : MonoBehaviour
         TrackWayPoint pathEnd = endPoints[Random.Range(0, endPoints.Count)]; //get random end node
 
         Transform[] transformPathList = getPathBetweenNodes(pathStart, pathEnd);
+
+        if (transformPathList == null)
+        {
+            return null; // return null if theres no path from start to finish
+        }
+
         BezierCurve[] curvePathList = new BezierCurve[transformPathList.Length - 1];
 
         for (int i = 0; i < transformPathList.Length - 1; ++i)
@@ -203,7 +216,16 @@ public class PathManager : MonoBehaviour
 
 		List<Transform> shortestPath = new List<Transform> ();
 
-		shortestPath.Add (current.transform);
+        //if there is no path between the start and end nodes then return null
+        try
+        {
+            shortestPath.Add(current.transform);
+        }
+        catch(System.NullReferenceException e)
+        {
+            return null;
+        }
+		
 		while (true)
 		{
 			shortestPath.Add (current.prevPoint.transform);

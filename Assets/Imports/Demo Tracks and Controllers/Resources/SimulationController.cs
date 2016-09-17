@@ -5,6 +5,9 @@ public class SimulationController : MonoBehaviour
 {
 
 	public float timeScale = 1;
+
+    public PathManager[] pathManagers;
+
 	float normalFixedDeltaTime;
 
 	// Use this for initialization
