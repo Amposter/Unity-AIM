@@ -4,15 +4,16 @@ using System.Collections.Generic;
 
 public class CarSpawner : MonoBehaviour {
 
-    private List<TrackWayPoint> startPoints;
 
     //Car prefab to be used
     public GameObject car;
 
     //Spawn variables
+    private List<TrackWayPoint> startPoints;
     public float spawnInterval = 1.0f;
     private int counter;
 
+    public float timeScale = 1;
 	// Use this for initialization
 	void Start ()
     {
@@ -34,13 +35,14 @@ public class CarSpawner : MonoBehaviour {
         counter = 0;
         while (true)
         {
-            Collider[] colliders = Physics.OverlapSphere(startPoints[counter%startPoints.Count].transform.position, 1);
+            Collider[] colliders = Physics.OverlapSphere(startPoints[counter%startPoints.Count].transform.position, 2);
             //GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             //sphere.transform.position = (startPoints[counter%startPoints.Count].transform.position);
+            //sphere.transform.localScale = new Vector3(2.0f,2.0f,2.0f);
             bool full = false;
             foreach (Collider col in colliders)
             {
-                if (col.gameObject.tag == "Obstacle")
+                if (col.gameObject.tag == "Vehicle")
                     full = true;
             }
             if (!full)
@@ -59,11 +61,11 @@ public class CarSpawner : MonoBehaviour {
         while (true)
         {
             int random = Random.Range(0, startPoints.Count);
-            Collider[] colliders = Physics.OverlapSphere(startPoints[random].transform.position, 1);
+            Collider[] colliders = Physics.OverlapSphere(startPoints[random].transform.position, 2);
             bool full = false;
             foreach (Collider col in colliders)
             {
-                if (col.gameObject.tag == "Obstacle")
+                if (col.gameObject.tag == "Vehicle")
                     full = true;
             }
             if (!full)
@@ -77,6 +79,6 @@ public class CarSpawner : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-	
+        Time.timeScale = timeScale;
 	}
 }

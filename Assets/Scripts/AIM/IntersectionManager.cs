@@ -45,7 +45,7 @@ public class IntersectionManager : MonoBehaviour {
     bool CheckReservation(KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] positions)
     {
         //Check if the lane is not fully occupied already
-        Collider[] colliders = Physics.OverlapSphere(positions[positions.Length-1].Value.Key, 1);
+        Collider[] colliders = Physics.OverlapSphere(positions[positions.Length-1].Value.Key, 2);
         foreach (Collider col in colliders)
         {
             if (col.gameObject.tag == "Obstacle")

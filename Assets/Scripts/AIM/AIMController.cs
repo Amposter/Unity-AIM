@@ -5,6 +5,10 @@ using System.Collections;
 
 public class AIMController : SimpleHeuristicController {
 
+    //For Debugging
+    public string _colliderName;
+    public float _colliderDotAngle;
+
     //Private variables
     private float requestCooldown = 2.0f;
     private TrackWayPoint.Type nextWayPointType;
@@ -56,17 +60,23 @@ public class AIMController : SimpleHeuristicController {
         base.Update();
     }
 
-    void OnTriggerEnter(Collider col)
+    void OnTriggerStay(Collider col)
     {
-        if (col.gameObject.tag == "Obstacle" && controller != Controller.AIM)
+        if (col.gameObject.tag == "Vehicle" && controller != Controller.AIM)
         {
             Vector3 otherPosCentre = col.gameObject.transform.position;
             Vector3 dir = otherPosCentre - transform.position;
             //Debug.Log(Vector3.Dot(dir, transform.forward));
             if (Vector3.Dot(dir, transform.forward) > 0)
+            {
+                _colliderDotAngle = Vector3.Dot(dir, transform.forward);
+                _colliderName = col.gameObject.name;
                 Pause();  //This assumes you won't collide while turning i.e., no pedestrian spawners going through intersections
+            }
         }
-
+    }
+    void OnTriggerEnter(Collider col)
+    {
         if (col.gameObject.tag == "IntersectionManager")
             nextIM = col.gameObject.GetComponent<IntersectionManager>();
 
@@ -79,8 +89,18 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerExit(Collider col)
     {
-        if (col.gameObject.tag == "Obstacle")
-            Unpause();
+        if (col.gameObject.tag == "Vehicle")
+        {
+            Vector3 otherPosCentre = col.gameObject.transform.position;
+            Vector3 dir = otherPosCentre - transform.position;
+            //Debug.Log(Vector3.Dot(dir, transform.forward));
+            if (Vector3.Dot(dir, transform.forward) > 0)
+            {
+                _colliderDotAngle = -999.0f;
+                _colliderName = "";
+                Unpause();
+            }
+        }
     }
 
     protected override IEnumerator Drive()
@@ -131,13 +151,8 @@ public class AIMController : SimpleHeuristicController {
 
     IEnumerator Turn() 
     {
-        bool debugCorectPositions = true;
         BezierCurve curve = path[nextDir]; 
         ++nextDir;
-        
-        //float t = (float)Math.Round(Time.time);
-        //float tOffset = 0.1f;
-        //Debug.Log(t + " + " + tOffset + " + " + (t + tOffset));
         int counter = 1;
         //Debug.Log("Initial Time Actual: " + Time.time);
         Vector3 toPoint = curve.GetPointAt(counter/(float)steps);
@@ -186,9 +201,6 @@ public class AIMController : SimpleHeuristicController {
             {
                 //Debug.Log("CurrTime: " + Math.Round(Time.time,1) + " " + transform.position);
                // Debug.Log(debugTime[counter - 1] + " " + (float)Math.Round(Time.time,1));
-                if (!Mathf.Approximately(debugTime[counter - 1], (float)Math.Round(Time.time, 1)))
-                    debugCorectPositions = false;
- 
                 ++counter;
                 toPoint = curve.GetPointAt((float)counter/steps);
                 toPoint.y = transform.position.y;
