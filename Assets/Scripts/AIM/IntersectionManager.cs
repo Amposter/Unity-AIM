@@ -7,11 +7,13 @@ public class IntersectionManager : MonoBehaviour {
     public int debugSpawnCounter = 0;
     private Dictionary<float, List<KeyValuePair<Vector3, Quaternion>>> reservations;
     public Vector3 carDimensions = new Vector3(1.0f,0.79f,2.05f);
+    public float padding = 0.15f;
 
     // Use this for initialization
     void Start ()
     {
         reservations = new Dictionary<float, List<KeyValuePair<Vector3,Quaternion>>>();
+        carDimensions += carDimensions * padding;
 	}
 	
 	// Update is called once per frame
