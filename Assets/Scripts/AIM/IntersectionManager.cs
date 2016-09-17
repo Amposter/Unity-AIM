@@ -46,12 +46,23 @@ public class IntersectionManager : MonoBehaviour {
     //Check if a reservation can be made - i.e. the list of times and positions do not clash with those booked already
     bool CheckReservation(KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] positions)
     {
+        Vector3 lastPos = positions[positions.Length - 1].Value.Key;
+        lastPos.y = 0.5f;
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.transform.position = lastPos;
+        cube.transform.rotation = positions[positions.Length - 1].Value.Value;
+        cube.transform.localScale = carDimensions * 1.1f;
+        cube.gameObject.GetComponent<MeshRenderer>().material.SetColor(0,Color.blue);
+        Destroy(cube, 1.0f);
         //Check if the lane is not fully occupied already
-        Collider[] colliders = Physics.OverlapSphere(positions[positions.Length-1].Value.Key, 2);
+        Collider[] colliders = Physics.OverlapBox(lastPos,carDimensions*0.55f, positions[positions.Length - 1].Value.Value);//Physics.OverlapSphere(positions[positions.Length-1].Value.Key, 2);
         foreach (Collider col in colliders)
         {
-            if (col.gameObject.tag == "Obstacle")
+            if (col.gameObject.tag == "Vehicle" && col.gameObject.GetComponent<AIMController>().Paused())
+            {
+                Debug.Log("Lane is full! Request rejected.");
                 return false;
+            }
         }
 
         for (int i = 0; i < positions.Length; ++i)
