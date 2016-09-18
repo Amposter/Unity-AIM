@@ -37,7 +37,7 @@ public class IntersectionManager : MonoBehaviour {
         cube.transform.rotation = positions[positions.Length - 1].Value.Value;
         cube.transform.localScale = carDimensions;
         cube.transform.position = lastPos;
-       // Destroy(cube);
+        Destroy(cube);
 
         //Check the path and the last position
         Collider[] colliders = Physics.OverlapBox(lastPos, carDimensions * 0.55f, positions[positions.Length - 1].Value.Value);//Physics.OverlapSphere(positions[positions.Length-1].Value.Key, 2);
