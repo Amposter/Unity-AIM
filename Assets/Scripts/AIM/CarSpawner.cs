@@ -27,13 +27,17 @@ public class CarSpawner : MonoBehaviour {
                 startPoints.Add(obj.GetComponent<TrackWayPoint>());
         }
 
+
+        //SpawnOne();
+        //Invoke("SpawnOne", 16.0f);
         StartCoroutine("Spawn"); 
     }
+
 
     //Spawns a car every 'spawnInterval' seconds alternating amongst the start way points.
     IEnumerator Spawn()
     {
-        counter = 0;
+        counter = 1;
         while (true)
         {
             Collider[] colliders = Physics.OverlapSphere(startPoints[counter%startPoints.Count].transform.position, 2);
@@ -81,7 +85,24 @@ public class CarSpawner : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update ()
+    {
+        timeScale += Input.GetAxis("Mouse ScrollWheel");
+
+        if (timeScale < 0.2f)
+            timeScale = 0.2f;
+        if (timeScale > 10.0f)
+            timeScale = 10.0f;
+
         Time.timeScale = timeScale;
-	}
+    }
+
+    //Spawn a single car, for debugging purposes only.
+    void SpawnOne()
+    {
+        GameObject instance = Instantiate(car);
+        instance.name = "Car #" + vin;
+        ++vin;
+    }
+
 }

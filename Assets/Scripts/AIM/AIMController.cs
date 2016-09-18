@@ -18,6 +18,7 @@ public class AIMController : SimpleHeuristicController {
     private PathManager pm;
     private int VIN;
     private Action action;
+    private BezierCurve currCurve;
     private IntersectionManager debugIM;
     private BezierCurve[] path;
     private int nextDir; //Current curve
@@ -42,7 +43,7 @@ public class AIMController : SimpleHeuristicController {
         requestGranted = false;
         debugTime = new float[steps];
         int val = debugIM.debugSpawnCounter;
-        path = GameObject.Find("PathManager").GetComponent<PathManager>().getStartPathCurves(start); //.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val+1]);
+        path = GameObject.Find("PathManager").GetComponent<PathManager>().getStartPathCurves(start);//.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val + 1]); //
         debugIM.debugSpawnCounter += 2;
         Vector3 startPoint = path[0].GetPointAt(0.0f);
         startPoint.y = 0.5f;
@@ -85,7 +86,12 @@ public class AIMController : SimpleHeuristicController {
             //Debug.Log(col.gameObject.GetComponent<TrackWayPoint>().type);
             nextWayPointType = col.gameObject.GetComponent<TrackWayPoint>().type;
         }
-       }
+     }
+
+    void OnTriggerStay(Collider col)
+    {
+
+    }
 
     void OnTriggerExit(Collider col)
     {
@@ -114,7 +120,7 @@ public class AIMController : SimpleHeuristicController {
     {
         if (nextWayPointType == TrackWayPoint.Type.END)
         {
-            transform.position += transform.forward.normalized * 5; //To ensure OnTriggerExit is called of vehicles that may have been paused due to this one
+            transform.position += transform.forward.normalized * 50; //To ensure OnTriggerExit is called of vehicles that may have been paused due to this one
             Destroy(gameObject,0.1f);
         }
 
@@ -127,6 +133,7 @@ public class AIMController : SimpleHeuristicController {
         {
             controller = Controller.HEURISTIC;
             setCurve(path[nextDir]);
+            currCurve = path[nextDir];
             ++nextDir;
             StartCoroutine("Drive");
         }
@@ -141,7 +148,6 @@ public class AIMController : SimpleHeuristicController {
             }
             else //We're entering the intersection
             {
-                controller = Controller.AIM;
                 KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = SimulatePath();
                 object[] parameters = new object[] { requestPath, nextIM};
                 StartCoroutine("MakeRequest", parameters);
@@ -151,9 +157,21 @@ public class AIMController : SimpleHeuristicController {
         nextWayPointType = default(TrackWayPoint.Type);
     }
 
+    //Compare the next path against 'curve'
+    public bool ComparePath(BezierCurve curve)
+    {
+        Debug.Log(gameObject.name);
+        if (controller == Controller.AIM)
+            return curve == path[nextDir];
+        else
+            return curve == path[nextDir-1];
+    }
+
     IEnumerator Turn() 
     {
-        BezierCurve curve = path[nextDir]; 
+        controller = Controller.AIM;
+        BezierCurve curve = path[nextDir];
+        currCurve = curve;
         ++nextDir;
         int counter = 1;
         //Debug.Log("Initial Time Actual: " + Time.time);
@@ -321,7 +339,6 @@ public class AIMController : SimpleHeuristicController {
                 toPoint = curve.GetPointAt(counter / (float)steps);
             }
         }
-        //return new KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[0];
         //Debug.Log("Positions recorded: " + output.Count);
         return output.ToArray();
     }
@@ -329,12 +346,28 @@ public class AIMController : SimpleHeuristicController {
 
     IEnumerator MakeRequest(object[] parameters)
     {
+        //yield return new WaitForSeconds(0.5f);
         KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = (KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[])parameters[0];
         IntersectionManager im = (IntersectionManager)parameters[1];
 
         while (true)
         {
-            requestGranted = im.Reserve(requestPath);
+  /*          BezierCurve nextLane = path[nextDir + 1];
+            Vector3 lastPos = nextLane.GetPointAt(0) + (nextLane.GetPointAt(0.2f) - nextLane.GetPointAt(0)).normalized * (2.05f * 1.1f); //positions[positions.Length - 1].Value.Key;
+            lastPos.y = 0.5f;
+            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.position = lastPos;
+            Destroy(cube,1.0f);
+            Collider[] colliders = Physics.OverlapBox(lastPos, new Vector3(0.5f,0.5f,0.5f));//Physics.OverlapSphere(positions[positions.Length-1].Value.Key, 2);
+            foreach (Collider col in colliders)
+            {
+                if (col.gameObject.tag == "Vehicle" && col.gameObject.GetComponent<AIMController>().Paused())
+                {
+                    yield return new WaitForSeconds(1.5f);
+                    break;
+                }
+            }*/
+            requestGranted = im.Reserve(requestPath, path[nextDir], path[nextDir+1], gameObject.name);
             if (requestGranted)
                 break;
             //Debug.Log("Request not granted");
@@ -344,7 +377,6 @@ public class AIMController : SimpleHeuristicController {
 
         requestGranted = false;
         StartCoroutine("Turn");
-
         yield return null;
     }
 }
