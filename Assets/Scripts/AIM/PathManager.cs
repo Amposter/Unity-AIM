@@ -125,15 +125,16 @@ public class PathManager : MonoBehaviour
     //A random path starting at start
     public BezierCurve[] getStartPathCurves(TrackWayPoint start)
     {
-        TrackWayPoint pathStart = start; 
-        TrackWayPoint pathEnd = endPoints[Random.Range(0, endPoints.Count)]; //get random end node
+        Transform[] transformPathList;
+        TrackWayPoint pathEnd;
 
-        Transform[] transformPathList = getPathBetweenNodes(pathStart, pathEnd);
-
-        if (transformPathList == null)
+        do
         {
-            return null; // return null if theres no path from start to finish
+            TrackWayPoint pathStart = start; //get random start node
+            pathEnd = endPoints[Random.Range(0, endPoints.Count)]; //get random end node
+            transformPathList = getPathBetweenNodes(pathStart, pathEnd);
         }
+        while (transformPathList == null); //if there is no path between the start and end nodes then choose new start/end points
 
         BezierCurve[] curvePathList = new BezierCurve[transformPathList.Length - 1];
 
@@ -153,7 +154,7 @@ public class PathManager : MonoBehaviour
         /***/
         foreach (BezierCurve curve in curvePathList)
         {
-            curve.drawColor = Color.blue;
+            //curve.drawColor = Color.blue;
         }
         SceneView.RepaintAll();
 

@@ -29,17 +29,14 @@ public class BezierCurve : MonoBehaviour {
         if (count < capacity)
         {
             ++count;
-            Debug.Log("Capacity " + capacity + ", Count: " + count);
             return true;
         }
-        Debug.Log("Capacity " + capacity + ", Count: " + count);
         return false;
     }
     public bool decr()
     {
         Debug.Assert(count > 0);
         --count;
-        Debug.Log("Count: " + count);
         return true;
     }
     #endregion

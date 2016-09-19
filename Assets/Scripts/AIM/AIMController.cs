@@ -320,7 +320,7 @@ public class AIMController : SimpleHeuristicController {
         //Debug.Log("Simulating Path");
 
         float time = (float)Math.Round(Time.time,1);
-        float timeOffset = 0.1f;
+        float timeOffset = 0.05f;
         float landmarkDistance = timeOffset * speed;
 
         Vector3 simulatedPos = transform.position;
@@ -381,7 +381,7 @@ public class AIMController : SimpleHeuristicController {
                     break;
                 }
             }*/
-            requestGranted = im.Reserve(requestPath, path[nextDir], path[nextDir+1], gameObject.name);
+            requestGranted = im.Reserve(requestPath);
             if (requestGranted && path[nextDir + 1].incr())
             {
                 path[nextDir - 1].decr();

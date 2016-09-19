@@ -19,15 +19,7 @@ public class CarSpawner : MonoBehaviour {
 	void Start ()
     {
         vin = 0;
-        GameObject[] wayPoints = GameObject.FindGameObjectsWithTag("WayPoint");
-        startPoints = new List<TrackWayPoint>();
-        foreach (GameObject obj in wayPoints)
-        {
-            if (obj.GetComponent<TrackWayPoint>().type == TrackWayPoint.Type.START)
-                startPoints.Add(obj.GetComponent<TrackWayPoint>());
-        }
-
-
+        startPoints = GameObject.Find("PathManager").GetComponent<PathManager>().startPoints;
         //SpawnOne();
         //Invoke("SpawnOne", 16.0f);
         StartCoroutine("Spawn"); 
