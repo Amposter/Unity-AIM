@@ -28,7 +28,7 @@ public class IntersectionManager : MonoBehaviour {
         if (!CheckReservation(positions, currLane, nextLane, name)) //Check for clashes first
             return false;
 
-        Vector3 lastPos = nextLane.GetPointAt(0) + (nextLane.GetPointAt(0.02f) - nextLane.GetPointAt(0)).normalized * (carDimensions.z * 2f); //positions[positions.Length - 1].Value.Key;
+       /* Vector3 lastPos = nextLane.GetPointAt(0) + (nextLane.GetPointAt(0.02f) - nextLane.GetPointAt(0)).normalized * (carDimensions.z * 2f); //positions[positions.Length - 1].Value.Key;
         lastPos.y = 0.5f;
         Vector3 placeholderPos = nextLane.GetPointAt(0);
         placeholderPos.y = 0.5f;
@@ -53,7 +53,7 @@ public class IntersectionManager : MonoBehaviour {
                 placeholder.name = "Placeholder #" + name;
                 Debug.Log("Placeholder placed");
             }
-        }
+        }*/
 
         //No clashes, add positions
         for (int i = 0; i < positions.Length; ++i)

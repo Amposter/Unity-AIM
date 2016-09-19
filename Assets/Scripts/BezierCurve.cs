@@ -15,15 +15,43 @@ using System.Collections.Generic;
 [ExecuteInEditMode]
 [Serializable]
 public class BezierCurve : MonoBehaviour {
-	
-	#region PublicVariables
-	
-	/// <summary>
-	///  	- the number of mid-points calculated for each pair of bezier points
-	///  	- used for drawing the curve in the editor
-	///  	- used for calculating the "length" variable
-	/// </summary>
-	public int resolution = 30;
+
+    #region AIMVariables
+    public float size = 2.9f; 
+    private int count;
+    #endregion
+
+    #region AIMMethods
+    public bool incr()
+    {
+        float distance = this.length;
+        int capacity = (int)(distance / size);
+        if (count < capacity)
+        {
+            ++count;
+            Debug.Log("Capacity " + capacity + ", Count: " + count);
+            return true;
+        }
+        Debug.Log("Capacity " + capacity + ", Count: " + count);
+        return false;
+    }
+    public bool decr()
+    {
+        Debug.Assert(count > 0);
+        --count;
+        Debug.Log("Count: " + count);
+        return true;
+    }
+    #endregion
+
+    #region PublicVariables
+
+    /// <summary>
+    ///  	- the number of mid-points calculated for each pair of bezier points
+    ///  	- used for drawing the curve in the editor
+    ///  	- used for calculating the "length" variable
+    /// </summary>
+    public int resolution = 30;
 	
 	/// <summary>
 	/// Gets or sets a value indicating whether this <see cref="BezierCurve"/> is dirty.

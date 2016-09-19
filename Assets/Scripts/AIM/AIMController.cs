@@ -50,6 +50,7 @@ public class AIMController : SimpleHeuristicController {
         transform.position = startPoint;
         transform.LookAt(startPoint);
         setCurve(path[nextDir]);
+        path[nextDir].incr();
         nextDir++;
         controller = Controller.HEURISTIC;
         StartCoroutine("Drive");
@@ -90,7 +91,19 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerStay(Collider col)
     {
-
+        if (col.gameObject.tag == "Vehicle" && controller != Controller.AIM)
+        {
+            Vector3 otherPosCentre = col.gameObject.transform.position;
+            Vector3 dir = otherPosCentre - transform.position;
+            //Debug.Log(Vector3.Dot(dir, transform.forward));
+            if (Vector3.Dot(dir, transform.forward) > 0)
+            {
+                _colliderDotAngle = Vector3.Dot(dir, transform.forward);
+                _colliderObject = col.gameObject;
+                _colliderName = col.gameObject.name;
+                Pause();  //This assumes you won't collide while turning i.e., no pedestrian spawners going through intersections
+            }
+        }
     }
 
     void OnTriggerExit(Collider col)
@@ -121,6 +134,7 @@ public class AIMController : SimpleHeuristicController {
         if (nextWayPointType == TrackWayPoint.Type.END)
         {
             transform.position += transform.forward.normalized * 500; //To ensure OnTriggerExit is called of vehicles that may have been paused due to this one
+            path[nextDir - 1].decr();
             Destroy(gameObject,0.1f);
         }
 
@@ -368,8 +382,11 @@ public class AIMController : SimpleHeuristicController {
                 }
             }*/
             requestGranted = im.Reserve(requestPath, path[nextDir], path[nextDir+1], gameObject.name);
-            if (requestGranted)
+            if (requestGranted && path[nextDir + 1].incr())
+            {
+                path[nextDir - 1].decr();
                 break;
+            }
             //Debug.Log("Request not granted");
             yield return new WaitForSeconds(requestCooldown);
             requestPath = SimulatePath(); //Update times if rejected
