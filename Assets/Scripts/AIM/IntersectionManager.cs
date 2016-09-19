@@ -86,7 +86,7 @@ public class IntersectionManager : MonoBehaviour {
                     return false;
                 }
                 Destroy(otherBounds);
-                Destroy(bounds,2.0f);
+                Destroy(bounds);
             }
             
         }
