@@ -46,7 +46,12 @@ public class CarSpawner : MonoBehaviour {
                 GameObject instance = Instantiate(car);
                 instance.name = "Car #" + vin;
                 ++vin;
-                car.GetComponent<AIMController>().start = startPoints[counter%startPoints.Count];
+                instance.GetComponent<AIMController>().start = startPoints[counter%startPoints.Count];
+
+                MeshRenderer[] meshes = instance.GetComponentsInChildren<MeshRenderer>();
+                Color colour = new Color(Random.Range(0f, 1.0f), Random.Range(0f, 1.0f), Random.Range(0f, 1.0f));
+                foreach (MeshRenderer mesh in meshes)
+                    mesh.material.color = colour;
             }
             ++counter;
             yield return new WaitForSeconds(spawnInterval);

@@ -320,7 +320,7 @@ public class AIMController : SimpleHeuristicController {
         //Debug.Log("Simulating Path");
 
         float time = (float)Math.Round(Time.time,1);
-        float timeOffset = 0.05f;
+        float timeOffset = 0.1f;
         float landmarkDistance = timeOffset * speed;
 
         Vector3 simulatedPos = transform.position;

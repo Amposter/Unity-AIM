@@ -82,7 +82,7 @@ public class IntersectionManager : MonoBehaviour {
                 if (bounds.GetComponent<Collider>().bounds.Intersects(otherBounds.GetComponent<Collider>().bounds))
                 {
                     Destroy(otherBounds);
-                    Destroy(bounds,2.0f);
+                    Destroy(bounds);
                     return false;
                 }
                 Destroy(otherBounds);
