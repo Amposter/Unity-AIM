@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
+using System.Collections;
 
 public class IntersectionManager : MonoBehaviour {
 
     public GameObject carPlaceholder;
+    public float cleanInterval = 20.0f;
+    public float cleanOffset = 5.0f;
     public int[] debugSpawnLocations = { 3,2, 2, 3}; 
     public int debugSpawnCounter = 0;
     private Dictionary<float, List<KeyValuePair<Vector3, Quaternion>>> reservations;
@@ -15,6 +19,7 @@ public class IntersectionManager : MonoBehaviour {
     {
         reservations = new Dictionary<float, List<KeyValuePair<Vector3,Quaternion>>>();
         carDimensions += carDimensions * padding;
+        StartCoroutine("Clean");
 	}
 	
 	// Update is called once per frame
@@ -22,6 +27,28 @@ public class IntersectionManager : MonoBehaviour {
     {
 	
 	}
+
+    //Cleans all entries that are at least 'cleanOffset' seconds old
+    IEnumerator Clean()
+    {
+        List<float> staleBookings = new List<float>(); ;
+        while (true)
+        {
+            yield return new WaitForSeconds(cleanInterval);
+            float timeStamp = (float)Math.Round(Time.time,1);
+            float timeCheck = timeStamp - cleanOffset;
+            foreach (float key in reservations.Keys)
+            {
+                if (key < timeCheck)
+                    staleBookings.Add(key);
+            }
+            foreach (float time in staleBookings)
+                reservations.Remove(time);
+
+            Debug.Log("Cleaned reservations. Removed: " + staleBookings.Count + " Time: " + timeStamp);
+            staleBookings.Clear();
+        }
+    }
 
     public bool Reserve(KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] positions)
     {

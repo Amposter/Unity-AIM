@@ -74,7 +74,7 @@ public class CarSpawner : MonoBehaviour {
             if (!full)
             {
                 GameObject instance = Instantiate(car);
-                car.GetComponent<AIMController>().start = startPoints[random];
+                instance.GetComponent<AIMController>().start = startPoints[random];
             }
             yield return new WaitForSeconds(spawnInterval);
         }
