@@ -14,7 +14,6 @@ public class CarSpawner : MonoBehaviour {
     public float spawnInterval = 1.0f;
     private int counter;
 
-    public float timeScale = 1;
 	// Use this for initialization
 	void Start ()
     {
@@ -79,14 +78,6 @@ public class CarSpawner : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-        timeScale += Input.GetAxis("Mouse ScrollWheel");
-
-        if (timeScale < 0.2f)
-            timeScale = 0.2f;
-        if (timeScale > 10.0f)
-            timeScale = 10.0f;
-
-        Time.timeScale = timeScale;
     }
 
     //Spawn a single car, for debugging purposes only.

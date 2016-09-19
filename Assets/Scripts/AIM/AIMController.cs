@@ -135,7 +135,7 @@ public class AIMController : SimpleHeuristicController {
         {
             transform.position += transform.forward.normalized * 500; //To ensure OnTriggerExit is called of vehicles that may have been paused due to this one
             path[nextDir - 1].decr();
-            Destroy(gameObject,0.1f);
+            Destroy(gameObject);
         }
 
         else if (nextWayPointType == default(TrackWayPoint.Type))
