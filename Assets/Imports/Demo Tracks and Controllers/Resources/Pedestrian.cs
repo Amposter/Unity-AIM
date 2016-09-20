@@ -7,6 +7,7 @@ public class Pedestrian : MonoBehaviour
 	public bool isDone = false;
 	int startID = 0;
 	string parentName = "";
+    bool waiting = false;
 
 	// Use this for initialization
 	void Start ()
@@ -17,7 +18,10 @@ public class Pedestrian : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		gameObject.transform.position += walkDirection * Time.deltaTime;
+        if(waiting == false)
+        {
+            gameObject.transform.position += walkDirection * Time.deltaTime;
+        }   
 	}
 
 	public void walk(string parentName, int startID, Vector3 walkDirection)
@@ -25,10 +29,37 @@ public class Pedestrian : MonoBehaviour
 		this.parentName = parentName;
 		this.startID = startID;
 		this.walkDirection = walkDirection;
+        transform.rotation = Quaternion.LookRotation(walkDirection.normalized, Vector3.up);
 	}
 
-	public void OnTriggerEnter(Collider other)
-	{
+    public void OnTriggerExit(Collider other)
+    {
+    
+    }
+
+    public void OnTriggerStay(Collider other)
+    {
+        if (!other.gameObject.tag.Equals("Vehicle"))
+        {
+            return;
+        }
+
+        if (!waiting)
+        {
+            waiting = true;
+            Invoke("stopWaiting", 0.5f);
+        }
+       
+    }
+
+    public void stopWaiting()
+    {
+        waiting = false;
+    }
+
+    public void OnTriggerEnter(Collider other)
+	{   
+
 		if (!parentName.Equals (other.transform.parent.gameObject.name))
 		{
 			return;

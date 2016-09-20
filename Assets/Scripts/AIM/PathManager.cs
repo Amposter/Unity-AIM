@@ -151,14 +151,6 @@ public class PathManager : MonoBehaviour
 
         }
 
-        /***/
-        foreach (BezierCurve curve in curvePathList)
-        {
-            //curve.drawColor = Color.blue;
-        }
-        SceneView.RepaintAll();
-
-        /***/
         return curvePathList;
     }
 

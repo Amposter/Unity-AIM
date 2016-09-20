@@ -20,6 +20,6 @@ public class SimulationController : MonoBehaviour
 	void Update ()
 	{
 		Time.timeScale = timeScale;
-		Time.fixedDeltaTime = normalFixedDeltaTime * (1/timeScale);
+		//Time.fixedDeltaTime = normalFixedDeltaTime * (1/timeScale);
 	}
 }
