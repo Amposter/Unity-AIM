@@ -299,6 +299,8 @@ public class BezierCurve : MonoBehaviour {
 		
 		return result;
 	}
+
+
 	
 	/// <summary>
 	/// 	- Sets this curve to 'dirty'

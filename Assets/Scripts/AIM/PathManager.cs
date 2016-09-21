@@ -123,7 +123,7 @@ public class PathManager : MonoBehaviour
 	}
 
     //A random path starting at start
-    public BezierCurve[] getStartPathCurves(TrackWayPoint start)
+    public TrackWayPoint[] getRandomPathNodesFromStartNode(TrackWayPoint start)
     {
         Transform[] transformPathList;
         TrackWayPoint pathEnd;
@@ -136,16 +136,33 @@ public class PathManager : MonoBehaviour
         }
         while (transformPathList == null); //if there is no path between the start and end nodes then choose new start/end points
 
-        BezierCurve[] curvePathList = new BezierCurve[transformPathList.Length - 1];
+        TrackWayPoint[] nodeList = new TrackWayPoint[transformPathList.Length];
 
-        for (int i = 0; i < transformPathList.Length - 1; ++i)
+        for (int i = 0; i < transformPathList.Length; ++i)
         {
 
             for (int j = 0; j < transformPathList[i].gameObject.GetComponent<TrackWayPoint>().nextPoints.Length; j++)
             {
-                if (transformPathList[i].gameObject.GetComponent<TrackWayPoint>().nextPoints[j] == transformPathList[i + 1].gameObject.GetComponent<TrackWayPoint>())
+                nodeList[i] = transformPathList[i].gameObject.GetComponent<TrackWayPoint>();
+            }
+
+        }
+
+        return nodeList;
+    }
+
+    public BezierCurve[] getCurvesFromPathNodes(TrackWayPoint[] waypointList)
+    {
+        BezierCurve[] curvePathList = new BezierCurve[waypointList.Length - 1];
+
+        for (int i = 0; i < waypointList.Length - 1; ++i)
+        {
+
+            for (int j = 0; j < waypointList[i].nextPoints.Length; j++)
+            {
+                if (waypointList[i].nextPoints[j] == waypointList[i+1])
                 {
-                    curvePathList[i] = transformPathList[i].gameObject.GetComponent<TrackWayPoint>().curveList[j];
+                    curvePathList[i] = waypointList[i].curveList[j];
                 }
             }
 
@@ -153,6 +170,7 @@ public class PathManager : MonoBehaviour
 
         return curvePathList;
     }
+
 
     public void clearDisplayPath()
 	{
