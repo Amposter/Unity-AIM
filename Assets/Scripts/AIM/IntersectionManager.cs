@@ -12,13 +12,12 @@ public class IntersectionManager : MonoBehaviour {
     public int debugSpawnCounter = 0;
     private Dictionary<float, List<KeyValuePair<Vector3, Quaternion>>> reservations;
     public Vector3 carDimensions = new Vector3(1.0f,0.79f,2.05f);
-    public float padding = 0.15f;
+    public float padding = 1.20f;
 
     // Use this for initialization
     void Start ()
     {
         reservations = new Dictionary<float, List<KeyValuePair<Vector3,Quaternion>>>();
-        carDimensions += carDimensions * padding;
         StartCoroutine("Clean");
 	}
 	
@@ -87,12 +86,11 @@ public class IntersectionManager : MonoBehaviour {
                 continue;
 
             List<KeyValuePair<Vector3,Quaternion>> reservedPositions = reservations[time];
-            Bounds b = new Bounds(pos, carDimensions); //Bounding box centered on the car's position
             GameObject bounds = GameObject.CreatePrimitive(PrimitiveType.Cube);
             //bounds.SetActive(false);
             bounds.transform.position = pos;
             bounds.transform.rotation = rot;
-            bounds.transform.localScale = carDimensions;
+            bounds.transform.localScale = carDimensions * padding;
             bounds.name = "bounds #" + i;
 
             //Check the requested position against all other position that were booked already
@@ -102,9 +100,10 @@ public class IntersectionManager : MonoBehaviour {
                 Quaternion otherRot = reservedPositions[j].Value;
                 GameObject otherBounds = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 otherBounds.transform.position = otherPos;
+                otherBounds.GetComponent<MeshRenderer>().material.color = Color.black;
                 otherBounds.name = "otherBounds #" + j;
                 otherBounds.transform.rotation = otherRot;
-                otherBounds.transform.localScale = carDimensions;
+                otherBounds.transform.localScale = carDimensions * padding;
 
                 if (bounds.GetComponent<Collider>().bounds.Intersects(otherBounds.GetComponent<Collider>().bounds))
                 {
