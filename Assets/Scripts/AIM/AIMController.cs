@@ -44,6 +44,10 @@ public class AIMController : SimpleHeuristicController {
         requestGranted = false;
         debugTime = new float[steps];
         int val = debugIM.debugSpawnCounter;
+        //TODO
+        //call public TrackWayPoint[] getRandomPathNodesFromStartNode(TrackWayPoint start)
+        //store that and then use result and call
+        //public BezierCurve[] getCurvesFromPathNodes(TrackWayPoint[] waypointList)
         path = GameObject.Find("PathManager").GetComponent<PathManager>().getStartPathCurves(start);//.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val + 1]); //
         debugIM.debugSpawnCounter += 2;
         Vector3 startPoint = path[0].GetPointAt(0.0f);
