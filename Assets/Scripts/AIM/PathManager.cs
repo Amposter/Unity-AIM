@@ -126,11 +126,13 @@ public class PathManager : MonoBehaviour
     public TrackWayPoint[] getRandomPathNodesFromStartNode(TrackWayPoint start)
     {
         Transform[] transformPathList;
+       
+        TrackWayPoint pathStart = start;
         TrackWayPoint pathEnd;
 
         do
         {
-            TrackWayPoint pathStart = start; //get random start node
+            
             pathEnd = endPoints[Random.Range(0, endPoints.Count)]; //get random end node
             transformPathList = getPathBetweenNodes(pathStart, pathEnd);
         }
@@ -138,14 +140,9 @@ public class PathManager : MonoBehaviour
 
         TrackWayPoint[] nodeList = new TrackWayPoint[transformPathList.Length];
 
-        for (int i = 0; i < transformPathList.Length; ++i)
+        for (int i = 0; i < transformPathList.Length; i++)
         {
-
-            for (int j = 0; j < transformPathList[i].gameObject.GetComponent<TrackWayPoint>().nextPoints.Length; j++)
-            {
-                nodeList[i] = transformPathList[i].gameObject.GetComponent<TrackWayPoint>();
-            }
-
+            nodeList[i] = transformPathList[i].gameObject.GetComponent<TrackWayPoint>();
         }
 
         return nodeList;
@@ -155,9 +152,9 @@ public class PathManager : MonoBehaviour
     {
         BezierCurve[] curvePathList = new BezierCurve[waypointList.Length - 1];
 
-        for (int i = 0; i < waypointList.Length - 1; ++i)
+        for (int i = 0; i < waypointList.Length - 1; i++)
         {
-
+           
             for (int j = 0; j < waypointList[i].nextPoints.Length; j++)
             {
                 if (waypointList[i].nextPoints[j] == waypointList[i+1])
