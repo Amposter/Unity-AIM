@@ -39,6 +39,17 @@ public class BezierCurve : MonoBehaviour {
         --count;
         return true;
     }
+
+    public bool full()
+    {
+        float distance = this.length;
+        int capacity = (int)(distance / size);
+        if (count < capacity)
+        {
+            return true;
+        }
+        return false;
+    }
     #endregion
 
     #region PublicVariables

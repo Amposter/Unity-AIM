@@ -2,8 +2,26 @@
 using System.Collections;
 
 //A collection of setup and configuration variables as well as for car ID's
-public class Config  {
+public class Config {
 
-	// Use this for initialization
+    // Use this for initialization
     public static int lastVIN = 0;
+
+    public static float[] reserverationOffsets =
+    {
+        0.1f,
+        0.1f
+    };
+
+    public static int[] decimalPlaces =
+    {
+        1,
+        1
+    };
+
+    public static int[] samplingSteps =
+    {
+        6,
+        6
+    };
 }
