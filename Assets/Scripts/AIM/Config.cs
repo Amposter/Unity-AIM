@@ -10,11 +10,27 @@ public class Config {
     public static float[] reserverationOffsets =
     {
         0.1f,
+        0.1f,
+        0.1f,
+        0.1f,
+        0.1f,
+        0.1f,
+        0.1f,
+        0.1f,
+        0.1f,
         0.1f
     };
 
     public static int[] decimalPlaces =
     {
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1,
         1
     };
@@ -22,6 +38,14 @@ public class Config {
     public static int[] samplingSteps =
     {
         6,
-        6
+        6,
+        15,
+        3,
+        6,
+        8,
+        7,
+        5,
+        3,
+        3
     };
 }

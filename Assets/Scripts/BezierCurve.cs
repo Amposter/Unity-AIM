@@ -25,7 +25,7 @@ public class BezierCurve : MonoBehaviour {
     public bool incr()
     {
         float distance = this.length;
-        int capacity = (int)(distance / size);
+        int capacity = (int)(distance / size) + 1;
         if (count < capacity)
         {
             ++count;
@@ -33,8 +33,10 @@ public class BezierCurve : MonoBehaviour {
         }
         return false;
     }
-    public bool decr()
+    public bool decr(string name)
     {
+        if (count <= 0)
+            Debug.Log(name);
         Debug.Assert(count > 0);
         --count;
         return true;
@@ -43,7 +45,7 @@ public class BezierCurve : MonoBehaviour {
     public bool full()
     {
         float distance = this.length;
-        int capacity = (int)(distance / size);
+        int capacity = (int)(distance / size) + 1;
         if (count < capacity)
         {
             return true;

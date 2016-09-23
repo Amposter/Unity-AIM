@@ -12,7 +12,7 @@ public class IntersectionManager : MonoBehaviour {
     public int debugSpawnCounter = 0;
     private Dictionary<float, List<KeyValuePair<Vector3, Quaternion>>> reservations;
     public Vector3 carDimensions = new Vector3(1.0f,0.79f,2.05f);
-    public float padding = 1.20f;
+    public float padding = 1.15f;
 
     // Use this for initialization
     void Start ()
@@ -44,7 +44,6 @@ public class IntersectionManager : MonoBehaviour {
             foreach (float time in staleBookings)
                 reservations.Remove(time);
 
-            Debug.Log("Cleaned reservations. Removed: " + staleBookings.Count + " Time: " + timeStamp);
             staleBookings.Clear();
         }
     }

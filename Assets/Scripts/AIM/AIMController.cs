@@ -48,7 +48,6 @@ public class AIMController : SimpleHeuristicController {
         string name = GameObject.FindGameObjectWithTag("Track").name;
         name = (name[name.Length - 2].ToString() + name[name.Length - 1]);
         int level = int.Parse(name);
-        Debug.Log(level);
         steps = Config.samplingSteps[level-1];
         decimalRound = Config.decimalPlaces[level-1];
         reservationOffset = Config.reserverationOffsets[level-1];
@@ -152,7 +151,7 @@ public class AIMController : SimpleHeuristicController {
         if (nextWayPointType == TrackWayPoint.Type.END)
         {
             transform.position += transform.forward.normalized * 500; //To ensure OnTriggerExit is called of vehicles that may have been paused due to this one.
-            path[nextDir - 1].decr();
+            path[nextDir - 1].decr(transform.name);
             Destroy(gameObject,0.1f);
         }
 
@@ -164,6 +163,8 @@ public class AIMController : SimpleHeuristicController {
         else if (nextWayPointType == TrackWayPoint.Type.NORMAL)
         {
             controller = Controller.HEURISTIC;
+            path[nextDir].incr();
+            path[nextDir - 1].decr(transform.name);
             setCurve(path[nextDir]);
             currCurve = path[nextDir];
             ++nextDir;
@@ -423,7 +424,7 @@ public class AIMController : SimpleHeuristicController {
             {
                 //path[nextDir+offset].drawColor = Color.red;
                 //SceneView.RepaintAll();
-                path[nextDir - 1].decr();
+                path[nextDir - 1].decr(transform.name);
                 _nextLaneFull = path[nextDir + offset].full();
                 break;
             }
