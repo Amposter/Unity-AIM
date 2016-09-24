@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SimpleHeuristicController : MonoBehaviour {
+public class SimpleHeuristicController : VehicleController
+{
 
     //Public variabes
     public float speed = 5f;
@@ -14,15 +15,17 @@ public class SimpleHeuristicController : MonoBehaviour {
     protected int resolution; //Number of points to sample on each path curve
 
 	// Use this for initialization
-	protected virtual void Start () {
+	protected override void Start ()
+	{
+		base.Start();
         paused = false;
         resolution = 20;
 	}
 
     // Update is called once per frame
-    protected virtual void Update ()
+	protected override void Update ()
     {
-        
+		base.Update ();
 	}
 
     public void setCurve(BezierCurve curve)
@@ -73,3 +76,4 @@ public class SimpleHeuristicController : MonoBehaviour {
         return paused;
     }
 }
+
