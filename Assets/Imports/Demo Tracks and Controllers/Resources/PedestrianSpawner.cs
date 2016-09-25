@@ -66,7 +66,7 @@ public class PedestrianSpawner : MonoBehaviour
 			float zPos = transform.GetChild (0).position.z - transform.GetChild (0).gameObject.GetComponent<BoxCollider> ().bounds.extents.z + 
 						 Random.value * (transform.GetChild (0).gameObject.GetComponent<BoxCollider> ().bounds.extents.z * 2);
 			
-			pedestrian = (GameObject) GameObject.Instantiate (Resources.Load ("Pedestrian"), new Vector3 (xPos, transform.GetChild (0).position.y, zPos), new Quaternion ());
+			pedestrian = (GameObject) GameObject.Instantiate (pedestrianPrefab, new Vector3 (xPos, transform.GetChild (0).position.y, zPos), new Quaternion ());
 
 			pedestrian.GetComponent<Pedestrian> ().walk (gameObject.name, 1, -moveVector);
 
@@ -79,11 +79,13 @@ public class PedestrianSpawner : MonoBehaviour
 			float zPos = transform.GetChild (1).position.z - transform.GetChild (1).gameObject.GetComponent<BoxCollider> ().bounds.extents.z + 
 				Random.value * (transform.GetChild (1).gameObject.GetComponent<BoxCollider> ().bounds.extents.z * 2);
 
-			//pedestrian = (GameObject) GameObject.Instantiate (Resources.Load ("Pedestrian"), new Vector3 (xPos, transform.GetChild (1).position.y , zPos), new Quaternion ());
             pedestrian = (GameObject)Instantiate(pedestrianPrefab, new Vector3(xPos, transform.GetChild(1).position.y, zPos), new Quaternion());
+
             pedestrian.GetComponent<Pedestrian> ().walk (gameObject.name, 2, moveVector);
 
 		}
 		pedestrianList.Add (pedestrian);
 	}
+
+
 }
