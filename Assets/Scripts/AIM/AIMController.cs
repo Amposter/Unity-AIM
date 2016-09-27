@@ -72,6 +72,10 @@ public class AIMController : SimpleHeuristicController {
         nextDir++;
         controller = Controller.HEURISTIC;
         StartCoroutine("Drive");
+
+        //To auto drive:  comment out StartCoroutine("Drive") and uncomment these below, need to handle pausing differently ofc
+        /*setCurves(path);
+        StartCoroutine("AutoDrive");*/
     }
 
     // Update is called once per frame

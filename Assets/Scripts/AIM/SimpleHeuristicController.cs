@@ -10,6 +10,7 @@ public class SimpleHeuristicController : VehicleController
     //Private variables
     public bool paused;
     private BezierCurve curve;
+    private BezierCurve[] curves;
 
 
     protected int resolution; //Number of points to sample on each path curve
@@ -33,6 +34,40 @@ public class SimpleHeuristicController : VehicleController
         this.curve = curve;
     }
 
+    public void setCurves(BezierCurve[] curves)
+    {
+        this.curves = curves;
+    }
+
+    protected virtual IEnumerator AutoDrive()
+    {
+        foreach (BezierCurve curve in curves)
+        {
+            int offset = 1;
+            Vector3 toPoint = curve.GetPointAt(offset / (float)resolution);
+            toPoint.y = transform.position.y;
+            transform.LookAt(toPoint);
+
+            while (offset <= resolution)
+            {
+                while (paused) //Do nothing
+                {
+                    yield return null;
+                }
+                Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
+                transform.LookAt(newPos);
+                transform.position = newPos;
+                if (transform.position == toPoint)
+                {
+                    ++offset;
+                    toPoint = curve.GetPointAt((float)offset / resolution);
+                    toPoint.y = transform.position.y;
+                    transform.LookAt(toPoint);
+                }
+                yield return null;
+            }
+        }
+    }
     protected virtual IEnumerator Drive ()
     {
         int offset = 1;
