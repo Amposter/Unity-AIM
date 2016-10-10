@@ -203,6 +203,7 @@ public class Optimizer : MonoBehaviour {
 
         GameObject obj = Instantiate(Unit, Unit.transform.position, Unit.transform.rotation) as GameObject;
         UnitController controller = obj.GetComponent<UnitController>();
+        ((NEAT_GroupController)controller).setPathManager (simController.getCurrentTrack ().GetComponentInChildren<PathManager> ());
 
         ControllerMap.Add(phenome, controller);
 

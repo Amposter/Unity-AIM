@@ -22,7 +22,7 @@ public class SimpleHeuristicController : VehicleController
     {
         base.Start();
         paused = false;
-        resolution = 25;
+        resolution = 20;
     }
 
     // Update is called once per frame
@@ -43,6 +43,7 @@ public class SimpleHeuristicController : VehicleController
 
     protected virtual IEnumerator AutoDrive()
     {
+        resolution = 15;
         foreach (BezierCurve curve in curves)
         {
             this.curve = curve;

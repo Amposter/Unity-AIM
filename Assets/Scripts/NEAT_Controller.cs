@@ -19,13 +19,23 @@ public class NEAT_Controller : SimpleHeuristicController
 	{
 		base.Update ();
 
-		if (proximityWarning && !NEATMode)
+        if (!proximityWarning && NEATMode)
+        {
+            this.gameObject.GetComponent<Vehicle>().enabled = false;
+            NEATMode = false;
+            finalLayerMask = vehicleMask | pedestrianMask;
+            UpdateNextPoint();
+            Unpause();
+        }
+
+        if (proximityWarning && !NEATMode)
 		{
 			Pause ();
 			finalLayerMask = vehicleMask | pedestrianMask | boundaryMask;
 			NEATMode = true;
 			this.gameObject.GetComponent<Vehicle> ().enabled = true;
-		}
+        }
+
 		if (NEATMode) {
 			Pause ();
 		}
@@ -47,6 +57,7 @@ public class NEAT_Controller : SimpleHeuristicController
 		if(other.gameObject.GetComponent<TrackWayPoint>().type == TrackWayPoint.Type.END)
 		{
 			finishedRoute = true;
+            groupController.groupFitness++;
 		}
 	}
 
@@ -54,7 +65,8 @@ public class NEAT_Controller : SimpleHeuristicController
 	{
 		if (NEATMode)
 		{
-			print ("COLLISION");
+            groupController.groupFitness -= 1;
+			//print ("COLLISION");
 		}
 
 	}

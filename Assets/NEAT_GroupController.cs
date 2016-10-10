@@ -9,12 +9,13 @@ public class NEAT_GroupController : UnitController
 	SharpNeat.Phenomes.IBlackBox box;
 	PathManager _pathManager;
 	public GameObject NEAT_VehiclePrefab;
+    public float groupFitness;
 	private List<GameObject> NEAT_VehiclesList = new List<GameObject>();
 
 	// Use this for initialization
 	void Start ()
 	{
-
+        groupFitness = 10000;
 	}
 
 	public void setPathManager(PathManager pathManager)
@@ -95,7 +96,7 @@ public class NEAT_GroupController : UnitController
 
 	public override float GetFitness()
 	{
-		return 1;
+		return groupFitness;
 	}
 
 
