@@ -41,12 +41,14 @@ public class SimpleHeuristicController : VehicleController
 
     protected virtual IEnumerator AutoDrive()
     {
-        foreach (BezierCurve curve in curves)
+
+        foreach (BezierCurve currentCurve in curves)
         {
             int offset = 1;
-            Vector3 toPoint = curve.GetPointAt(offset / (float)resolution);
-            toPoint.y = transform.position.y;
-            transform.LookAt(toPoint);
+			resolution = 20;
+			Vector3 toPoint = currentCurve.GetPointAt(offset / (float)resolution);
+			toPoint.y = gameObject.transform.position.y;
+			gameObject.transform.transform.LookAt(toPoint);
 
             while (offset <= resolution)
             {
@@ -54,22 +56,23 @@ public class SimpleHeuristicController : VehicleController
                 {
                     yield return null;
                 }
-                Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
-                transform.LookAt(newPos);
-                transform.position = newPos;
+				Vector3 newPos = Vector3.MoveTowards(gameObject.transform.position, toPoint, speed * Time.deltaTime);
+				gameObject.transform.LookAt(newPos);
+				gameObject.transform.position = newPos;
                 if (transform.position == toPoint)
                 {
                     ++offset;
-                    toPoint = curve.GetPointAt((float)offset / resolution);
-                    toPoint.y = transform.position.y;
-                    transform.LookAt(toPoint);
+					toPoint = currentCurve.GetPointAt((float)offset / resolution);
+					toPoint.y = gameObject.transform.position.y;
+					gameObject.transform.LookAt(toPoint);
                 }
-                yield return null;
+				yield return new WaitForFixedUpdate();
             }
         }
     }
     protected virtual IEnumerator Drive ()
     {
+		
         int offset = 1;
         Vector3 toPoint = curve.GetPointAt(offset /(float)resolution);
         toPoint.y = transform.position.y;
@@ -79,7 +82,7 @@ public class SimpleHeuristicController : VehicleController
         {
             while (paused) //Do nothing
             {
-                yield return null;
+				yield return null;
             }
             Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
             transform.LookAt(newPos);
@@ -91,7 +94,7 @@ public class SimpleHeuristicController : VehicleController
                 toPoint.y = transform.position.y;
                 transform.LookAt(toPoint);
             }
-            yield return null;
+			yield return new WaitForFixedUpdate();
         }
     }
 

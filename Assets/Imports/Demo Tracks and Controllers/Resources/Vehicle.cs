@@ -12,10 +12,10 @@ public class Vehicle : MonoBehaviour
 	public float distanceBetweenAxles;
 	public float frictionForce;
 
-	private float currentAcceleration = 0;
+	public float currentAcceleration = 0;
 	private float currentTurnSpeed = 0;
-	private float currentSteeringAngle = 0;
-	private float currentBrakeForce = 0;
+	public float currentSteeringAngle = 0;
+	public float currentBrakeForce = 0;
 	private bool isMovingForward = true;
 
 	// Use this for initialization
@@ -25,12 +25,12 @@ public class Vehicle : MonoBehaviour
 	}
 
 	// Update is called once per frame
-	void Update()
+	void FixedUpdate()
 	{
 		
 	}
 
-	void FixedUpdate()
+	void Update()
 	{
 		if (isMovingForward)
 		{
@@ -105,12 +105,6 @@ public class Vehicle : MonoBehaviour
 		currentSteeringAngle = maxSteeringAngle * turning;
 	}
 
-	//value between 0 and 1
-	public void setbrakingMagnitude(float braking)
-	{
-		currentBrakeForce = maxBrakeForce * braking;
-	}
-
 	//value between -1 and 1
 	public void setAccelerationMagnitude(float acceleration)
 	{
@@ -120,6 +114,6 @@ public class Vehicle : MonoBehaviour
 	//detect collisions!
 	public void OnCollisionEnter(Collision collision)
 	{
-		print ("Collision with: " + collision.collider.gameObject.name);
+		//print ("Collision with: " + collision.collider.gameObject.name);
 	}
 }

@@ -14,7 +14,7 @@ public class HumanController : MonoBehaviour {
 	{
 		gameObject.GetComponent<Vehicle> ().setAccelerationMagnitude (Input.GetAxis ("Vertical"));
 		gameObject.GetComponent<Vehicle> ().setSteeringMagnitude (Input.GetAxis ("Horizontal"));
-		gameObject.GetComponent<Vehicle> ().setbrakingMagnitude (Input.GetAxis ("Jump"));
+		//gameObject.GetComponent<Vehicle> ().setbrakingMagnitude (Input.GetAxis ("Jump"));
 	}
 
 	void LateUpdate()

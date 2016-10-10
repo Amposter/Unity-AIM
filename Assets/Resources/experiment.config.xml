@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+    <Config>
+      <PopulationSize>25</PopulationSize>
+      <SpecieCount>5</SpecieCount>
+      <Activation>
+        <Scheme>Acyclic</Scheme>
+      </Activation>
+      <ComplexityRegulationStrategy>Absolute</ComplexityRegulationStrategy>
+      <ComplexityThreshold>39</ComplexityThreshold>
+      <Description>NEAT Autonomous Vehicle Obstacle Avoidance</Description>
+
+    </Config>

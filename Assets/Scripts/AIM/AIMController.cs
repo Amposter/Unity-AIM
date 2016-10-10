@@ -263,7 +263,7 @@ public class AIMController : SimpleHeuristicController {
                     toPoint.y = transform.position.y;
                     transform.LookAt(toPoint);
                 }
-                yield return null;
+				yield return new WaitForFixedUpdate();
             }
         }
         Act();
@@ -433,12 +433,12 @@ public class AIMController : SimpleHeuristicController {
                 break;
             }
             _nextLaneFull = path[nextDir + offset].full();
-            yield return new WaitForSeconds(requestCooldown);
+		yield return new WaitForSeconds(requestCooldown/Time.timeScale);
             requestPath = SimulatePath(); 
         }
 
         requestGranted = false;
         StartCoroutine("Turn");
-        yield return null;
+		yield return new WaitForFixedUpdate();;
     }
 }
