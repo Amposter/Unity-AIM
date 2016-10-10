@@ -82,7 +82,8 @@ public class NEAT_GroupController : UnitController
 		{
 			foreach (TrackWayPoint startPoint in _pathManager.startPoints)
 			{
-				GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation, this.transform) as GameObject;
+				GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
+                NEAT_Vehicle.transform.parent = transform;
 				NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
 				NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes(_pathManager.getRandomPathNodesFromStartNode(startPoint)));
 				NEAT_VehiclesList.Add(NEAT_Vehicle);
