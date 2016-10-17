@@ -36,10 +36,10 @@ public class NEAT_Controller : SimpleHeuristicController
 		float angle = Vector3.Angle (curve.GetPointAt (1) - this.transform.position, transform.forward);
 		Vector3 cross = Vector3.Cross (curve.GetPointAt (1) - this.transform.position, transform.forward);
 		angle = (cross.y < 0)?angle:-angle;
-		sensorInputs [10] = (float)Math.Round(((angle / 180)+1)/2,4);
+		sensorInputs [10] = (float)Math.Round(((angle / 180)+1)/2,3);
 
 		//distance to target wayPoint
-		sensorInputs [11] = (float)Math.Round(Mathf.Clamp((curve.GetPointAt(1)-this.transform.position).magnitude/initialDistanceToTarget,0f,1f),4);
+		sensorInputs [11] = (float)Math.Round(Mathf.Clamp((curve.GetPointAt(1)-this.transform.position).magnitude/initialDistanceToTarget,0f,1f),3);
 		//Debug.DrawLine (this.transform.position, curve.GetPointAt(1), Color.white);
 		proximityWarning = true;
 

@@ -51,8 +51,8 @@ public class NEAT_GroupController : UnitController
 
 					box.Activate();
 
-					NEAT_Vehicle.GetComponent<Vehicle> ().gas = (float)box.OutputSignalArray[0];
-					NEAT_Vehicle.GetComponent<Vehicle> ().steer = (float)box.OutputSignalArray[1];
+					NEAT_Vehicle.GetComponent<Vehicle> ().gas = (float)Math.Round(box.OutputSignalArray[0],3);
+					NEAT_Vehicle.GetComponent<Vehicle> ().steer = (float)Math.Round(box.OutputSignalArray[1],3);
 				}
 					
 				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute)
