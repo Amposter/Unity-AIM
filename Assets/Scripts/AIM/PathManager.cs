@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEditor;
 
 
 public class PathManager : MonoBehaviour
@@ -50,7 +49,7 @@ public class PathManager : MonoBehaviour
 		{
 			curve.drawColor = Color.blue;
 		}
-		SceneView.RepaintAll ();
+		//SceneView.RepaintAll ();
 	}
 
     public BezierCurve[] getDebugPathCurves(int start, int end)
@@ -179,7 +178,7 @@ public class PathManager : MonoBehaviour
 			curve.drawColor = Color.yellow;
 		}
 		displayPath = null;
-		SceneView.RepaintAll ();
+		//SceneView.RepaintAll ();
 	}
 		
 	//crude implementation of dijkstras shortest path algorithm hammered into submission to work with our data structures 

@@ -57,7 +57,7 @@ namespace SharpNEAT.Core
 
             for (int i = 0; i < _optimizer.Trials; i++)
             {
-                Utility.Log("Iteration " + (i + 1));                
+                //Utility.Log("Iteration " + (i + 1));                
                 
                 dict = new Dictionary<TGenome, TPhenome>();
                 foreach (TGenome genome in genomeList)

@@ -10,16 +10,18 @@ using System.IO;
 
 public class Optimizer : MonoBehaviour {
 
-    const int NUM_INPUTS = 10;
+    const int NUM_INPUTS = 12;
     const int NUM_OUTPUTS = 2;
 
 	public float evoSpeed = 10;
+	public float runBestSpeed = 1;
 
     public int Trials;
     public float TrialDuration;
     public float StoppingFitness;
     bool EARunning;
     string popFileSavePath, champFileSavePath;
+	float normalFixedDeltaTime;
 
     SimpleExperiment experiment;
     static NeatEvolutionAlgorithm<NeatGenome> _ea;
@@ -51,9 +53,10 @@ public class Optimizer : MonoBehaviour {
 
         experiment.Initialize("NEAT Experiment", xmlConfig.DocumentElement, NUM_INPUTS, NUM_OUTPUTS);
 
-		champFileSavePath = string.Format("Assets/Resources/{0}.champ.xml", "NEAT_Controller");
-		popFileSavePath = string.Format("Assets/Resources/{0}.pop.xml", "NEAT_Controller");
+		champFileSavePath = string.Format(Application.dataPath+"/Resources/{0}.champ.xml", "NEAT_Controller");
+		popFileSavePath = string.Format(Application.dataPath+"/Resources/{0}.pop.xml", "NEAT_Controller");
 
+		normalFixedDeltaTime = Time.fixedDeltaTime;
         //print(champFileSavePath);
 	}
 
@@ -120,7 +123,7 @@ public class Optimizer : MonoBehaviour {
         XmlWriterSettings _xwSettings = new XmlWriterSettings();
         _xwSettings.Indent = true;
         // Save genomes to xml file.        
-        DirectoryInfo dirInf = new DirectoryInfo("Assets/Resources");
+		DirectoryInfo dirInf = new DirectoryInfo(Application.dataPath+"/Resources");
         if (!dirInf.Exists)
         {
             Debug.Log("Creating subdirectory");
@@ -170,15 +173,32 @@ public class Optimizer : MonoBehaviour {
 		controller.Activate(box);
     }
 
+	double superFitness = 0;
     public void StopEvaluation(IBlackBox box)
     {
+		//save superChamp!
+		if (_ea.CurrentChampGenome.EvaluationInfo.Fitness > superFitness)
+		{
+			superFitness = _ea.CurrentChampGenome.EvaluationInfo.Fitness;
+			XmlWriterSettings _xwSettings = new XmlWriterSettings ();
+			_xwSettings.Indent = true;
+			// Save genomes to xml file.        
+			DirectoryInfo dirInf = new DirectoryInfo (Application.dataPath + "/Resources");
+			if (!dirInf.Exists) {
+				Debug.Log ("Creating subdirectory");
+				dirInf.Create ();
+			}
+			using (XmlWriter xw = XmlWriter.Create (string.Format(Application.dataPath+"/Resources/{0}.SUPERchamp.xml", "NEAT_Controller"), _xwSettings)) {
+				experiment.SavePopulation (xw, new NeatGenome[] { _ea.CurrentChampGenome });
+			}
+		}
 		((NEAT_GroupController)ControllerMap [box]).cleanUp ();
     }
 
     public void RunBest()
     {
-        Time.timeScale = 1;
-
+		Time.timeScale = runBestSpeed;
+		//Time.fixedDeltaTime = normalFixedDeltaTime * (1/runBestSpeed);
         NeatGenome genome = null;
 
 
@@ -201,11 +221,20 @@ public class Optimizer : MonoBehaviour {
         // Decode the genome into a phenome (neural network).
         var phenome = genomeDecoder.Decode(genome);
 
-        GameObject obj = Instantiate(Unit, Unit.transform.position, Unit.transform.rotation) as GameObject;
-        UnitController controller = obj.GetComponent<UnitController>();
-        ((NEAT_GroupController)controller).setPathManager (simController.getCurrentTrack ().GetComponentInChildren<PathManager> ());
+		//print("Running best genome with fitness: "+ genome.BirthGeneration);
 
-        ControllerMap.Add(phenome, controller);
+		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
+		UnitController controller = groupController.GetComponent<UnitController>();
+		((NEAT_GroupController)controller).setPathManager (simController.getCurrentTrack ().GetComponentInChildren<PathManager> ());
+
+		if (!ControllerMap.ContainsKey (phenome))
+		{
+			ControllerMap.Add (phenome, controller);
+		}
+		else
+		{
+			ControllerMap [phenome] = controller;
+		}
 
         controller.Activate(phenome);
     }
@@ -234,6 +263,6 @@ public class Optimizer : MonoBehaviour {
             RunBest();
         }
 
-        GUI.Button(new Rect(10, Screen.height - 70, 100, 60), string.Format("Generation: {0}\nFitness: {1:0.00}", Generation, Fitness));
+		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nTimeScale: {2}", Generation, Fitness, Time.timeScale));
     }
 }

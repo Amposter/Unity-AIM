@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 
 public class VehicleController : MonoBehaviour
@@ -7,7 +8,7 @@ public class VehicleController : MonoBehaviour
     public bool showSensorsDebug = true;
 	public float sensorRange = 10;
 	public float proximityThreshHold = 3;
-    float[] sensorInputs = new float[32];
+    public float[] sensorInputs = new float[12];
     bool useFrontSensorOnly = false;
 	protected int finalLayerMask;
 	public bool proximityWarning = false;
@@ -34,17 +35,20 @@ public class VehicleController : MonoBehaviour
     {
 		finalLayerMask = vehicleMask | pedestrianMask; //build a layermask that only checks the boundary, vehicle and pedestrian physics layers
 	}
-	
+
+
+	protected float minObstacleRange = 0;
+
 	// Update is called once per frame
 	protected virtual void Update ()
     {
-		float minObstacleRange = 1;
+		minObstacleRange = 0;
 
 		//perform a raycast for each sensor
 		if (Physics.Raycast (transform.position, transform.forward, out sensor4, sensorRange, finalLayerMask))
 		{
-			sensorInputs [4] = (transform.position - sensor4.point).magnitude/sensorRange;
-			if (sensorInputs [4] < minObstacleRange)
+			sensorInputs [4] = (float)Math.Round(1f-(transform.position - sensor4.point).magnitude/sensorRange,4);
+			if (sensorInputs [4] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [4];
 			}
@@ -55,7 +59,7 @@ public class VehicleController : MonoBehaviour
 		}
 		else
 		{
-			sensorInputs[4] = 1;
+			sensorInputs[4] = 0;
 			if (showSensorsDebug)
 			{
 				Debug.DrawLine (transform.position, transform.position + transform.forward * sensorRange, Color.green);
@@ -66,8 +70,8 @@ public class VehicleController : MonoBehaviour
 		{
 			if (Physics.Raycast (transform.position, -transform.right, out sensor0, sensorRange, finalLayerMask))
 			{
-				sensorInputs [0] = (transform.position - sensor0.point).magnitude/sensorRange;
-				if (sensorInputs [0] < minObstacleRange)
+				sensorInputs [0] = (float)Math.Round(1f-(transform.position - sensor0.point).magnitude/sensorRange,4);
+				if (sensorInputs [0] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [0];
 				}
@@ -78,7 +82,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[0] = 1;
+				sensorInputs[0] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + -transform.right * sensorRange, Color.green);
@@ -87,10 +91,10 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, Quaternion.Euler (0, 22.5f, 0) * -transform.right, out sensor1, sensorRange, finalLayerMask))
 			{
-				sensorInputs [1] = (transform.position - sensor1.point).magnitude/sensorRange;
-				if (sensorInputs [1] < minObstacleRange)
+				sensorInputs [1] = (float)Math.Round(1f-(transform.position - sensor1.point).magnitude/sensorRange,4);
+				if (sensorInputs [1] > minObstacleRange)
 				{
-					minObstacleRange = sensorInputs [1];
+
 				}
 				if (showSensorsDebug)
 				{
@@ -99,7 +103,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[1] = 1;
+				sensorInputs[1] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + Quaternion.Euler (0, 22.5f, 0) * -transform.right * sensorRange, Color.green);
@@ -108,8 +112,8 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, Quaternion.Euler (0, 45f, 0) * -transform.right, out sensor2, sensorRange, finalLayerMask))
 			{
-				sensorInputs [2] = (transform.position - sensor2.point).magnitude/sensorRange;
-				if (sensorInputs [2] < minObstacleRange)
+				sensorInputs [2] = (float)Math.Round(1f-(transform.position - sensor2.point).magnitude/sensorRange,4);
+				if (sensorInputs [2] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [2];
 				}
@@ -120,7 +124,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[2] = 1;
+				sensorInputs[2] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + Quaternion.Euler (0, 45f, 0) * -transform.right * sensorRange, Color.green);
@@ -129,8 +133,8 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, Quaternion.Euler (0, 67.5f, 0) * -transform.right, out sensor3, sensorRange, finalLayerMask))
 			{
-				sensorInputs [3] = (transform.position - sensor3.point).magnitude/sensorRange;
-				if (sensorInputs [3] < minObstacleRange)
+				sensorInputs [3] = (float)Math.Round(1f-(transform.position - sensor3.point).magnitude/sensorRange,4);
+				if (sensorInputs [3] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [3];
 				}
@@ -141,7 +145,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[3] = 1;
+				sensorInputs[3] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + Quaternion.Euler (0, 67.5f, 0) * -transform.right * sensorRange, Color.green);
@@ -150,8 +154,8 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, Quaternion.Euler (0, -22.5f, 0) * transform.right, out sensor5, sensorRange, finalLayerMask))
 			{
-				sensorInputs [5] = (transform.position - sensor5.point).magnitude/sensorRange;
-				if (sensorInputs [5] < minObstacleRange)
+				sensorInputs [5] = (float)Math.Round(1f-(transform.position - sensor5.point).magnitude/sensorRange,4);
+				if (sensorInputs [5] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [5];
 				}
@@ -162,7 +166,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[5] = 1;
+				sensorInputs[5] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + Quaternion.Euler (0, -22.5f, 0) * transform.right * sensorRange, Color.green);
@@ -171,8 +175,8 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, Quaternion.Euler (0, -45f, 0) * transform.right, out sensor6, sensorRange, finalLayerMask))
 			{
-				sensorInputs [6] = (transform.position - sensor6.point).magnitude/sensorRange;
-				if (sensorInputs [6] < minObstacleRange)
+				sensorInputs [6] = (float)Math.Round(1f-(transform.position - sensor6.point).magnitude/sensorRange,4);
+				if (sensorInputs [6] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [6];
 				}
@@ -183,7 +187,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[6] = 1;
+				sensorInputs[6] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + Quaternion.Euler (0, -45f, 0) * transform.right * sensorRange, Color.green);
@@ -192,8 +196,8 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, Quaternion.Euler (0, -67.5f, 0) * transform.right, out sensor7, sensorRange, finalLayerMask))
 			{
-				sensorInputs [7] = (transform.position - sensor7.point).magnitude/sensorRange;
-				if (sensorInputs [7] < minObstacleRange)
+				sensorInputs [7] = (float)Math.Round(1f-(transform.position - sensor7.point).magnitude/sensorRange,4);
+				if (sensorInputs [7] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [7];
 				}
@@ -204,7 +208,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[7] = 1;
+				sensorInputs[7] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + Quaternion.Euler (0, -67.5f, 0) * transform.right * sensorRange, Color.green);
@@ -213,8 +217,8 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, transform.right, out sensor8, sensorRange, finalLayerMask))
 			{
-				sensorInputs [8] = (transform.position - sensor8.point).magnitude/sensorRange;
-				if (sensorInputs [8] < minObstacleRange)
+				sensorInputs [8] = (float)Math.Round(1f-(transform.position - sensor8.point).magnitude/sensorRange,4);
+				if (sensorInputs [8] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [8];
 				}
@@ -225,7 +229,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[8] = 1;
+				sensorInputs[8] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + transform.right * sensorRange, Color.green);
@@ -234,8 +238,8 @@ public class VehicleController : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, -transform.forward, out sensor9, sensorRange, finalLayerMask))
 			{
-				sensorInputs [9] = (transform.position - sensor9.point).magnitude/sensorRange;
-				if (sensorInputs [9] < minObstacleRange)
+				sensorInputs [9] = (float)Math.Round(1f-(transform.position - sensor9.point).magnitude/sensorRange,4);
+				if (sensorInputs [9] > minObstacleRange)
 				{
 					minObstacleRange = sensorInputs [9];
 				}
@@ -246,7 +250,7 @@ public class VehicleController : MonoBehaviour
 			}
 			else
 			{
-				sensorInputs[9] = 1;
+				sensorInputs[9] = 0;
 				if (showSensorsDebug)
 				{
 					Debug.DrawLine (transform.position, transform.position + -transform.forward * sensorRange, Color.green);
@@ -254,7 +258,8 @@ public class VehicleController : MonoBehaviour
 			}
 		}
 
-		if (minObstacleRange * sensorRange < proximityThreshHold)
+
+		if ((1f-minObstacleRange) * sensorRange < proximityThreshHold)
 		{
 			proximityWarning = true;
 		}

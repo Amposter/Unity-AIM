@@ -12,8 +12,8 @@ public class HumanController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		gameObject.GetComponent<Vehicle> ().setAccelerationMagnitude (Input.GetAxis ("Vertical"));
-		gameObject.GetComponent<Vehicle> ().setSteeringMagnitude (Input.GetAxis ("Horizontal"));
+		//gameObject.GetComponent<Vehicle> ().setAccelerationMagnitude (Input.GetAxis ("Vertical"));
+		//gameObject.GetComponent<Vehicle> ().setSteeringMagnitude (Input.GetAxis ("Horizontal"));
 		//gameObject.GetComponent<Vehicle> ().setbrakingMagnitude (Input.GetAxis ("Jump"));
 	}
 

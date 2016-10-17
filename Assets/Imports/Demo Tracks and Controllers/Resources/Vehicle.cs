@@ -1,119 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SharpNeat.Phenomes;
 
-public class Vehicle : MonoBehaviour
-{
+public class Vehicle : MonoBehaviour {
 
-	public float maxSpeed;
-	public float maxReverseSpeed;
-	public float maxAcceleration;
-	public float maxBrakeForce;
-	public float maxSteeringAngle;
-	public float distanceBetweenAxles;
-	public float frictionForce;
+	public float Speed = 5f;
+	private float MaxTurnAngle = Mathf.PI/4;
+	public float distanceBetweenAxles = 1.258f;
 
-	public float currentAcceleration = 0;
-	private float currentTurnSpeed = 0;
-	public float currentSteeringAngle = 0;
-	public float currentBrakeForce = 0;
-	private bool isMovingForward = true;
 
 	// Use this for initialization
-	void Start()
+	void Start ()
 	{
-		
+		MaxTurnAngle = Mathf.PI/4;
 	}
 
-	// Update is called once per frame
-	void FixedUpdate()
+	public float gas = 0;
+	public float steer = 0;
+
+
+	void LateUpdate()
 	{
-		
-	}
+		float turningRadius = distanceBetweenAxles / Mathf.Sin (Mathf.Clamp((steer*2-1)*MaxTurnAngle,-MaxTurnAngle,MaxTurnAngle));
 
-	void Update()
-	{
-		if (isMovingForward)
+		float currentTurnSpeed = gameObject.GetComponent<Rigidbody> ().velocity.magnitude / turningRadius;
+
+		if (gas < 0)
 		{
-			if (gameObject.GetComponent<Rigidbody> ().velocity.magnitude > maxSpeed)
-			{
-				gameObject.GetComponent<Rigidbody> ().velocity = gameObject.GetComponent<Rigidbody> ().velocity.normalized * maxSpeed;
-			}
-		}
-		else if(gameObject.GetComponent<Rigidbody> ().velocity.magnitude > maxReverseSpeed)
-		{
-			gameObject.GetComponent<Rigidbody> ().velocity = gameObject.GetComponent<Rigidbody> ().velocity.normalized * maxReverseSpeed;
-		}
-		// LIMIT REVERSE
-
-		if (gameObject.GetComponent<Rigidbody> ().velocity.magnitude != 0)
-		{
-			if (Vector3.Angle (transform.forward, gameObject.GetComponent<Rigidbody> ().velocity.normalized) > 90f)
-			{
-				gameObject.GetComponent<Rigidbody> ().velocity = gameObject.GetComponent<Rigidbody> ().velocity.magnitude * -transform.forward;
-				isMovingForward = false;
-			}
-			else
-			{
-				gameObject.GetComponent<Rigidbody> ().velocity = gameObject.GetComponent<Rigidbody> ().velocity.magnitude * transform.forward;
-				isMovingForward = true;
-			}
-
-			float currentFriction = (frictionForce * gameObject.GetComponent<Rigidbody> ().velocity.magnitude);
-
-			//if we accelerating ignore friction
-			if (currentAcceleration > 0.1)
-			{
-				currentFriction = 0;
-			}
-				
-			float finalFrictionForce = currentBrakeForce + currentFriction;
-			gameObject.GetComponent<Rigidbody> ().AddForce(-gameObject.GetComponent<Rigidbody> ().velocity.normalized * finalFrictionForce, ForceMode.Acceleration);
-
-			if (gameObject.GetComponent<Rigidbody> ().velocity.magnitude < 0.01)
-			{
-				gameObject.GetComponent<Rigidbody> ().velocity = Vector3.zero;
-			}
+			currentTurnSpeed = -currentTurnSpeed;
 		}
 
-
-		if (currentSteeringAngle != 0 && gameObject.GetComponent<Rigidbody> ().velocity.magnitude != 0)
-		{
-			float turningRadius = distanceBetweenAxles / Mathf.Sin (currentSteeringAngle);
-
-			currentTurnSpeed = gameObject.GetComponent<Rigidbody> ().velocity.magnitude / turningRadius;
-
-			if (!isMovingForward)
-			{
-				currentTurnSpeed = -currentTurnSpeed;
-			}
-
-			gameObject.GetComponent<Rigidbody> ().angularVelocity = new Vector3 (0, currentTurnSpeed, 0);
-		}
-		else
-		{
-			gameObject.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
-		}
-
-		gameObject.GetComponent<Rigidbody> ().AddForce(transform.forward*currentAcceleration, ForceMode.Acceleration);
-
-
+		gameObject.GetComponent<Rigidbody> ().angularVelocity = new Vector3 (0, currentTurnSpeed, 0);
+		gameObject.GetComponent<Rigidbody>().velocity = transform.forward*(Mathf.Clamp((gas*2-1) * Speed,-Speed,Speed));
 	}
 
-	//value between -1 and 1
-	public void setSteeringMagnitude(float turning)
-	{
-		currentSteeringAngle = maxSteeringAngle * turning;
-	}
 
-	//value between -1 and 1
-	public void setAccelerationMagnitude(float acceleration)
-	{
-		currentAcceleration = maxAcceleration * acceleration;
-	}
-
-	//detect collisions!
-	public void OnCollisionEnter(Collision collision)
-	{
-		//print ("Collision with: " + collision.collider.gameObject.name);
-	}
 }

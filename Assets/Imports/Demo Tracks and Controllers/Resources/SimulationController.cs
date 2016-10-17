@@ -16,6 +16,7 @@ public class SimulationController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		Application.targetFrameRate = 50;
 		normalFixedDeltaTime = Time.fixedDeltaTime;
 		foreach (GameObject track in tracksList)
 		{
@@ -66,8 +67,8 @@ public class SimulationController : MonoBehaviour
 		switch (trackNum)
 		{
 		case 0:
-			Camera.main.transform.position = new Vector3 (0,175,0);
-			Camera.main.transform.rotation = Quaternion.Euler(90,0,0);
+			Camera.main.transform.position = new Vector3 (0,130,0);
+			Camera.main.transform.rotation = Quaternion.Euler(90,90,0);
 			break;
 		case 1:
 			Camera.main.transform.position = new Vector3 (0,76,2);

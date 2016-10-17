@@ -55,12 +55,16 @@ namespace SharpNEAT.Core
 
 			_phenomeEvaluator.Reset();
 
-			int genomeNum = 0;
+			float genomeNum = 0;
 
             foreach (TGenome genome in genomeList)
             {
 				genomeNum++;
-				Debug.Log ("Evaluating genome: "+genomeNum);
+				if (((genomeNum / genomeList.Count) * 100) % 20 == 0)
+				{
+					Debug.Log ("Generation "+((genomeNum / genomeList.Count) * 100)+"% evaluated...");
+				}
+
 				TPhenome phenome = _genomeDecoder.Decode (genome);
 
 				if (null == phenome) {   // Non-viable genome.
@@ -88,7 +92,7 @@ namespace SharpNEAT.Core
 					FitnessInfo fitnessInfo = _phenomeEvaluator.GetLastFitness(phenome);
 					fitnessDict[genome][i] = fitnessInfo;
 
-					Debug.Log ("Trial "+(i + 1)+" fitness: "+fitnessInfo._fitness);
+					//Debug.Log ("Trial "+(i + 1)+" fitness: "+fitnessInfo._fitness);
 				}
 
 				double fitness = 0;
@@ -104,7 +108,7 @@ namespace SharpNEAT.Core
 
 				genome.EvaluationInfo.SetFitness(fitness);
 				genome.EvaluationInfo.AuxFitnessArr = fitnessDict[genome][0]._auxFitnessArr;
-				Debug.Log ("Final fitness for genome "+genomeNum+": "+fitness);
+				//Debug.Log ("Final fitness for genome "+genomeNum+": "+fitness);
             }
         }
 
