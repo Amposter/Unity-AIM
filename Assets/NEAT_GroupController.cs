@@ -26,7 +26,7 @@ public class NEAT_GroupController : UnitController
 	}
 
 	// Update is called once per frame
-	void Update()
+	void FixedUpdate()
 	{
 		if (IsRunning)
 		{
@@ -34,27 +34,28 @@ public class NEAT_GroupController : UnitController
 			{
 				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller> ();
 
-				if (neatController.NEATMode)
-				{
-					box.InputSignalArray[0] = neatController.getSensorInputs()[0];
-					box.InputSignalArray[1] = neatController.getSensorInputs()[1];
-					box.InputSignalArray[2] = neatController.getSensorInputs()[2];
-					box.InputSignalArray[3] = neatController.getSensorInputs()[3];
-					box.InputSignalArray[4] = neatController.getSensorInputs()[4];
-					box.InputSignalArray[5] = neatController.getSensorInputs()[5];
-					box.InputSignalArray[6] = neatController.getSensorInputs()[6];
-					box.InputSignalArray[7] = neatController.getSensorInputs()[7];
-					box.InputSignalArray[8] = neatController.getSensorInputs()[8];
-					box.InputSignalArray[9] = neatController.getSensorInputs()[9];
-					box.InputSignalArray[10] = neatController.getSensorInputs()[10];
-					box.InputSignalArray[11] = neatController.getSensorInputs()[11];
+				neatController.updateSensors ();
 
-					box.Activate();
+				box.InputSignalArray[0] = neatController.getSensorInputs()[0];
+				box.InputSignalArray[1] = neatController.getSensorInputs()[1];
+				box.InputSignalArray[2] = neatController.getSensorInputs()[2];
+				box.InputSignalArray[3] = neatController.getSensorInputs()[3];
+				box.InputSignalArray[4] = neatController.getSensorInputs()[4];
+				box.InputSignalArray[5] = neatController.getSensorInputs()[5];
+				box.InputSignalArray[6] = neatController.getSensorInputs()[6];
+				box.InputSignalArray[7] = neatController.getSensorInputs()[7];
+				box.InputSignalArray[8] = neatController.getSensorInputs()[8];
+				box.InputSignalArray[9] = neatController.getSensorInputs()[9];
+				box.InputSignalArray[10] = neatController.getSensorInputs()[10];
+				box.InputSignalArray[11] = neatController.getSensorInputs()[11];
 
-					NEAT_Vehicle.GetComponent<Vehicle> ().gas = (float)Math.Round(box.OutputSignalArray[0],3);
-					NEAT_Vehicle.GetComponent<Vehicle> ().steer = (float)Math.Round(box.OutputSignalArray[1],3);
-				}
-					
+				box.Activate();
+
+				NEAT_Vehicle.GetComponent<Vehicle> ().gas = (float)Math.Round(box.OutputSignalArray[0],4);
+				NEAT_Vehicle.GetComponent<Vehicle> ().steer = (float)Math.Round(box.OutputSignalArray[1],4);
+
+				NEAT_Vehicle.GetComponent<Vehicle> ().updateControls ();
+				
 				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute)
 				{
 					NEAT_Vehicle.SetActive (false);

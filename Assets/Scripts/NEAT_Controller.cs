@@ -30,24 +30,14 @@ public class NEAT_Controller : SimpleHeuristicController
 	{
 		base.Update ();
 
-		UpdateNextPoint();
 
-		//angle to targetWayPoint
-		float angle = Vector3.Angle (curve.GetPointAt (1) - this.transform.position, transform.forward);
-		Vector3 cross = Vector3.Cross (curve.GetPointAt (1) - this.transform.position, transform.forward);
-		angle = (cross.y < 0)?angle:-angle;
-		sensorInputs [10] = (float)Math.Round(((angle / 180)+1)/2,3);
-
-		//distance to target wayPoint
-		sensorInputs [11] = (float)Math.Round(Mathf.Clamp((curve.GetPointAt(1)-this.transform.position).magnitude/initialDistanceToTarget,0f,1f),3);
-		//Debug.DrawLine (this.transform.position, curve.GetPointAt(1), Color.white);
 		proximityWarning = true;
 
 		//distance to goal
 		if (distanceRewardCutOff - sensorInputs [11] >= 0.01f && sensorInputs [11] > 0)
 		{
 			groupController.groupFitness += 1000*((distanceRewardCutOff - sensorInputs [11])/0.01f);
-			groupController.groupFitness += (1 - minObstacleRange) * 0.1f;
+			groupController.groupFitness += (1 - minObstacleRange) * 10f;
 			distanceRewardCutOff -= (distanceRewardCutOff - sensorInputs [11]);
 		}
 
@@ -57,35 +47,23 @@ public class NEAT_Controller : SimpleHeuristicController
 			rewardTimer += Time.deltaTime;
 			if (rewardTimer >= rewardTimeInterval)
 			{
-				//angle to goal
-				/*if (sensorInputs [10] < prevAngle)
-				{
-					groupController.groupFitness += 1;
-					prevAngle = sensorInputs [10];
-				}
-				*/
-
-
-
-				//groupController.groupFitness += (1 - minObstacleRange)*2;
 
 				//penalize for not moving
 				if (gameObject.GetComponent<Rigidbody>().velocity.magnitude < 0.02)
 				{
-					groupController.groupFitness -= 0.1f;
+					groupController.groupFitness -= 1f;
 				}
 				//penalize for reversing or driving too slow
 				if (gameObject.GetComponent<Vehicle> ().gas < 0.65)
 				{
-					groupController.groupFitness -= 0.1f;
+					groupController.groupFitness -= 1f;
 				}
 				//penalize for movDing further from target
 				if ((curve.GetPointAt (1) - this.transform.position).magnitude > (curve.GetPointAt (1) - prevPos).magnitude)
 				{
-					groupController.groupFitness -= 0.1f;
+					groupController.groupFitness -= 0.5f;
 				}
-
-
+					
 				prevPos = this.transform.position;
 			}
 		}
@@ -125,6 +103,20 @@ public class NEAT_Controller : SimpleHeuristicController
 
 	}
 
+	public override void updateSensors()
+	{
+		base.updateSensors ();
+
+		//angle to targetWayPoint
+		float angle = Vector3.Angle (curve.GetPointAt (1) - this.transform.position, transform.forward);
+		Vector3 cross = Vector3.Cross (curve.GetPointAt (1) - this.transform.position, transform.forward);
+		angle = (cross.y < 0)?angle:-angle;
+		sensorInputs [10] = (float)Math.Round(((angle / 180)+1)/2,4);
+
+		//distance to target wayPoint
+		sensorInputs [11] = (float)Math.Round(Mathf.Clamp((curve.GetPointAt(1)-this.transform.position).magnitude/initialDistanceToTarget,0f,1f),4);
+		//Debug.DrawLine (this.transform.position, curve.GetPointAt(1), Color.white);
+	}
 
 	public void startDriving(BezierCurve[] curves)
 	{
@@ -151,9 +143,11 @@ public class NEAT_Controller : SimpleHeuristicController
 
 	public void OnCollisionEnter(Collision other)
 	{
+		
 		if (NEATMode)
 		{
-            groupController.groupFitness -= 50;
+			finishedRoute = true;
+			groupController.groupFitness -= 1000;
 			//print ("COLLISION");
 		}
 
