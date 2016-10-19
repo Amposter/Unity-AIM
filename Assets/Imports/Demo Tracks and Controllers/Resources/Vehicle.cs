@@ -36,6 +36,11 @@ public class Vehicle : MonoBehaviour {
 			currentTurnSpeed = -currentTurnSpeed;
 		}
 
+		if (float.IsNaN(gas) || float.IsNaN(currentTurnSpeed))
+		{
+			return;
+		}
+
 		gameObject.GetComponent<Rigidbody> ().angularVelocity = new Vector3 (0, currentTurnSpeed, 0);
 		gameObject.GetComponent<Rigidbody>().velocity = transform.forward*(Mathf.Clamp((gas*2-1) * Speed,-Speed,Speed));
 	}

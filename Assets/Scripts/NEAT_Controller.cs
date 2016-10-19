@@ -30,20 +30,17 @@ public class NEAT_Controller : SimpleHeuristicController
 	{
 		base.Update ();
 
-
-		proximityWarning = true;
-
-		//distance to goal
-		if (distanceRewardCutOff - sensorInputs [11] >= 0.01f && sensorInputs [11] > 0)
-		{
-			groupController.groupFitness += 1000*((distanceRewardCutOff - sensorInputs [11])/0.01f);
-			groupController.groupFitness += (1 - minObstacleRange) * 10f;
-			distanceRewardCutOff -= (distanceRewardCutOff - sensorInputs [11]);
-		}
-
 		//if in NEAT_MODE issue time based rewards
 		if (NEATMode)
 		{
+			//distance to goal
+			if (distanceRewardCutOff - sensorInputs [11] >= 0.01f && sensorInputs [11] > 0)
+			{
+				groupController.groupFitness += 1000*((distanceRewardCutOff - sensorInputs [11])/0.01f);
+				groupController.groupFitness += (1 - minObstacleRange) * 10f;
+				distanceRewardCutOff -= (distanceRewardCutOff - sensorInputs [11]);
+			}
+
 			rewardTimer += Time.deltaTime;
 			if (rewardTimer >= rewardTimeInterval)
 			{
@@ -74,18 +71,16 @@ public class NEAT_Controller : SimpleHeuristicController
 			gameObject.GetComponent<Rigidbody> ().velocity = Vector3.zero;
 			gameObject.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
             NEATMode = false;
-            finalLayerMask = /*vehicleMask |*/ pedestrianMask;
+            finalLayerMask = vehicleMask | pedestrianMask;
             UpdateNextPoint();
             Unpause();
-			//groupController.groupFitness += 250;
+			groupController.groupFitness += 100;
         }
         else if (proximityWarning && !NEATMode)
 		{
 			Pause ();
-			finalLayerMask = /*vehicleMask | */pedestrianMask | boundaryMask;
-
+			finalLayerMask = vehicleMask | pedestrianMask | boundaryMask;
 			prevPos = this.transform.position;
-			prevAngle = float.MaxValue;
 			prevDistance = 1;
 			prevMinObstacleDistance = float.MaxValue;
 			initialDistanceToTarget = (curve.GetPointAt(1)-this.transform.position).magnitude;
@@ -93,9 +88,8 @@ public class NEAT_Controller : SimpleHeuristicController
 			if (hasBeenTriggered == false)
 			{
 				hasBeenTriggered = true;
-				groupController.totalTriggered++;
 			}
-
+			groupController.totalTriggered++;
 			this.gameObject.GetComponent<Vehicle> ().enabled = true;
         }
 
@@ -115,14 +109,14 @@ public class NEAT_Controller : SimpleHeuristicController
 
 		//distance to target wayPoint
 		sensorInputs [11] = (float)Math.Round(Mathf.Clamp((curve.GetPointAt(1)-this.transform.position).magnitude/initialDistanceToTarget,0f,1f),4);
-		//Debug.DrawLine (this.transform.position, curve.GetPointAt(1), Color.white);
+		Debug.DrawLine (this.transform.position, curve.GetPointAt(1), Color.white);
 	}
 
 	public void startDriving(BezierCurve[] curves)
 	{
 		setCurve (curves [0]);
 		setCurves (curves);
-		//StartCoroutine ("AutoDrive");
+		StartCoroutine ("AutoDrive");
 	}
 
 	public void OnTriggerEnter(Collider other)
@@ -143,13 +137,10 @@ public class NEAT_Controller : SimpleHeuristicController
 
 	public void OnCollisionEnter(Collision other)
 	{
-		
-		if (NEATMode)
-		{
+
 			finishedRoute = true;
 			groupController.groupFitness -= 1000;
 			//print ("COLLISION");
-		}
 
 	}
 

@@ -34,7 +34,17 @@ public class NEAT_GroupController : UnitController
 			{
 				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller> ();
 
+				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute)
+				{
+					NEAT_Vehicle.SetActive (false);
+				}
+
 				neatController.updateSensors ();
+
+				if (!neatController.NEATMode)
+				{
+					continue;
+				}
 
 				box.InputSignalArray[0] = neatController.getSensorInputs()[0];
 				box.InputSignalArray[1] = neatController.getSensorInputs()[1];
@@ -55,11 +65,6 @@ public class NEAT_GroupController : UnitController
 				NEAT_Vehicle.GetComponent<Vehicle> ().steer = (float)Math.Round(box.OutputSignalArray[1],4);
 
 				NEAT_Vehicle.GetComponent<Vehicle> ().updateControls ();
-				
-				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute)
-				{
-					NEAT_Vehicle.SetActive (false);
-				}
 			}
 
 		}
@@ -74,41 +79,42 @@ public class NEAT_GroupController : UnitController
 	{
 		this.box = box;
 		this.IsRunning = true;
-
-		foreach (TrackWayPoint startPoint in _pathManager.startPoints)
-		{
-			GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
-			NEAT_Vehicle.transform.parent = transform;
-			NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
-			NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes(_pathManager.getRandomPathNodesFromStartNode(startPoint)));
-			NEAT_VehiclesList.Add(NEAT_Vehicle);
-		}
-
-		//StartCoroutine ("spawnCars");
+		StartCoroutine ("spawnCars");
 	}
 
 	protected IEnumerator spawnCars()
 	{
+		for (int i = 0; i < 10; i++)
+		{
 			foreach (TrackWayPoint startPoint in _pathManager.startPoints)
 			{
 				GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
-                NEAT_Vehicle.transform.parent = transform;
+				NEAT_Vehicle.transform.parent = transform;
 				NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
-				NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes(_pathManager.getRandomPathNodesFromStartNode(startPoint)));
-				NEAT_VehiclesList.Add(NEAT_Vehicle);
+				NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoint)));
+				NEAT_VehiclesList.Add (NEAT_Vehicle);
 			}
+			yield return new WaitForSeconds(1f+(UnityEngine.Random.Range(1, 15)/10f));
+		}
 
-		return null;
+		yield return null;
 	}
 
 
 	public override float GetFitness()
 	{
-		if (groupFitness <= 0)
+		if (totalTriggered > 0)
 		{
-			return 1;
+			if (groupFitness <= 0)
+			{
+				return 1;
+			}
+			return groupFitness / totalTriggered;
 		}
-		return groupFitness;
+		else
+		{
+			return 0.1f;
+		}
 	}
 
 

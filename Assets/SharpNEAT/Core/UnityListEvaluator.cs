@@ -83,13 +83,19 @@ namespace SharpNEAT.Core
 						fitnessDict.Add(genome, new FitnessInfo[_optimizer.Trials]);
 					}
 
-					_phenomeEvaluator.Reset();
+					//_phenomeEvaluator.Reset();
 
 					yield return Coroutiner.StartCoroutine(_phenomeEvaluator.Evaluate(phenome));
 
 					//yield return new WaitForSeconds(_optimizer.TrialDuration);
-
+				
 					FitnessInfo fitnessInfo = _phenomeEvaluator.GetLastFitness(phenome);
+					//0.1f is the fitness assigned to phenomes that were not triggered;
+					if (fitnessInfo._fitness == 0.1f)
+					{
+						i--;
+						continue;
+					}
 					fitnessDict[genome][i] = fitnessInfo;
 
 					//Debug.Log ("Trial "+(i + 1)+" fitness: "+fitnessInfo._fitness);
