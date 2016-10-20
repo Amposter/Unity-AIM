@@ -10,8 +10,8 @@ using System.IO;
 
 public class Optimizer : MonoBehaviour {
 
-    const int NUM_INPUTS = 12;
-    const int NUM_OUTPUTS = 2;
+    int NUM_INPUTS;
+    int NUM_OUTPUTS;
 
 	public float evoSpeed = 10;
 	public float runBestSpeed = 1;
@@ -42,6 +42,17 @@ public class Optimizer : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
+        if (Config.NEAT)
+        {
+            NUM_INPUTS = 10;
+            NUM_OUTPUTS = 2;
+        }
+        else if (Config.HyperNEAT)
+        {
+            NUM_INPUTS = 4;
+            NUM_OUTPUTS = 1;
+        }
+
 		simController = GameObject.Find ("SimulationController").GetComponent<SimulationController> ();
 
         Utility.DebugLog = true;
@@ -173,7 +184,9 @@ public class Optimizer : MonoBehaviour {
 		controller.Activate(box);
     }
 
-	double superFitness = 0;
+    string superChampFileSavePath = string.Format(Application.dataPath + "/Resources/{0}.SUPERchamp.xml", "NEAT_Controller");
+
+    double superFitness = 0;
     public void StopEvaluation(IBlackBox box)
     {
 		//save superChamp!
@@ -188,7 +201,7 @@ public class Optimizer : MonoBehaviour {
 				Debug.Log ("Creating subdirectory");
 				dirInf.Create ();
 			}
-			using (XmlWriter xw = XmlWriter.Create (string.Format(Application.dataPath+"/Resources/{0}.SUPERchamp.xml", "NEAT_Controller"), _xwSettings)) {
+			using (XmlWriter xw = XmlWriter.Create (superChampFileSavePath, _xwSettings)) {
 				experiment.SavePopulation (xw, new NeatGenome[] { _ea.CurrentChampGenome });
 			}
 		}
@@ -205,13 +218,13 @@ public class Optimizer : MonoBehaviour {
         // Try to load the genome from the XML document.
         try
         {
-            using (XmlReader xr = XmlReader.Create(champFileSavePath))
+            using (XmlReader xr = XmlReader.Create(superChampFileSavePath))
                 genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, (NeatGenomeFactory)experiment.CreateGenomeFactory())[0];
         }
         catch (Exception e1)
         {
-			print("Error loading genome from save file. ("+champFileSavePath+")\nLoading aborted.\n"
-				+ e1.Message + "\nJoe: " + champFileSavePath);
+			print("Error loading genome from save file. ("+superChampFileSavePath+")\nLoading aborted.\n"
+				+ e1.Message + "\nJoe: " + superChampFileSavePath);
             return;
         }
 

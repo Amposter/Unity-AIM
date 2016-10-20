@@ -4,6 +4,9 @@ using System.Collections;
 //A collection of setup and configuration variables as well as for car ID's
 public class Config {
 
+    public static bool NEAT = false;
+    public static bool HyperNEAT = true;
+
     // Use this for initialization
     public static int lastVIN = 0;
 
