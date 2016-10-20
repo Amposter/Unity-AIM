@@ -3,6 +3,7 @@ using System.Collections;
 using SharpNeat.Domains;
 using SharpNeat.EvolutionAlgorithms;
 using SharpNeat.Genomes.Neat;
+using SharpNeat.Genomes.HyperNeat;
 using SharpNeat.Decoders;
 using System.Collections.Generic;
 using System.Xml;
@@ -14,6 +15,8 @@ using SharpNeat.SpeciationStrategies;
 using SharpNeat.EvolutionAlgorithms.ComplexityRegulation;
 using SharpNEAT.Core;
 using System;
+using SharpNeat.Decoders.HyperNeat;
+using SharpNeat.Network;
 
 public class SimpleExperiment : INeatExperiment
 {
@@ -109,7 +112,56 @@ public class SimpleExperiment : INeatExperiment
 
     public IGenomeDecoder<NeatGenome, IBlackBox> CreateGenomeDecoder()
     {
-        return new NeatGenomeDecoder(_activationScheme);
+        if (Config.NEAT)
+        {
+            return new NeatGenomeDecoder(_activationScheme);
+        }
+        else if (Config.HyperNEAT)
+        {
+            //These are the actual input/output nodes for the ANN. The config file's input/output nodes differ as they are for the CPPN, not the ANN.
+            SubstrateNodeSet input = new SubstrateNodeSet(10);
+            SubstrateNodeSet hidden = new SubstrateNodeSet(5);
+            SubstrateNodeSet output = new SubstrateNodeSet(1);
+            //   SubstrateNodeSet hidden = new SubstrateNodeSet(10);
+
+            uint inputID = 1; uint hidID = 11; uint outputID = 16;
+
+            //Left to right sensors
+            for (int x = -4; x < 5; ++x, ++inputID)
+                input.NodeList.Add(new SubstrateNode(inputID, new double[] { x, -1 }));
+
+            //Back sensor
+            input.NodeList.Add(new SubstrateNode(inputID++, new double[] { 0, -2 }));
+
+
+
+            //Hidden nodes
+            for (int x = -4; x < 5; ++x, ++hidID)
+                hidden.NodeList.Add(new SubstrateNode(hidID, new double[] { x, 1 }));
+
+            //Output nodes
+            output.NodeList.Add(new SubstrateNode(outputID, new double[] { 0, 3 }));
+
+            List<SubstrateNodeSet> nodeSet = new List<SubstrateNodeSet>(3);
+            nodeSet.Add(input);
+            nodeSet.Add(hidden);
+            nodeSet.Add(output);
+
+            //Mapping
+            List<NodeSetMapping> nodeSetMapping = new List<NodeSetMapping>(1);
+            nodeSetMapping.Add(NodeSetMapping.Create(0, 1, (double?)null));
+            nodeSetMapping.Add(NodeSetMapping.Create(1, 2, (double?)null));
+
+            //Substrate using steepend sigmoids, < 0.2 will not gen a weight
+            Substrate substrate = new Substrate(nodeSet, DefaultActivationFunctionLibrary.CreateLibraryCppn(), 0, 0.2, 5, nodeSetMapping);
+
+            //Final decoder
+            IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder = //Cppn
+                new HyperNeatDecoder(substrate, _activationScheme, _activationScheme, false);
+
+            return genomeDecoder;
+        }
+        else throw new FormatException("Either NEAT or HyperNEAT needs to be checked in the Config.cs file!");
     }
 
     public IGenomeFactory<NeatGenome> CreateGenomeFactory()
