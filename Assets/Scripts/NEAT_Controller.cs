@@ -6,12 +6,15 @@ public class NEAT_Controller : SimpleHeuristicController
 {
 	public NEAT_GroupController groupController;
 	public bool finishedRoute = false;
-	public bool NEATMode = false;
+	public bool NEATMode = true;
 	public Vehicle vehicle;
 	public bool hasBeenTriggered = false;
 	float rewardTimer = 0;
 	float rewardTimeInterval = 0.25f;
 	float distanceRewardCutOff = 1f;
+
+    public enum Controller {HEURISTIC, NEURAL_NET};
+    public Controller controller;
 
 	// Use this for initialization
 	protected override void Start ()
@@ -30,67 +33,30 @@ public class NEAT_Controller : SimpleHeuristicController
 	{
 		base.Update ();
 
-		//if in NEAT_MODE issue time based rewards
-		if (NEATMode)
-		{
-			//distance to goal
-			if (distanceRewardCutOff - sensorInputs [11] >= 0.01f && sensorInputs [11] > 0)
-			{
-				groupController.groupFitness += 1000*((distanceRewardCutOff - sensorInputs [11])/0.01f);
-				groupController.groupFitness += (1 - minObstacleRange) * 10f;
-				distanceRewardCutOff -= (distanceRewardCutOff - sensorInputs [11]);
-			}
-
-			rewardTimer += Time.deltaTime;
-			if (rewardTimer >= rewardTimeInterval)
-			{
-
-				//penalize for not moving
-				if (gameObject.GetComponent<Rigidbody>().velocity.magnitude < 0.02)
-				{
-					groupController.groupFitness -= 1f;
-				}
-				//penalize for reversing or driving too slow
-				if (gameObject.GetComponent<Vehicle> ().gas < 0.65)
-				{
-					groupController.groupFitness -= 1f;
-				}
-				//penalize for movDing further from target
-				if ((curve.GetPointAt (1) - this.transform.position).magnitude > (curve.GetPointAt (1) - prevPos).magnitude)
-				{
-					groupController.groupFitness -= 0.5f;
-				}
-					
-				prevPos = this.transform.position;
-			}
-		}
-
-		if (!proximityWarning && NEATMode)
+        //Rewards for driving faster when not in an intersection.
+        if (controller == Controller.HEURISTIC)
         {
-            this.gameObject.GetComponent<Vehicle>().enabled = false;
-			gameObject.GetComponent<Rigidbody> ().velocity = Vector3.zero;
-			gameObject.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
-            NEATMode = false;
-            finalLayerMask = vehicleMask | pedestrianMask;
-            UpdateNextPoint();
-            Unpause();
-			groupController.groupFitness += 100;
-        }
-        else if (proximityWarning && !NEATMode)
-		{
-			Pause ();
-			finalLayerMask = vehicleMask | pedestrianMask | boundaryMask;
-			prevPos = this.transform.position;
-			prevDistance = 1;
-			prevMinObstacleDistance = float.MaxValue;
-			initialDistanceToTarget = (curve.GetPointAt(1)-this.transform.position).magnitude;
-			NEATMode = true;
-			if (hasBeenTriggered == false)
-			{
-				hasBeenTriggered = true;
-			}
-			groupController.totalTriggered++;
-			this.gameObject.GetComponent<Vehicle> ().enabled = true;
+            float speedWeight = getSpeedWeight();
+
+            if (speedWeight < 0.1)
+            { //no reward
+            }
+            else if (speedWeight < 0.3)
+            {
+                groupController.groupFitness += 0.001f;
+            }
+            else if (speedWeight < 0.5)
+            {
+                groupController.groupFitness += 0.003f;
+            }
+            else if (speedWeight < 0.85)
+            {
+                groupController.groupFitness += 0.09f;
+            }
+            else if (speedWeight <= 0.99)
+            {
+                groupController.groupFitness += 0.1f;
+            }
         }
 
 
@@ -100,16 +66,6 @@ public class NEAT_Controller : SimpleHeuristicController
 	public override void updateSensors()
 	{
 		base.updateSensors ();
-
-		//angle to targetWayPoint
-		float angle = Vector3.Angle (curve.GetPointAt (1) - this.transform.position, transform.forward);
-		Vector3 cross = Vector3.Cross (curve.GetPointAt (1) - this.transform.position, transform.forward);
-		angle = (cross.y < 0)?angle:-angle;
-		sensorInputs [10] = (float)Math.Round(((angle / 180)+1)/2,4);
-
-		//distance to target wayPoint
-		sensorInputs [11] = (float)Math.Round(Mathf.Clamp((curve.GetPointAt(1)-this.transform.position).magnitude/initialDistanceToTarget,0f,1f),4);
-		Debug.DrawLine (this.transform.position, curve.GetPointAt(1), Color.white);
 	}
 
 	public void startDriving(BezierCurve[] curves)
@@ -129,19 +85,26 @@ public class NEAT_Controller : SimpleHeuristicController
 			finishedRoute = true;
 			if(hasBeenTriggered)
 			{
-				groupController.groupFitness += 10000;
-			}
-          
+				groupController.groupFitness += 50;
+			}       
 		}
-	}
 
-	public void OnCollisionEnter(Collision other)
+        //Update controller type
+        if (other.gameObject.GetComponent<TrackWayPoint>().type == TrackWayPoint.Type.INTERSECTION_BORDER)
+        {
+            if (controller == Controller.HEURISTIC)
+                controller = Controller.NEURAL_NET;
+            else
+                controller = Controller.HEURISTIC;
+        }
+    }
+
+    public void OnCollisionEnter(Collision other)
 	{
 
 			finishedRoute = true;
-			groupController.groupFitness -= 1000;
+			groupController.groupFitness -= 100;
 			//print ("COLLISION");
-
 	}
 
 

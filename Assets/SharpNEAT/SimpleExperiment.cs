@@ -136,10 +136,10 @@ public class SimpleExperiment : INeatExperiment
 
 
             //Hidden nodes
-            for (int x = -4; x < 5; ++x, ++hidID)
+            for (int x = -2; x < 2; ++x, ++hidID)
                 hidden.NodeList.Add(new SubstrateNode(hidID, new double[] { x, 1 }));
 
-            //Output nodes
+            //Output node
             output.NodeList.Add(new SubstrateNode(outputID, new double[] { 0, 3 }));
 
             List<SubstrateNodeSet> nodeSet = new List<SubstrateNodeSet>(3);

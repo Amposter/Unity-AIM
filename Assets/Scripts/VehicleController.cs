@@ -8,7 +8,7 @@ public class VehicleController : MonoBehaviour
     public bool showSensorsDebug = true;
 	public float sensorRange = 10;
 	public float proximityThreshHold = 3;
-    public float[] sensorInputs = new float[12];
+    public float[] sensorInputs = new float[10];
     bool useFrontSensorOnly = false;
 	protected int finalLayerMask;
 	public bool proximityWarning = false;
@@ -34,7 +34,7 @@ public class VehicleController : MonoBehaviour
 	// Use this for initialization
 	protected virtual void Start ()
     {
-		finalLayerMask = vehicleMask | pedestrianMask; //build a layermask that only checks the boundary, vehicle and pedestrian physics layers
+		finalLayerMask = vehicleMask | pedestrianMask | boundaryMask; //build a layermask that only checks the boundary, vehicle and pedestrian physics layers
 	}
 
 

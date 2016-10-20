@@ -56,15 +56,12 @@ public class NEAT_GroupController : UnitController
 				box.InputSignalArray[7] = neatController.getSensorInputs()[7];
 				box.InputSignalArray[8] = neatController.getSensorInputs()[8];
 				box.InputSignalArray[9] = neatController.getSensorInputs()[9];
-				box.InputSignalArray[10] = neatController.getSensorInputs()[10];
-				box.InputSignalArray[11] = neatController.getSensorInputs()[11];
+
 
 				box.Activate();
+                //Invert output as all inputs are inverted
+                NEAT_Vehicle.GetComponent<SimpleHeuristicController>().setSpeedWeight(0.5f);//Mathf.Clamp((float)(box.OutputSignalArray[0])/SimpleHeuristicController.speed,0,1);
 
-				NEAT_Vehicle.GetComponent<Vehicle> ().gas = (float)Math.Round(box.OutputSignalArray[0],4);
-				NEAT_Vehicle.GetComponent<Vehicle> ().steer = (float)Math.Round(box.OutputSignalArray[1],4);
-
-				NEAT_Vehicle.GetComponent<Vehicle> ().updateControls ();
 			}
 
 		}
@@ -91,7 +88,8 @@ public class NEAT_GroupController : UnitController
 				GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
 				NEAT_Vehicle.transform.parent = transform;
 				NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
-				NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoint)));
+                NEAT_Vehicle.GetComponent<NEAT_Controller>().controller = NEAT_Controller.Controller.HEURISTIC;
+                NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoint)));
 				NEAT_VehiclesList.Add (NEAT_Vehicle);
 			}
 			yield return new WaitForSeconds(1f+(UnityEngine.Random.Range(1, 15)/10f));

@@ -5,11 +5,12 @@ public class SimpleHeuristicController : VehicleController
 {
 
 	//Public variabes
-	public float speed = 5f;
+	public static float speed = 5f;
 	public bool paused;
+    private float speedWeight;
 
-	//Private variables
-	public BezierCurve curve;
+    //Private variables
+    public BezierCurve curve;
 	private BezierCurve[] curves;
 	private int counter;
 
@@ -61,7 +62,7 @@ public class SimpleHeuristicController : VehicleController
 					yield return new WaitForFixedUpdate();
 				}
 
-				Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
+				Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speedWeight * speed * Time.deltaTime);
 				transform.LookAt(newPos);
 				transform.position = newPos;
 				if (transform.position == toPoint)
@@ -170,5 +171,15 @@ public class SimpleHeuristicController : VehicleController
 	{
 		return toPoint;
 	}
+
+    public void setSpeedWeight(float weight)
+    {
+        speedWeight = weight;
+    }
+
+    public float getSpeedWeight()
+    {
+        return speedWeight;
+    }
 }
 
