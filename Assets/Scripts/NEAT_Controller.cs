@@ -32,7 +32,6 @@ public class NEAT_Controller : SimpleHeuristicController
 	protected override void Update()
 	{
 		base.Update ();
-
         //Rewards for driving faster when not in an intersection.
         if (controller == Controller.HEURISTIC)
         {
@@ -70,9 +69,10 @@ public class NEAT_Controller : SimpleHeuristicController
 
 	public void startDriving(BezierCurve[] curves)
 	{
+        NEATMode = true;
 		setCurve (curves [0]);
 		setCurves (curves);
-		StartCoroutine ("AutoDrive");
+		StartCoroutine (base.AutoDrive());
 	}
 
 	public void OnTriggerEnter(Collider other)
@@ -102,7 +102,7 @@ public class NEAT_Controller : SimpleHeuristicController
     public void OnCollisionEnter(Collision other)
 	{
 
-			finishedRoute = true;
+			//finishedRoute = true;
 			groupController.groupFitness -= 100;
 			//print ("COLLISION");
 	}

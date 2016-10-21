@@ -30,7 +30,7 @@ public class NEAT_GroupController : UnitController
 	{
 		if (IsRunning)
 		{
-			foreach (GameObject NEAT_Vehicle in NEAT_VehiclesList)
+            foreach (GameObject NEAT_Vehicle in NEAT_VehiclesList)
 			{
 				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller> ();
 
@@ -60,8 +60,7 @@ public class NEAT_GroupController : UnitController
 
 				box.Activate();
                 //Invert output as all inputs are inverted
-                NEAT_Vehicle.GetComponent<SimpleHeuristicController>().setSpeedWeight(0.5f);//Mathf.Clamp((float)(box.OutputSignalArray[0])/SimpleHeuristicController.speed,0,1);
-
+                NEAT_Vehicle.GetComponent<SimpleHeuristicController>().setSpeedWeight(1-Mathf.Clamp((float)(box.OutputSignalArray[0])/SimpleHeuristicController.speed,0,1));
 			}
 
 		}

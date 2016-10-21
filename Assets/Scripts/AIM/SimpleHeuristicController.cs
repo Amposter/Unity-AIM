@@ -59,12 +59,12 @@ public class SimpleHeuristicController : VehicleController
 			{
 				while (paused) //Do nothing
 				{
-					yield return new WaitForFixedUpdate();
+                    yield return new WaitForFixedUpdate();
 				}
 
-				Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speedWeight * speed * Time.deltaTime);
-				transform.LookAt(newPos);
-				transform.position = newPos;
+                Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speedWeight * speed * Time.deltaTime);
+                transform.position = newPos;
+                //GetComponent<Rigidbody>().MovePosition(newPos);
 				if (transform.position == toPoint)
 				{
 					++offset;
@@ -136,7 +136,7 @@ public class SimpleHeuristicController : VehicleController
 			{
 				yield return null;
 			}
-			Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
+            Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
 			transform.LookAt(newPos);
 			transform.position = newPos; 
 			if (transform.position == toPoint)

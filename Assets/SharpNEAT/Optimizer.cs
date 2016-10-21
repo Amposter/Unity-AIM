@@ -13,15 +13,16 @@ public class Optimizer : MonoBehaviour {
     int NUM_INPUTS;
     int NUM_OUTPUTS;
 
-	public float evoSpeed = 10;
+	public float evoSpeed = 1;
 	public float runBestSpeed = 1;
 
     public int Trials;
     public float TrialDuration;
     public float StoppingFitness;
     bool EARunning;
-    string popFileSavePath, champFileSavePath;
-	float normalFixedDeltaTime;
+    string popFileSavePath, champFileSavePath, superChampFileSavePath;
+
+    float normalFixedDeltaTime;
 
     SimpleExperiment experiment;
     static NeatEvolutionAlgorithm<NeatGenome> _ea;
@@ -44,13 +45,13 @@ public class Optimizer : MonoBehaviour {
 	{
         if (Config.NEAT)
         {
-            NUM_INPUTS = 10;
-            NUM_OUTPUTS = 2;
+            NUM_INPUTS = 10; //Sensors
+            NUM_OUTPUTS = 1; //Speed
         }
         else if (Config.HyperNEAT)
         {
-            NUM_INPUTS = 4;
-            NUM_OUTPUTS = 1;
+            NUM_INPUTS = 4;  //Two substrate nodes (x1,y1,x2,y2) 
+            NUM_OUTPUTS = 2; //Weight stregnth + bias
         }
 
 		simController = GameObject.Find ("SimulationController").GetComponent<SimulationController> ();
@@ -66,8 +67,8 @@ public class Optimizer : MonoBehaviour {
 
 		champFileSavePath = string.Format(Application.dataPath+"/Resources/{0}.champ.xml", "NEAT_Controller");
 		popFileSavePath = string.Format(Application.dataPath+"/Resources/{0}.pop.xml", "NEAT_Controller");
-
-		normalFixedDeltaTime = Time.fixedDeltaTime;
+        superChampFileSavePath = string.Format(Application.dataPath + "/Resources/{0}.SUPERchamp.xml", "NEAT_Controller");
+        normalFixedDeltaTime = Time.fixedDeltaTime;
         //print(champFileSavePath);
 	}
 
@@ -184,7 +185,6 @@ public class Optimizer : MonoBehaviour {
 		controller.Activate(box);
     }
 
-    string superChampFileSavePath = string.Format(Application.dataPath + "/Resources/{0}.SUPERchamp.xml", "NEAT_Controller");
 
     double superFitness = 0;
     public void StopEvaluation(IBlackBox box)
