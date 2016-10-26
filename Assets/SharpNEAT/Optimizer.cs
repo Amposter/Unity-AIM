@@ -71,9 +71,7 @@ public class Optimizer : MonoBehaviour {
         superChampFileSavePath = string.Format(Application.dataPath + "/Resources/{0}.SUPERchamp.xml", "NEAT_Controller");
         normalFixedDeltaTime = Time.fixedDeltaTime;
         //print(champFileSavePath);
-
-		Invoke("StartEA",2.0f);
-	}
+			}
 
     // Update is called once per frame
     void Update()

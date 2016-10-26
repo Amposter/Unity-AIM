@@ -78,7 +78,7 @@ public class NEAT_GroupController : UnitController
 
 	protected IEnumerator spawnCars()
 	{
-		for (int i = 0; i < 15; i++)
+		for (int i = 0; i < 12; i++)
 		{
 			foreach (TrackWayPoint startPoint in _pathManager.startPoints)
 			{
