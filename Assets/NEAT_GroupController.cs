@@ -13,6 +13,9 @@ public class NEAT_GroupController : UnitController
     public float groupFitness;
 	private List<GameObject> NEAT_VehiclesList = new List<GameObject>();
 	public int totalTriggered = 0;
+	public int speedCheckCount = 0;
+	public float totalSpeedAccumulator = 0;
+	public int collisionCount = 0;
 
 	// Use this for initialization
 	void Start ()
@@ -32,7 +35,7 @@ public class NEAT_GroupController : UnitController
 		{
             foreach (GameObject NEAT_Vehicle in NEAT_VehiclesList)
 			{
-				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller> ();
+				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller>();
 
 				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute)
 				{
@@ -40,11 +43,6 @@ public class NEAT_GroupController : UnitController
 				}
 
 				neatController.updateSensors ();
-
-				if (!neatController.NEATMode)
-				{
-					continue;
-				}
 
 				box.InputSignalArray[0] = neatController.getSensorInputs()[0];
 				box.InputSignalArray[1] = neatController.getSensorInputs()[1];
@@ -57,10 +55,10 @@ public class NEAT_GroupController : UnitController
 				box.InputSignalArray[8] = neatController.getSensorInputs()[8];
 				box.InputSignalArray[9] = neatController.getSensorInputs()[9];
 
-
 				box.Activate();
-                //Invert output as all inputs are inverted
-                NEAT_Vehicle.GetComponent<SimpleHeuristicController>().setSpeedWeight(1-Mathf.Clamp((float)(box.OutputSignalArray[0])/SimpleHeuristicController.speed,0,1));
+ 
+				neatController.setSpeedWeight(Mathf.Clamp((float)(box.OutputSignalArray[0]),0 , 1));
+				neatController.updatePosition();
 			}
 
 		}
@@ -80,18 +78,29 @@ public class NEAT_GroupController : UnitController
 
 	protected IEnumerator spawnCars()
 	{
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 15; i++)
 		{
 			foreach (TrackWayPoint startPoint in _pathManager.startPoints)
 			{
-				GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
-				NEAT_Vehicle.transform.parent = transform;
-				NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
-                NEAT_Vehicle.GetComponent<NEAT_Controller>().controller = NEAT_Controller.Controller.HEURISTIC;
-                NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoint)));
-				NEAT_VehiclesList.Add (NEAT_Vehicle);
+				Collider[] colliders = Physics.OverlapSphere(startPoint.transform.position, 1);
+				bool full = false;
+				foreach (Collider col in colliders)
+				{
+					if (col.gameObject.tag == "Vehicle")
+						full = true;
+				}
+
+				if (!full) {
+					GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
+					NEAT_Vehicle.transform.parent = transform;
+					NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
+					NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoint)));
+					NEAT_VehiclesList.Add (NEAT_Vehicle);
+				} else {
+					i--;
+				}
 			}
-			yield return new WaitForSeconds(1f+(UnityEngine.Random.Range(1, 15)/10f));
+			yield return new WaitForSeconds(1f+(UnityEngine.Random.Range(1, 20)/10f));
 		}
 
 		yield return null;
@@ -100,18 +109,7 @@ public class NEAT_GroupController : UnitController
 
 	public override float GetFitness()
 	{
-		if (totalTriggered > 0)
-		{
-			if (groupFitness <= 0)
-			{
-				return 1;
-			}
-			return groupFitness / totalTriggered;
-		}
-		else
-		{
-			return 0.1f;
-		}
+		return Mathf.Clamp(((totalSpeedAccumulator / speedCheckCount) * 1000) - (collisionCount*100), 1, float.MaxValue);
 	}
 
 
