@@ -17,6 +17,7 @@ public class SimulationController : MonoBehaviour
 	void Start ()
 	{
 		Application.targetFrameRate = 60;
+		Time.fixedDeltaTime = 1f / 20f;
 
 		normalFixedDeltaTime = Time.fixedDeltaTime;
 		foreach (GameObject track in tracksList)

@@ -34,7 +34,7 @@ public class VehicleController : MonoBehaviour
 	// Use this for initialization
 	protected virtual void Start ()
     {
-		finalLayerMask = vehicleMask | pedestrianMask | boundaryMask; //build a layermask that only checks the boundary, vehicle and pedestrian physics layers
+		finalLayerMask = vehicleMask | pedestrianMask; //build a layermask that only checks the boundary, vehicle and pedestrian physics layers
 	}
 
 

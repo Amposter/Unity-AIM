@@ -7,14 +7,14 @@ public class SimpleHeuristicController : VehicleController
 	//Public variabes
 	public static float speed = 5f;
 	public bool paused;
-    private float speedWeight;
+    public float speedWeight;
 
     //Private variables
     public BezierCurve curve;
 	private BezierCurve[] curves;
-	private int counter;
+	protected int counter;
 
-	private int offset;
+	protected int offset;
 	protected Vector3 toPoint;
 
 	protected int resolution; //Number of points to sample on each path curve
@@ -32,6 +32,38 @@ public class SimpleHeuristicController : VehicleController
 	{
 		base.Update ();
 	}
+		
+
+	public void updatePosition()
+	{		
+		resolution = 25;
+
+
+		if (offset <= resolution) {
+			if (paused) { //Do nothing
+				return;
+			}
+
+			Vector3 newPos = Vector3.MoveTowards (transform.position, toPoint, speedWeight * speed * Time.fixedDeltaTime);
+			transform.position = newPos;
+			//GetComponent<Rigidbody>().MovePosition(newPos);
+			if (transform.position == toPoint) {
+				++offset;
+				toPoint = curve.GetPointAt ((float)offset / resolution);
+				toPoint.y = transform.position.y;
+				transform.LookAt (toPoint);
+			}
+		} else if (counter < curves.Length - 1) {
+			++counter;
+			this.curve = curves [counter];
+			offset = 1;
+			toPoint = curve.GetPointAt (offset / (float)resolution);
+			toPoint.y = transform.position.y;
+			transform.LookAt (toPoint);
+		} else {
+			return;
+		}
+	}
 
 	public void setCurve(BezierCurve curve)
 	{
@@ -43,39 +75,7 @@ public class SimpleHeuristicController : VehicleController
 		this.curves = curves;
 	}
 
-	protected virtual IEnumerator AutoDrive()
-	{
-		resolution = 25;
-		//  foreach (BezierCurve curve in curves)
-		for (counter = 0; counter < curves.Length; ++counter)
-		{
-			this.curve = curves[counter];
-			offset = 1;
-			toPoint = curve.GetPointAt(offset / (float)resolution);
-			toPoint.y = transform.position.y;
-			transform.LookAt(toPoint);
 
-			while (offset <= resolution)
-			{
-				while (paused) //Do nothing
-				{
-                    yield return new WaitForFixedUpdate();
-				}
-
-                Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speedWeight * speed * Time.deltaTime);
-                transform.position = newPos;
-                //GetComponent<Rigidbody>().MovePosition(newPos);
-				if (transform.position == toPoint)
-				{
-					++offset;
-					toPoint = curve.GetPointAt((float)offset / resolution);
-					toPoint.y = transform.position.y;
-					transform.LookAt(toPoint);
-				}
-				yield return new WaitForFixedUpdate();
-			}
-		}
-	}
 
 	protected void AutoDriveFrame()
 	{
