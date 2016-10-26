@@ -54,7 +54,6 @@ public class NEAT_Controller : SimpleHeuristicController
 		setCurve (curves [0]);
 		setCurves (curves);
 
-		Debug.Log ("setup");
 		resolution = 25;
 		counter = 0;
 		this.curve = curves[counter];

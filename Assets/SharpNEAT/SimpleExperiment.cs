@@ -166,7 +166,10 @@ public class SimpleExperiment : INeatExperiment
 
     public IGenomeFactory<NeatGenome> CreateGenomeFactory()
     {
-        return new NeatGenomeFactory(InputCount, OutputCount, _neatGenomeParams);
+		if (Config.NEAT)
+        	return new NeatGenomeFactory(InputCount, OutputCount, _neatGenomeParams);
+		else
+			return new CppnGenomeFactory(InputCount, OutputCount, _neatGenomeParams);
     }
 
     public NeatEvolutionAlgorithm<NeatGenome> CreateEvolutionAlgorithm(string fileName)

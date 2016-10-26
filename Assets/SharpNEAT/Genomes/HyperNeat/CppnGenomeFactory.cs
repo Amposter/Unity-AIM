@@ -30,6 +30,12 @@ namespace SharpNeat.Genomes.HyperNeat
     {
         #region Constructors
 
+		// /*HERE*/ Added to create a factory with specified parameters 
+         public CppnGenomeFactory(int inputNeuronCount, int outputNeuronCount, NeatGenomeParameters neatParams) 
+         : base(inputNeuronCount, outputNeuronCount, DefaultActivationFunctionLibrary.CreateLibraryCppn(), neatParams) 
+         { 
+         } 
+		
         /// <summary>
         /// Constructs with default NeatGenomeParameters, ID generators initialized to zero and a
         /// default IActivationFunctionLibrary.

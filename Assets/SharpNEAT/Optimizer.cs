@@ -54,6 +54,7 @@ public class Optimizer : MonoBehaviour {
             NUM_OUTPUTS = 2; //Weight stregnth + bias
         }
 
+		System.Console.WriteLine("From optimizer.");
 		simController = GameObject.Find ("SimulationController").GetComponent<SimulationController> ();
 
         Utility.DebugLog = true;
@@ -70,6 +71,8 @@ public class Optimizer : MonoBehaviour {
         superChampFileSavePath = string.Format(Application.dataPath + "/Resources/{0}.SUPERchamp.xml", "NEAT_Controller");
         normalFixedDeltaTime = Time.fixedDeltaTime;
         //print(champFileSavePath);
+
+		Invoke("StartEA",2.0f);
 	}
 
     // Update is called once per frame
@@ -277,5 +280,5 @@ public class Optimizer : MonoBehaviour {
         }
 
 		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nTimeScale: {2}", Generation, Fitness, Time.timeScale));
-    }
+	}
 }

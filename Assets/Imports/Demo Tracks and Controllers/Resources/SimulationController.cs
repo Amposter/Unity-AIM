@@ -16,7 +16,7 @@ public class SimulationController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		Application.targetFrameRate = 60;
+		Application.targetFrameRate = 20;
 		Time.fixedDeltaTime = 1f / 20f;
 
 		normalFixedDeltaTime = Time.fixedDeltaTime;
