@@ -31,6 +31,7 @@ public class VehicleController : MonoBehaviour
 	protected int vehicleMask = 1 << 10;
 	protected int pedestrianMask = 1 << 11;
 
+
 	// Use this for initialization
 	protected virtual void Start ()
     {
