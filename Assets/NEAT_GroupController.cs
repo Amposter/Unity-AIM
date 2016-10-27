@@ -15,6 +15,8 @@ public class NEAT_GroupController : UnitController
 	public int totalTriggered = 0;
 	public int speedCheckCount = 0;
 	public float totalSpeedAccumulator = 0;
+	public int minDistanceCheckCount = 0;
+	public float totalDistanceAccumulator = 0;
 	public int collisionCount = 0;
 
 	// Use this for initialization
@@ -109,7 +111,11 @@ public class NEAT_GroupController : UnitController
 
 	public override float GetFitness()
 	{
-		return Mathf.Clamp(((totalSpeedAccumulator / speedCheckCount) * 1000) - (collisionCount*100), 1, float.MaxValue);
+		return Mathf.Clamp(
+							((totalSpeedAccumulator / speedCheckCount) * 1000)
+							+((totalDistanceAccumulator / minDistanceCheckCount) * 1000)
+							-(collisionCount*150)
+							,1, float.MaxValue);
 	}
 
 

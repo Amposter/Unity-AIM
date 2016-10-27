@@ -40,6 +40,8 @@ public class NEAT_Controller : SimpleHeuristicController
 
 			groupController.speedCheckCount++;
 			groupController.totalSpeedAccumulator += getSpeedWeight ();
+			groupController.minDistanceCheckCount++;
+			groupController.totalDistanceAccumulator += (1f-minObstacleRange);
 		}
 
 	}

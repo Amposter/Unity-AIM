@@ -101,13 +101,23 @@ public class SimpleExperiment : INeatExperiment
 
     public List<NeatGenome> LoadPopulation(XmlReader xr)
     {
-        NeatGenomeFactory genomeFactory = (NeatGenomeFactory)CreateGenomeFactory();
-        return NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, genomeFactory);
+		if (Config.NEAT) {
+			NeatGenomeFactory genomeFactory = (NeatGenomeFactory)CreateGenomeFactory ();
+			return NeatGenomeXmlIO.ReadCompleteGenomeList (xr, false, genomeFactory);
+		}
+		else 
+		{
+			CppnGenomeFactory genomeFactory = (CppnGenomeFactory)CreateGenomeFactory (); 			
+			return NeatGenomeXmlIO.ReadCompleteGenomeList (xr, true, genomeFactory);
+		}
     }
 
     public void SavePopulation(XmlWriter xw, IList<NeatGenome> genomeList)
     {
-        NeatGenomeXmlIO.WriteComplete(xw, genomeList, false);
+		if (Config.NEAT)
+        	NeatGenomeXmlIO.WriteComplete(xw, genomeList, false);
+		else
+			NeatGenomeXmlIO.WriteComplete(xw, genomeList, true);
     }
 
     public IGenomeDecoder<NeatGenome, IBlackBox> CreateGenomeDecoder()

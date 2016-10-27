@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SharpNeat.Phenomes;
+using SharpNeat.Genomes.HyperNeat;
 using System.Collections.Generic;
 using SharpNeat.EvolutionAlgorithms;
 using SharpNeat.Genomes.Neat;
@@ -215,17 +216,27 @@ public class Optimizer : MonoBehaviour {
 		//Time.fixedDeltaTime = normalFixedDeltaTime * (1/runBestSpeed);
         NeatGenome genome = null;
 
+		string xmlPath = UnityEditor.EditorUtility.OpenFilePanel ("Select XML", string.Format (UnityEngine.Application.dataPath + "/Resources/"), null);
 
         // Try to load the genome from the XML document.
         try
         {
-            using (XmlReader xr = XmlReader.Create(superChampFileSavePath))
+			if (Config.NEAT)
+			{
+				using (XmlReader xr = XmlReader.Create(xmlPath))
                 genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, (NeatGenomeFactory)experiment.CreateGenomeFactory())[0];
-        }
+			}
+			else 
+			{
+				using (XmlReader xr = XmlReader.Create(xmlPath))
+					genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, true, (CppnGenomeFactory)experiment.CreateGenomeFactory())[0];
+			}
+
+		}
         catch (Exception e1)
         {
-			print("Error loading genome from save file. ("+superChampFileSavePath+")\nLoading aborted.\n"
-				+ e1.Message + "\nJoe: " + superChampFileSavePath);
+			print("Error loading genome from save file. ("+xmlPath+")\nLoading aborted.\n"
+				+ e1.Message);
             return;
         }
 
@@ -272,7 +283,7 @@ public class Optimizer : MonoBehaviour {
         {
             StopEA();
         }
-        if (GUI.Button(new Rect(10, 110, 100, 40), "Run best"))
+        if (GUI.Button(new Rect(10, 110, 100, 40), "Open File"))
         {
             RunBest();
         }
