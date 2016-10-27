@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SharpNeat.Phenomes;
+using SharpNeat.Genomes.HyperNeat;
 using System.Collections.Generic;
 using SharpNeat.EvolutionAlgorithms;
 using SharpNeat.Genomes.Neat;
@@ -219,9 +220,18 @@ public class Optimizer : MonoBehaviour {
         // Try to load the genome from the XML document.
         try
         {
+			if (Config.NEAT)
+			{
             using (XmlReader xr = XmlReader.Create(superChampFileSavePath))
                 genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, (NeatGenomeFactory)experiment.CreateGenomeFactory())[0];
-        }
+			}
+			else 
+			{
+				using (XmlReader xr = XmlReader.Create(superChampFileSavePath))
+					genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, true, (CppnGenomeFactory)experiment.CreateGenomeFactory())[0];
+			}
+
+		}
         catch (Exception e1)
         {
 			print("Error loading genome from save file. ("+superChampFileSavePath+")\nLoading aborted.\n"
