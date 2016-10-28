@@ -41,7 +41,7 @@ public class Optimizer : MonoBehaviour {
     private double Fitness;
 	SimulationController simController = null;
 	FileBrowser browser;
-
+	string mode = "";
 
 	// Use this for initialization
 	void Start ()
@@ -75,7 +75,16 @@ public class Optimizer : MonoBehaviour {
         normalFixedDeltaTime = Time.fixedDeltaTime;
         //print(champFileSavePath);
 		browser = new FileBrowser (string.Format (UnityEngine.Application.dataPath + "/Resources/"), 1, new Rect(new Vector2(0,0), new Vector2(300,300)));
-			}
+		if (Config.NEAT)
+		{
+			mode = "NEAT";
+		}
+		else if (Config.HyperNEAT)
+		{
+			mode = "HYPERNEAT";
+		}
+
+		}
 
     // Update is called once per frame
     void Update()
@@ -317,7 +326,7 @@ public class Optimizer : MonoBehaviour {
 
 
 
-		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nSuperFitness: {3:0.00}\nTimeScale: {2}", Generation, Fitness, Time.timeScale, superFitness));
+		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nSuperFitness: {3:0.00}\nTimeScale: {2}\n{4}", Generation, Fitness, Time.timeScale, superFitness, mode));
 	}
 
 	bool fileBrowserOpen = false;
