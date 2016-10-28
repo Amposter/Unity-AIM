@@ -308,7 +308,7 @@ public class Optimizer : MonoBehaviour {
 
 
 
-		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nTimeScale: {2}", Generation, Fitness, Time.timeScale));
+		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nSuperFitness: {3:0.00}\nTimeScale: {2}", Generation, Fitness, Time.timeScale, superFitness));
 	}
 
 	bool fileBrowserOpen = false;

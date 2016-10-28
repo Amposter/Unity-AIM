@@ -18,6 +18,7 @@ public class NEAT_GroupController : UnitController
 	public int minDistanceCheckCount = 0;
 	public float totalDistanceAccumulator = 0;
 	public int collisionCount = 0;
+	private int spawnBlockedCount = 0;
 
 	// Use this for initialization
 	void Start ()
@@ -92,13 +93,17 @@ public class NEAT_GroupController : UnitController
 						full = true;
 				}
 
-				if (!full) {
+				if (!full)
+				{
 					GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
 					NEAT_Vehicle.transform.parent = transform;
 					NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
 					NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoint)));
 					NEAT_VehiclesList.Add (NEAT_Vehicle);
-				} else {
+				}
+				else
+				{
+					spawnBlockedCount++;
 					i--;
 				}
 			}
@@ -112,9 +117,10 @@ public class NEAT_GroupController : UnitController
 	public override float GetFitness()
 	{
 		return Mathf.Clamp(
-							((totalSpeedAccumulator / speedCheckCount) * 1000)
+							((totalSpeedAccumulator / speedCheckCount) * 2000)
 							+((totalDistanceAccumulator / minDistanceCheckCount) * 1000)
-							-(collisionCount*150)
+							-(spawnBlockedCount*100)
+							-(collisionCount*250)
 							,1, float.MaxValue);
 	}
 
