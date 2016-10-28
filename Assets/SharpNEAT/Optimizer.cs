@@ -40,6 +40,8 @@ public class Optimizer : MonoBehaviour {
     private uint Generation;
     private double Fitness;
 	SimulationController simController = null;
+	FileBrowser browser;
+
 
 	// Use this for initialization
 	void Start ()
@@ -72,6 +74,7 @@ public class Optimizer : MonoBehaviour {
         superChampFileSavePath = string.Format(Application.dataPath + "/Resources/{0}.SUPERchamp.xml", "NEAT_Controller");
         normalFixedDeltaTime = Time.fixedDeltaTime;
         //print(champFileSavePath);
+		browser = new FileBrowser (string.Format (UnityEngine.Application.dataPath + "/Resources/"), 1, new Rect(new Vector2(0,0), new Vector2(300,300)));
 			}
 
     // Update is called once per frame
@@ -187,7 +190,7 @@ public class Optimizer : MonoBehaviour {
 		controller.Activate(box);
     }
 
-
+	string xmlPath = "";
     double superFitness = 0;
     public void StopEvaluation(IBlackBox box)
     {
@@ -216,9 +219,7 @@ public class Optimizer : MonoBehaviour {
 		//Time.fixedDeltaTime = normalFixedDeltaTime * (1/runBestSpeed);
         NeatGenome genome = null;
 
-		string xmlPath = UnityEditor.EditorUtility.OpenFilePanel ("Select XML", string.Format (UnityEngine.Application.dataPath + "/Resources/"), null);
 
-        // Try to load the genome from the XML document.
         try
         {
 			if (Config.NEAT)
@@ -285,9 +286,35 @@ public class Optimizer : MonoBehaviour {
         }
         if (GUI.Button(new Rect(10, 110, 100, 40), "Open File"))
         {
-            RunBest();
+			showFileBrowser ();
         }
+
+		if(fileBrowserOpen)
+		{
+			if (browser.draw ())
+			{
+				if (browser.outputFile != null) {
+					xmlPath = browser.outputFile.ToString ();
+					RunBest ();
+					browser.outputFile = null;
+					fileBrowserOpen = false;
+				}
+				else
+				{
+					fileBrowserOpen = false;
+				}
+			}
+		}
+
+
 
 		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nTimeScale: {2}", Generation, Fitness, Time.timeScale));
 	}
+
+	bool fileBrowserOpen = false;
+	private void showFileBrowser()
+	{
+		fileBrowserOpen = true;
+	}
+
 }
