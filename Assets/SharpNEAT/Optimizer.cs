@@ -99,6 +99,11 @@ public class Optimizer : MonoBehaviour {
                 print("Lowering time scale to " + Time.timeScale);
             }
         }
+
+		if(guiForm != null)
+		{
+			guiForm.RefreshView ();
+		}
     }
 
     public void StartEA()
@@ -213,6 +218,7 @@ public class Optimizer : MonoBehaviour {
 		((NEAT_GroupController)ControllerMap [box]).cleanUp ();
     }
 
+	SharpNeatGUI.GenomeForm guiForm;
     public void RunBest()
     {
 		Time.timeScale = runBestSpeed;
@@ -247,7 +253,10 @@ public class Optimizer : MonoBehaviour {
         // Decode the genome into a phenome (neural network).
         var phenome = genomeDecoder.Decode(genome);
 
-		//print("Running best genome with fitness: "+ genome.BirthGeneration);
+
+
+		guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView(), genome);
+
 
 		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
 		UnitController controller = groupController.GetComponent<UnitController>();
