@@ -117,11 +117,7 @@ namespace SharpNEAT.Core
                     var fit = fitness;
                     fitness /= _optimizer.Trials; // Averaged fitness
                     
-                    if (fit > _optimizer.StoppingFitness)
-                    {
-                      //  Utility.Log("Fitness is " + fit + ", stopping now because stopping fitness is " + _optimizer.StoppingFitness);
-                      //  _phenomeEvaluator.StopConditionSatisfied = true;
-                    }
+               
                     genome.EvaluationInfo.SetFitness(fitness);
                     genome.EvaluationInfo.AuxFitnessArr = fitnessDict[genome][0]._auxFitnessArr;
                 }

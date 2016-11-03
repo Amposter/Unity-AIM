@@ -81,7 +81,44 @@ public class NEAT_GroupController : UnitController
 
 	protected IEnumerator spawnCars()
 	{
-		for (int i = 0; i < 12; i++)
+		int numCars = 0;
+		int track = GameObject.Find ("SimulationController").GetComponent<SimulationController> ().getTrack ();
+		switch (track) {
+		case 1:
+			numCars = 12;
+			break;
+		case 2:
+			numCars = 5;
+			break;
+		case 3:
+			numCars = 6;
+			break;
+		case 4:
+			numCars = 9;
+			break;
+		case 5:
+			numCars = 4;
+			break;
+		case 6:
+			numCars = 3;
+			break;
+		case 7:
+			numCars = 6;
+			break;
+		case 8:
+			numCars = 12;
+			break;
+		case 9:
+			numCars = 7;
+			break;
+		case 10:
+			numCars = 12;
+			break;
+		}
+
+		Debug.Log (numCars);
+
+		for (int i = 0; i < numCars; i++)
 		{
 			foreach (TrackWayPoint startPoint in _pathManager.startPoints)
 			{

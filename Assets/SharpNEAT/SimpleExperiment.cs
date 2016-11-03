@@ -122,56 +122,269 @@ public class SimpleExperiment : INeatExperiment
 
     public IGenomeDecoder<NeatGenome, IBlackBox> CreateGenomeDecoder()
     {
-        if (Config.NEAT)
-        {
-            return new NeatGenomeDecoder(_activationScheme);
-        }
-        else if (Config.HyperNEAT)
-        {
-            //These are the actual input/output nodes for the ANN. The config file's input/output nodes differ as they are for the CPPN, not the ANN.
-            SubstrateNodeSet input = new SubstrateNodeSet(10);
-            SubstrateNodeSet hidden = new SubstrateNodeSet(5);
-            SubstrateNodeSet output = new SubstrateNodeSet(1);
-            //   SubstrateNodeSet hidden = new SubstrateNodeSet(10);
+		{
+			if (Config.NEAT) {
+				return new NeatGenomeDecoder (_activationScheme);
+			} else if (Config.HyperNEAT) {
+				if (Config.substrateSetup == Config.HyperNEATSubstrateSetup.StopGo) {
+					//These are the actual input/output nodes for the ANN. The config file's input/output nodes differ as they are for the CPPN, not the ANN.
+					SubstrateNodeSet input = new SubstrateNodeSet (10);
+					SubstrateNodeSet hidden = new SubstrateNodeSet (5);
+					SubstrateNodeSet output = new SubstrateNodeSet (1);
+					//   SubstrateNodeSet hidden = new SubstrateNodeSet(10);
 
-            uint inputID = 1; uint hidID = 11; uint outputID = 16;
+					uint inputID = 1;
+					uint hidID = 11;
+					uint outputID = 16;
 
-            //Left to right sensors
-            for (int x = -4; x < 5; ++x, ++inputID)
-                input.NodeList.Add(new SubstrateNode(inputID, new double[] { x, -1 }));
+					if (!Config.substrateHiddenNodes) {
+						outputID = 11;
+					}
 
-            //Back sensor
-            input.NodeList.Add(new SubstrateNode(inputID++, new double[] { 0, -2 }));
+					//Left to right sensors
+					for (int x = -4; x < 5; ++x, ++inputID)
+						input.NodeList.Add (new SubstrateNode (inputID, new double[] { x, -1 }));
+
+					//Back sensor
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 0, -2 }));
+
+					//Hidden nodes
+					if (Config.substrateHiddenNodes) {
+						for (int x = -2; x < 2; ++x, ++hidID)
+							hidden.NodeList.Add (new SubstrateNode (hidID, new double[] { x, 2 }));
+					}
+					//Output node
+					output.NodeList.Add (new SubstrateNode (outputID, new double[] { 0, 4 }));
+
+					List<SubstrateNodeSet> nodeSet;
+					if (Config.substrateHiddenNodes) {
+						nodeSet = new List<SubstrateNodeSet> (3);
+						nodeSet.Add (input);
+						nodeSet.Add (hidden);
+						nodeSet.Add (output);
+					} else {
+						nodeSet = new List<SubstrateNodeSet> (2);
+						nodeSet.Add (input);
+						nodeSet.Add (output);
+					}
+
+					List<NodeSetMapping> nodeSetMapping;
+					//Mapping
+					if (Config.substrateHiddenNodes) {
+						nodeSetMapping = new List<NodeSetMapping> (2);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+						nodeSetMapping.Add (NodeSetMapping.Create (1, 2, (double?)null));
+					} else {
+						nodeSetMapping = new List<NodeSetMapping> (1);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+					}
+					//Substrate using steepend sigmoids, < 0.2 will not gen a weight 														
+					Substrate substrate = new Substrate (nodeSet, DefaultActivationFunctionLibrary.CreateLibraryCppn (), 3, 0.2, 5, nodeSetMapping);
+					//3 = Sine fn
+					//Final decoder
+					IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder = //Cppn
+						new HyperNeatDecoder (substrate, _activationScheme, _activationScheme, false);
+
+					return genomeDecoder;
+				} else if (Config.substrateSetup == Config.HyperNEATSubstrateSetup.SimpleDeviatePath) {
+					//These are the actual input/output nodes for the ANN. The config file's input/output nodes differ as they are for the CPPN, not the ANN.
+					SubstrateNodeSet input = new SubstrateNodeSet (12);
+					SubstrateNodeSet hidden = new SubstrateNodeSet (5);
+					SubstrateNodeSet output = new SubstrateNodeSet (2);
+					//   SubstrateNodeSet hidden = new SubstrateNodeSet(10);
+
+					uint inputID = 1;
+					uint hidID = 13;
+					uint outputID = 18;
+
+					if (!Config.substrateHiddenNodes) {
+						outputID = 13;
+					}
+
+					//Left to right sensors
+					for (int x = -4; x < 5; ++x, ++inputID)
+						input.NodeList.Add (new SubstrateNode (inputID, new double[] { x, -1 }));
+
+					//Back sensor
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 0, -2 }));
+
+					//Angle and distance
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 0, 0 }));
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 0, 1 }));
+
+					//Hidden nodes
+					if (Config.substrateHiddenNodes) {
+						for (int x = -2; x < 2; ++x, ++hidID)
+							hidden.NodeList.Add (new SubstrateNode (hidID, new double[] { x, 2 }));
+					}
+
+					//Output nodes: angle and speed
+					output.NodeList.Add (new SubstrateNode (outputID++, new double[] { 0, 3 }));
+					output.NodeList.Add (new SubstrateNode (outputID, new double[] { 0, 4 }));
+
+					List<SubstrateNodeSet> nodeSet;
+					if (Config.substrateHiddenNodes) {
+						nodeSet = new List<SubstrateNodeSet> (3);
+						nodeSet.Add (input);
+						nodeSet.Add (hidden);
+						nodeSet.Add (output);
+					} else {
+						nodeSet = new List<SubstrateNodeSet> (2);
+						nodeSet.Add (input);
+						nodeSet.Add (output);
+					}
+
+					List<NodeSetMapping> nodeSetMapping;
+					//Mapping
+					if (Config.substrateHiddenNodes) {
+						nodeSetMapping = new List<NodeSetMapping> (2);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+						nodeSetMapping.Add (NodeSetMapping.Create (1, 2, (double?)null));
+					} else {
+						nodeSetMapping = new List<NodeSetMapping> (1);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+					}
+					//Substrate using steepend sigmoids, < 0.2 will not gen a weight 														
+					Substrate substrate = new Substrate (nodeSet, DefaultActivationFunctionLibrary.CreateLibraryCppn (), 3, 0.2, 5, nodeSetMapping);
+					//3 = Sine fn
+					//Final decoder
+					IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder = //Cppn
+						new HyperNeatDecoder (substrate, _activationScheme, _activationScheme, false);
+
+					return genomeDecoder;
+				} else if (Config.substrateSetup == Config.HyperNEATSubstrateSetup.SingleObstacleInput) {
+					//These are the actual input/output nodes for the ANN. The config file's input/output nodes differ as they are for the CPPN, not the ANN.
+					SubstrateNodeSet input = new SubstrateNodeSet (2);
+					SubstrateNodeSet hidden = new SubstrateNodeSet (5);
+					SubstrateNodeSet output = new SubstrateNodeSet (2);
+					//   SubstrateNodeSet hidden = new SubstrateNodeSet(10);
+
+					uint inputID = 1;
+					uint hidID = 3;
+					uint outputID = 8;
+
+					if (!Config.substrateHiddenNodes) {
+						outputID = 8;
+					}
+
+					//Angle and distance to closest obstacle
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 0, 0 }));
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 0, 1 }));
+
+					//Hidden nodes
+					if (Config.substrateHiddenNodes) {
+						for (int x = -2; x < 2; ++x, ++hidID)
+							hidden.NodeList.Add (new SubstrateNode (hidID, new double[] { x, 2 }));
+					}
+
+					//Output nodes: angle and speed
+					output.NodeList.Add (new SubstrateNode (outputID, new double[] { 0, 3 }));
+					output.NodeList.Add (new SubstrateNode (outputID, new double[] { 0, 4 }));
+
+					List<SubstrateNodeSet> nodeSet;
+					if (Config.substrateHiddenNodes) {
+						nodeSet = new List<SubstrateNodeSet> (3);
+						nodeSet.Add (input);
+						nodeSet.Add (hidden);
+						nodeSet.Add (output);
+					} else {
+						nodeSet = new List<SubstrateNodeSet> (2);
+						nodeSet.Add (input);
+						nodeSet.Add (output);
+					}
+
+					List<NodeSetMapping> nodeSetMapping;
+					//Mapping
+					if (Config.substrateHiddenNodes) {
+						nodeSetMapping = new List<NodeSetMapping> (2);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+						nodeSetMapping.Add (NodeSetMapping.Create (1, 2, (double?)null));
+					} else {
+						nodeSetMapping = new List<NodeSetMapping> (1);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+					}
+					//Substrate using steepend sigmoids, < 0.2 will not gen a weight 														
+					Substrate substrate = new Substrate (nodeSet, DefaultActivationFunctionLibrary.CreateLibraryCppn (), 3, 0.2, 5, nodeSetMapping);
+					//3 = Sine fn
+					//Final decoder
+					IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder = //Cppn
+						new HyperNeatDecoder (substrate, _activationScheme, _activationScheme, false);
+
+					return genomeDecoder;
+				} else if (Config.substrateSetup == Config.HyperNEATSubstrateSetup.ComplexStopGo) 
+				{
+					//These are the actual input/output nodes for the ANN. The config file's input/output nodes differ as they are for the CPPN, not the ANN.
+					SubstrateNodeSet input = new SubstrateNodeSet (10);
+					SubstrateNodeSet hidden = new SubstrateNodeSet (5);
+					SubstrateNodeSet output = new SubstrateNodeSet (1);
+					//   SubstrateNodeSet hidden = new SubstrateNodeSet(10);
+
+					uint inputID = 1;
+					uint hidID = 11;
+					uint outputID = 16;
+
+					if (!Config.substrateHiddenNodes) {
+						outputID = 11;
+					}
+
+					//Sensors
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { -10, 0 })); // left
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { -9.24, 3.83 })); // left + 22.5*
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { -7.07 , 7.07 })); // 45* left
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { -3.83, 9.24 })); // left + 62.5*
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 0, 10 })); // forward
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 3.83, 9.24 })); // forward + 22.5*
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 7.07, 7.07 })); // 45* right
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 9.24, 3.83 })); // forward + 62.5*
+					input.NodeList.Add (new SubstrateNode (inputID++, new double[] { 10, 0 })); // right
+					input.NodeList.Add (new SubstrateNode (inputID, new double[] { 0, -10 })); // back
 
 
+					//Hidden nodes
+					if (Config.substrateHiddenNodes) {
+						for (int x = -2; x < 2; ++x, ++hidID)
+							hidden.NodeList.Add (new SubstrateNode (hidID, new double[] { x, 3 }));
+					}
 
-            //Hidden nodes
-            for (int x = -2; x < 2; ++x, ++hidID)
-                hidden.NodeList.Add(new SubstrateNode(hidID, new double[] { x, 1 }));
+					//Output node
+					output.NodeList.Add (new SubstrateNode (outputID, new double[] { 0, 0 }));
 
-            //Output node
-            output.NodeList.Add(new SubstrateNode(outputID, new double[] { 0, 3 }));
+					List<SubstrateNodeSet> nodeSet;
+					if (Config.substrateHiddenNodes) {
+						nodeSet = new List<SubstrateNodeSet> (3);
+						nodeSet.Add (input);
+						nodeSet.Add (hidden);
+						nodeSet.Add (output);
+					} else {
+						nodeSet = new List<SubstrateNodeSet> (2);
+						nodeSet.Add (input);
+						nodeSet.Add (output);
+					}
 
-            List<SubstrateNodeSet> nodeSet = new List<SubstrateNodeSet>(3);
-            nodeSet.Add(input);
-            nodeSet.Add(hidden);
-            nodeSet.Add(output);
+					List<NodeSetMapping> nodeSetMapping;
+					//Mapping
+					if (Config.substrateHiddenNodes) {
+						nodeSetMapping = new List<NodeSetMapping> (2);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+						nodeSetMapping.Add (NodeSetMapping.Create (1, 2, (double?)null));
+					} else {
+						nodeSetMapping = new List<NodeSetMapping> (1);
+						nodeSetMapping.Add (NodeSetMapping.Create (0, 1, (double?)null));
+					}
+					//Substrate using steepend sigmoids, < 0.2 will not gen a weight 														
+					Substrate substrate = new Substrate (nodeSet, DefaultActivationFunctionLibrary.CreateLibraryCppn (), 3, 0.2, 5, nodeSetMapping);
+					//3 = Sine fn
+					//Final decoder
+					IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder = //Cppn
+						new HyperNeatDecoder (substrate, _activationScheme, _activationScheme, false);
 
-            //Mapping
-            List<NodeSetMapping> nodeSetMapping = new List<NodeSetMapping>(1);
-            nodeSetMapping.Add(NodeSetMapping.Create(0, 1, (double?)null));
-            nodeSetMapping.Add(NodeSetMapping.Create(1, 2, (double?)null));
-
-            //Substrate using steepend sigmoids, < 0.2 will not gen a weight
-            Substrate substrate = new Substrate(nodeSet, DefaultActivationFunctionLibrary.CreateLibraryCppn(), 0, 0.2, 5, nodeSetMapping);
-
-            //Final decoder
-            IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder = //Cppn
-                new HyperNeatDecoder(substrate, _activationScheme, _activationScheme, false);
-
-            return genomeDecoder;
-        }
-        else throw new FormatException("Either NEAT or HyperNEAT needs to be checked in the Config.cs file!");
+					return genomeDecoder;
+				}
+			} else {
+				throw new FormatException ("Either NEAT or HyperNEAT needs to be checked in the Config.cs file with the correct parameters!");
+			}
+			return default(IGenomeDecoder<NeatGenome, IBlackBox>);
+		}
     }
 
     public IGenomeFactory<NeatGenome> CreateGenomeFactory()

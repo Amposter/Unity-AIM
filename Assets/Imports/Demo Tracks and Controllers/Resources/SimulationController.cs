@@ -120,4 +120,9 @@ public class SimulationController : MonoBehaviour
 	{
 		return tracksList [currentTrack];
 	}
+
+	public int getTrack()
+	{
+		return currentTrack;
+	}
 }

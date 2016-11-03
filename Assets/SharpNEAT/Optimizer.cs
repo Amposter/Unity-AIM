@@ -19,7 +19,8 @@ public class Optimizer : MonoBehaviour {
 
     public int Trials;
     public float TrialDuration;
-    public float StoppingFitness;
+	public int StoppingGeneration;
+	public int NumRuns;
     bool EARunning;
     string popFileSavePath, champFileSavePath, superChampFileSavePath;
 
@@ -69,9 +70,9 @@ public class Optimizer : MonoBehaviour {
 
         experiment.Initialize("NEAT Experiment", xmlConfig.DocumentElement, NUM_INPUTS, NUM_OUTPUTS);
 
-		champFileSavePath = string.Format(Application.dataPath+"/Resources/{0}.champ.xml", "NEAT_Controller");
-		popFileSavePath = string.Format(Application.dataPath+"/Resources/{0}.pop.xml", "NEAT_Controller");
-        superChampFileSavePath = string.Format(Application.dataPath + "/Resources/{0}.SUPERchamp.xml", "NEAT_Controller");
+		champFileSavePath = string.Format("/{0}.champ.xml", "NEAT_Controller");
+		popFileSavePath = string.Format("/{0}.pop.xml", "NEAT_Controller");
+        superChampFileSavePath = string.Format("/{0}.SUPERchamp.xml", "NEAT_Controller");
         normalFixedDeltaTime = Time.fixedDeltaTime;
         //print(champFileSavePath);
 		browser = new FileBrowser (string.Format (UnityEngine.Application.dataPath + "/Resources/"), 1, new Rect(new Vector2(0,0), new Vector2(300,300)));
@@ -102,12 +103,17 @@ public class Optimizer : MonoBehaviour {
             accum = 0.0f;
             frames = 0;
             //   print("FPS: " + fps);
-            if (fps < 10)
+            if (fps < 5)
             {
                 Time.timeScale = Time.timeScale - 1;
                 print("Lowering time scale to " + Time.timeScale);
             }
         }
+
+		if (Generation >= StoppingGeneration)
+		{
+			StopEA();
+		}
 
 		if(guiForm != null)
 		{
@@ -119,8 +125,7 @@ public class Optimizer : MonoBehaviour {
     {        
         Utility.DebugLog = true;
         Utility.Log("Starting NEAT Training");
-		print("Loading: " + popFileSavePath);
-        _ea = experiment.CreateEvolutionAlgorithm(popFileSavePath);
+        _ea = experiment.CreateEvolutionAlgorithm();
         startTime = DateTime.Now;
 
         _ea.UpdateEvent += new EventHandler(ea_UpdateEvent);
@@ -154,30 +159,39 @@ public class Optimizer : MonoBehaviour {
         XmlWriterSettings _xwSettings = new XmlWriterSettings();
         _xwSettings.Indent = true;
         // Save genomes to xml file.        
-		DirectoryInfo dirInf = new DirectoryInfo(Application.dataPath+"/Resources");
+		DirectoryInfo dirInf = new DirectoryInfo(Application.dataPath+"/Resources/"+currentRun);
         if (!dirInf.Exists)
         {
             Debug.Log("Creating subdirectory");
             dirInf.Create();
         }
-        using (XmlWriter xw = XmlWriter.Create(popFileSavePath, _xwSettings))
+		using (XmlWriter xw = XmlWriter.Create(Application.dataPath+"/Resources/"+currentRun+popFileSavePath, _xwSettings))
         {
             experiment.SavePopulation(xw, _ea.GenomeList);
         }
         // Also save the best genome
 
-        using (XmlWriter xw = XmlWriter.Create(champFileSavePath, _xwSettings))
+		using (XmlWriter xw = XmlWriter.Create(Application.dataPath+"/Resources/"+currentRun+champFileSavePath, _xwSettings))
         {
             experiment.SavePopulation(xw, new NeatGenome[] { _ea.CurrentChampGenome });
         }
         DateTime endTime = DateTime.Now;
         Utility.Log("Total time elapsed: " + (endTime - startTime));
 
-        System.IO.StreamReader stream = new System.IO.StreamReader(popFileSavePath);
+		//System.IO.StreamReader stream = new System.IO.StreamReader(Application.dataPath+"/Resources/"+currentRun+popFileSavePath);
 
-        EARunning = false;        
+        EARunning = false;  
+
+		if (currentRun < NumRuns)
+		{
+			superFitness = 0;
+			currentRun++;
+			StartEA ();
+		}
         
     }
+
+	public uint currentRun = 1;
 
     public void StopEA()
     {
@@ -215,12 +229,12 @@ public class Optimizer : MonoBehaviour {
 			XmlWriterSettings _xwSettings = new XmlWriterSettings ();
 			_xwSettings.Indent = true;
 			// Save genomes to xml file.        
-			DirectoryInfo dirInf = new DirectoryInfo (Application.dataPath + "/Resources");
+			DirectoryInfo dirInf = new DirectoryInfo (Application.dataPath+"/Resources/"+currentRun);
 			if (!dirInf.Exists) {
 				Debug.Log ("Creating subdirectory");
 				dirInf.Create ();
 			}
-			using (XmlWriter xw = XmlWriter.Create (superChampFileSavePath, _xwSettings)) {
+			using (XmlWriter xw = XmlWriter.Create (Application.dataPath+"/Resources/"+currentRun+superChampFileSavePath, _xwSettings)) {
 				experiment.SavePopulation (xw, new NeatGenome[] { _ea.CurrentChampGenome });
 			}
 		}
@@ -326,7 +340,7 @@ public class Optimizer : MonoBehaviour {
 
 
 
-		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nSuperFitness: {3:0.00}\nTimeScale: {2}\n{4}", Generation, Fitness, Time.timeScale, superFitness, mode));
+		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nSuperFitness: {3:0.00}\nCurrent Run: {5}\nTimeScale: {2}\n{4}", Generation, Fitness, Time.timeScale, superFitness, mode, currentRun));
 	}
 
 	bool fileBrowserOpen = false;

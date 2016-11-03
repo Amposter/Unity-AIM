@@ -4,11 +4,18 @@ using System.Collections;
 //A collection of setup and configuration variables as well as for car ID's
 public class Config {
 
-    public static bool NEAT = true;
-    public static bool HyperNEAT = false;
+	public static bool NEAT = true;
+	public static bool HyperNEAT = false;
 
-    // Use this for initialization
-    public static int lastVIN = 0;
+	public static bool substrateHiddenNodes = true;
+
+	public enum HyperNEATSubstrateSetup
+	{
+		StopGo, SimpleDeviatePath, ComplexDeviatePath, SingleObstacleInput, ComplexStopGo
+	};
+	public static HyperNEATSubstrateSetup substrateSetup = HyperNEATSubstrateSetup.ComplexStopGo;
+
+	public static int lastVIN = 0;
 
     public static float[] reserverationOffsets =
     {
