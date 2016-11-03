@@ -116,7 +116,6 @@ public class NEAT_GroupController : UnitController
 			break;
 		}
 
-		Debug.Log (numCars);
 
 		for (int i = 0; i < numCars; i++)
 		{
