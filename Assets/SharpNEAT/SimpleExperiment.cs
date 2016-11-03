@@ -383,8 +383,9 @@ public class SimpleExperiment : INeatExperiment
 				} else {
 					throw new FormatException ("Either NEAT or HyperNEAT needs to be checked in the Config.cs file with the correct parameters!");
 				}
-				return default(IGenomeDecoder<NeatGenome, IBlackBox>);
+
 			}
+			return default(IGenomeDecoder<NeatGenome, IBlackBox>);
 		}
     }
 
