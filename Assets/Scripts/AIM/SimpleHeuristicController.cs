@@ -52,9 +52,9 @@ public class SimpleHeuristicController : VehicleController
             {
                 while (paused) //Do nothing
                 {
-                    yield return null;
+					yield return new WaitForFixedUpdate();
                 }
-                Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
+				Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.fixedDeltaTime);
                 transform.LookAt(newPos);
                 transform.position = newPos;
                 if (transform.position == toPoint)
@@ -64,7 +64,7 @@ public class SimpleHeuristicController : VehicleController
                     toPoint.y = transform.position.y;
                     transform.LookAt(toPoint);
                 }
-                yield return null;
+				yield return new WaitForFixedUpdate();
             }
         }
     }
@@ -79,9 +79,9 @@ public class SimpleHeuristicController : VehicleController
         {
             while (paused) //Do nothing
             {
-                yield return null;
+				yield return new WaitForFixedUpdate();
             }
-            Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
+			Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.fixedDeltaTime);
             transform.LookAt(newPos);
             transform.position = newPos; 
             if (transform.position == toPoint)
@@ -91,7 +91,7 @@ public class SimpleHeuristicController : VehicleController
                 toPoint.y = transform.position.y;
                 transform.LookAt(toPoint);
             }
-            yield return null;
+			yield return new WaitForFixedUpdate();
         }
     }
 

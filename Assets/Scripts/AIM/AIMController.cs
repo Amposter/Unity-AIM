@@ -227,7 +227,7 @@ public class AIMController : SimpleHeuristicController {
             {
                 Vector3 travelVector = (toPoint - transform.position);
                 Vector3 dir = travelVector.normalized;
-                Vector3 newPos = transform.position + speed * dir * Time.deltaTime;
+				Vector3 newPos = transform.position + speed * dir * Time.fixedDeltaTime;
                 /*   if (Mathf.Approximately((float)Math.Round(Time.time,2), (float)Math.Round(t + tOffset,2)))
                    {
                        Debug.Log(t + tOffset + " and " + Time.time);
@@ -235,7 +235,7 @@ public class AIMController : SimpleHeuristicController {
 
                    }*/
                 float distanceToTravel = travelVector.magnitude;
-                if (distanceToTravel <= speed * Time.deltaTime)
+                if (distanceToTravel <= speed * Time.fixedDeltaTime)
                 {
                     /*  if (distanceToTravel / (speed * Time.deltaTime) > 0.75)
                       { }
@@ -246,7 +246,7 @@ public class AIMController : SimpleHeuristicController {
                 }
                 else
                 {
-                    if ((distanceToTravel - speed * Time.deltaTime) < speed * Time.deltaTime * 0.2f)
+                    if ((distanceToTravel - speed * Time.fixedDeltaTime) < speed * Time.fixedDeltaTime * 0.2f)
                     {
                         if (Mathf.Approximately(debugTime[counter - 1], (float)Math.Round(Time.time, decimalRound)))
                             newPos = toPoint;
@@ -263,7 +263,7 @@ public class AIMController : SimpleHeuristicController {
                     toPoint.y = transform.position.y;
                     transform.LookAt(toPoint);
                 }
-                yield return null;
+				yield return new WaitForFixedUpdate();
             }
         }
         Act();
