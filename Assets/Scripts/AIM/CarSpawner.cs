@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class CarSpawner : MonoBehaviour {
+public class CarSpawner : MonoBehaviour
+{
 
 
     //Car prefab to be used
@@ -11,7 +12,16 @@ public class CarSpawner : MonoBehaviour {
     //Spawn variables
     private List<TrackWayPoint> startPoints;
     public float spawnInterval = 1.0f;
-    private int counter;
+	public int carsPerStartPoint = 1;
+
+	//performance measuremnets
+	public float avgIdleTime;
+	public float avgSpeed;
+	public int carsThrough;
+	public int collisions;
+
+	public float testDuration = 0;
+
 
 	// Use this for initialization
 	void Start ()
@@ -26,33 +36,34 @@ public class CarSpawner : MonoBehaviour {
     //Spawns a car every 'spawnInterval' seconds alternating amongst the start way points.
     IEnumerator Spawn()
     {
-        counter = 1;
-        while (true)
-        {
-            Collider[] colliders = Physics.OverlapSphere(startPoints[counter%startPoints.Count].transform.position, 2);
-            //GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //sphere.transform.position = (startPoints[counter%startPoints.Count].transform.position);
-            //sphere.transform.localScale = new Vector3(2.0f,2.0f,2.0f);
-            bool full = false;
-            foreach (Collider col in colliders)
-            {
-                if (col.gameObject.tag == "Vehicle")
-                    full = true;
-            }
-            if (!full)
-            {
-                GameObject instance = Instantiate(car);
-                instance.name = "Car #" + Config.lastVIN++;
-                instance.GetComponent<AIMController>().start = startPoints[counter%startPoints.Count];
+		int[] carsSpawnedPerStartPoint = new int[startPoints.Count];
+		int carsSpawned = 0;
+		do
+		{
+			for (int pointIndex = 0; pointIndex < startPoints.Count; pointIndex++)
+			{
+				if(carsSpawnedPerStartPoint[pointIndex] < carsPerStartPoint)
+				{
+					Collider[] colliders = Physics.OverlapSphere(startPoints[pointIndex].transform.position, 2);
+					bool full = false;
+					foreach (Collider col in colliders)
+					{
+						if (col.gameObject.tag == "Vehicle")
+							full = true;
+					}
+					if (!full)
+					{
+						GameObject instance = Instantiate(car);
+						instance.GetComponent<AIMController>().start = startPoints[pointIndex];
+						carsSpawnedPerStartPoint[pointIndex]++;
+					}
+				}
+			}
+			yield return new WaitForSeconds(spawnInterval);
+		}
+		while(carsSpawned < carsPerStartPoint*startPoints.Count);
 
-                MeshRenderer[] meshes = instance.GetComponentsInChildren<MeshRenderer>();
-                Color colour = new Color(Random.Range(0f, 1.0f), Random.Range(0f, 1.0f), Random.Range(0f, 1.0f));
-                foreach (MeshRenderer mesh in meshes)
-                    mesh.material.color = colour;
-            }
-            ++counter;
-            yield return new WaitForSeconds(spawnInterval);
-        }
+		yield return null;
     }
 
     //Spawns a car ever 'spawnInterval' seconds randomly choosing a start way point.

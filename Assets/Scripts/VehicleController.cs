@@ -4,6 +4,7 @@ using System.Collections;
 
 public class VehicleController : MonoBehaviour
 {
+	public bool useSensors = true;
     public bool showSensorsDebug = true;
 	public float sensorRange = 10;
     float[] sensorInputs = new float[32];
@@ -34,7 +35,10 @@ public class VehicleController : MonoBehaviour
 	// Update is called once per frame
 	protected virtual void Update ()
     {
-		
+		if (!useSensors) {
+			return;
+		}
+
 		//perform a raycast for each sensor
 		if (Physics.Raycast (transform.position, transform.forward, out sensor4, sensorRange, finalLayerMask))
 		{
