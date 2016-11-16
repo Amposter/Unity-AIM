@@ -41,6 +41,10 @@ public class AIMController : SimpleHeuristicController {
     public enum Controller {AIM, HEURISTIC};
     public Controller controller;
    
+	float updateInterval = 0.2f;
+	float updateTimer = 0;
+	public CarSpawner carSpawner;
+
     // Use this for initialization
     protected override void Start ()
     {
@@ -82,6 +86,25 @@ public class AIMController : SimpleHeuristicController {
     protected override void Update ()
     {
         base.Update();
+
+		updateTimer += Time.deltaTime;
+
+		if (paused)
+		{
+			carSpawner.idleTime += Time.deltaTime;
+		}
+
+		if (updateTimer >= updateInterval)
+		{
+			updateTimer = 0;
+
+			if (!paused)
+			{
+				carSpawner.totalSpeedAccumulator += speed;
+			}
+			carSpawner.totalSpeedCheckCount++;
+
+		}
     }
 
     void OnTriggerEnter(Collider col)
@@ -156,6 +179,7 @@ public class AIMController : SimpleHeuristicController {
         {
             transform.position += transform.forward.normalized * 500; //To ensure OnTriggerExit is called of vehicles that may have been paused due to this one.
             path[nextDir - 1].decr(transform.name);
+			carSpawner.carsThrough++;
             Destroy(gameObject,0.1f);
         }
 

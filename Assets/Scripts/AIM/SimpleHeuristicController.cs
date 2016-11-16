@@ -5,7 +5,7 @@ public class SimpleHeuristicController : VehicleController
 {
 
     //Public variabes
-    public float speed = 5f;
+    public float speed = 8f;
 
     //Private variables
     public bool paused;

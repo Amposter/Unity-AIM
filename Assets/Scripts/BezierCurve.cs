@@ -52,6 +52,11 @@ public class BezierCurve : MonoBehaviour {
         }
         return false;
     }
+
+	public void reset()
+	{
+		count = 0;
+	}
     #endregion
 
     #region PublicVariables

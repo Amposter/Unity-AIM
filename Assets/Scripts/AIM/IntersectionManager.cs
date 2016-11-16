@@ -26,7 +26,7 @@ public class IntersectionManager : MonoBehaviour {
     {
 	
 	}
-
+		
     //Cleans all entries that are at least 'cleanOffset' seconds old
     IEnumerator Clean()
     {
