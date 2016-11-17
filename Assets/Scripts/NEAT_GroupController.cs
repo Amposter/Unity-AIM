@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections;
 using System;
+using System.IO;
+using System.Text;
 
 public class NEAT_GroupController : UnitController
 {
@@ -19,6 +21,10 @@ public class NEAT_GroupController : UnitController
 	public float totalDistanceAccumulator = 0;
 	public int collisionCount = 0;
 	private int spawnBlockedCount = 0;
+	public Optimizer optimizer;
+	private int carsSpawned = 0;
+	public int carsThrough = 0;
+	public float idleTime = 0;
 
 	// Use this for initialization
 	void Start ()
@@ -40,28 +46,28 @@ public class NEAT_GroupController : UnitController
 			{
 				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller>();
 
-				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute)
-				{
+				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute) {
 					NEAT_Vehicle.SetActive (false);
-				}
+				} else if (NEAT_Vehicle.activeInHierarchy) {
 
-				neatController.updateSensors ();
+					neatController.updateSensors ();
 
-				box.InputSignalArray[0] = neatController.getSensorInputs()[0];
-				box.InputSignalArray[1] = neatController.getSensorInputs()[1];
-				box.InputSignalArray[2] = neatController.getSensorInputs()[2];
-				box.InputSignalArray[3] = neatController.getSensorInputs()[3];
-				box.InputSignalArray[4] = neatController.getSensorInputs()[4];
-				box.InputSignalArray[5] = neatController.getSensorInputs()[5];
-				box.InputSignalArray[6] = neatController.getSensorInputs()[6];
-				box.InputSignalArray[7] = neatController.getSensorInputs()[7];
-				box.InputSignalArray[8] = neatController.getSensorInputs()[8];
-				box.InputSignalArray[9] = neatController.getSensorInputs()[9];
+					box.InputSignalArray [0] = neatController.getSensorInputs () [0];
+					box.InputSignalArray [1] = neatController.getSensorInputs () [1];
+					box.InputSignalArray [2] = neatController.getSensorInputs () [2];
+					box.InputSignalArray [3] = neatController.getSensorInputs () [3];
+					box.InputSignalArray [4] = neatController.getSensorInputs () [4];
+					box.InputSignalArray [5] = neatController.getSensorInputs () [5];
+					box.InputSignalArray [6] = neatController.getSensorInputs () [6];
+					box.InputSignalArray [7] = neatController.getSensorInputs () [7];
+					box.InputSignalArray [8] = neatController.getSensorInputs () [8];
+					box.InputSignalArray [9] = neatController.getSensorInputs () [9];
 
-				box.Activate();
+					box.Activate ();
  
-				neatController.setSpeedWeight(Mathf.Clamp((float)(box.OutputSignalArray[0]),0 , 1));
-				neatController.updatePosition();
+					neatController.setSpeedWeight (Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1));
+					neatController.updatePosition ();
+				}
 			}
 
 		}
@@ -79,75 +85,46 @@ public class NEAT_GroupController : UnitController
 		StartCoroutine ("spawnCars");
 	}
 
-	protected IEnumerator spawnCars()
+	protected IEnumerator spawnCars ()
 	{
-		int numCars = 0;
-		int track = GameObject.Find ("SimulationController").GetComponent<SimulationController> ().getTrack ();
-		switch (track) {
-		case 1:
-			numCars = 12;
-			break;
-		case 2:
-			numCars = 5;
-			break;
-		case 3:
-			numCars = 6;
-			break;
-		case 4:
-			numCars = 9;
-			break;
-		case 5:
-			numCars = 4;
-			break;
-		case 6:
-			numCars = 3;
-			break;
-		case 7:
-			numCars = 6;
-			break;
-		case 8:
-			numCars = 12;
-			break;
-		case 9:
-			numCars = 7;
-			break;
-		case 10:
-			numCars = 12;
-			break;
-		}
 
+		List<TrackWayPoint> startPoints = GameObject.Find ("PathManager").GetComponent<PathManager> ().startPoints;
+	
+		int[] carsSpawnedPerStartPoint = new int[startPoints.Count];
 
-		for (int i = 0; i < numCars; i++)
-		{
-			foreach (TrackWayPoint startPoint in _pathManager.startPoints)
+		do {
+			for (int pointIndex = 0; pointIndex < startPoints.Count; pointIndex++)
 			{
-				Collider[] colliders = Physics.OverlapSphere(startPoint.transform.position, 1);
-				bool full = false;
-				foreach (Collider col in colliders)
+				if (carsSpawnedPerStartPoint [pointIndex] < optimizer.Test_carsPerStartPoint)
 				{
-					if (col.gameObject.tag == "Vehicle")
-						full = true;
-				}
-
-				if (!full)
-				{
-					GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoint.transform.position, startPoint.transform.rotation) as GameObject;
-					NEAT_Vehicle.transform.parent = transform;
-					NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
-					NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoint)));
-					NEAT_VehiclesList.Add (NEAT_Vehicle);
-				}
-				else
-				{
-					spawnBlockedCount++;
-					i--;
+					Collider[] colliders = Physics.OverlapSphere (startPoints [pointIndex].transform.position, 2);
+					bool full = false;
+					foreach (Collider col in colliders)
+					{
+						if (col.gameObject.tag == "Vehicle")
+							full = true;
+					}
+					if (!full)
+					{
+						GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoints[pointIndex].transform.position, startPoints[pointIndex].transform.rotation) as GameObject;
+						NEAT_Vehicle.transform.parent = transform;
+						NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
+						NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoints[pointIndex])));
+						NEAT_VehiclesList.Add (NEAT_Vehicle);
+						carsSpawned++;
+					}
+					else
+					{
+						spawnBlockedCount++;
+					}
 				}
 			}
-			yield return new WaitForSeconds(1f+(UnityEngine.Random.Range(1, 20)/10f));
-		}
+			yield return new WaitForSeconds (1 + (UnityEngine.Random.Range (1, 20) / (float)10));
+		} while(carsSpawned < optimizer.Test_carsPerStartPoint * startPoints.Count);
 
 		yield return null;
 	}
+
 
 
 	public override float GetFitness()
@@ -160,6 +137,28 @@ public class NEAT_GroupController : UnitController
 							,1, float.MaxValue);
 	}
 
+	public void record() 
+	{ 
+		string delimiter = ","; 
+
+		float throughPut = (float)carsThrough / (float)carsSpawned; 
+		float avgSpeed = (totalSpeedAccumulator / speedCheckCount)*8; 
+	
+
+		string[][] output = new string[][]  
+		{ 
+			new string[]{throughPut + "", avgSpeed + "", collisionCount + "", idleTime + "", carsSpawned + ""} 
+		}; 
+
+
+		int length = output.GetLength(0);   
+		StringBuilder sb = new StringBuilder();   
+		for (int index = 0; index < length; index++)   
+		sb.AppendLine(string.Join(delimiter, output[index]));   
+
+		File.AppendAllText(Application.dataPath + "/results/results_run"+optimizer.test_currentRun+"_neuro.csv", sb.ToString());  
+	} 
+	
 
 	public void cleanUp()
 	{

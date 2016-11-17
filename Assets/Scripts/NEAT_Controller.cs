@@ -34,6 +34,11 @@ public class NEAT_Controller : SimpleHeuristicController
 
 		rewardTimer += Time.deltaTime;
 
+		if (getSpeedWeight () < 0.015)
+		{
+			groupController.idleTime += Time.deltaTime;
+		}
+
 		if (rewardTimer >= rewardTimeInterval)
 		{
 			rewardTimer = 0;
@@ -74,6 +79,7 @@ public class NEAT_Controller : SimpleHeuristicController
 		if(other.gameObject.GetComponent<TrackWayPoint>().type == TrackWayPoint.Type.END)
 		{
 			finishedRoute = true;
+			groupController.carsThrough++;
 		}
     }
 

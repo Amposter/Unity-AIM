@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class CarSpawner : MonoBehaviour {
-
+public class CarSpawner : MonoBehaviour
+{
 
     //Car prefab to be used
     public GameObject car;

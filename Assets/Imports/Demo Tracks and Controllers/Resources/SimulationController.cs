@@ -16,6 +16,11 @@ public class SimulationController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+
+	}
+
+	public void setup()
+	{
 		Application.targetFrameRate = 20;
 		Time.fixedDeltaTime = 1f / 15f;
 
@@ -28,7 +33,6 @@ public class SimulationController : MonoBehaviour
 
 		loadNextTrack ();
 	}
-
 
 	// Update is called once per frame
 	void Update ()

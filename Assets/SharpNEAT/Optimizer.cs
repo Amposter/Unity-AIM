@@ -11,6 +11,15 @@ using System.IO;
 
 public class Optimizer : MonoBehaviour {
 
+	public enum RunType
+	{
+		TEST,
+		EVOLVE
+	};
+
+	public RunType runType = RunType.EVOLVE;
+
+
     int NUM_INPUTS;
     int NUM_OUTPUTS;
 
@@ -23,6 +32,12 @@ public class Optimizer : MonoBehaviour {
 	public int NumRuns;
     bool EARunning;
     string popFileSavePath, champFileSavePath, superChampFileSavePath;
+
+	public float Test_trialDuration = 0;
+	private float Test_trialDurationTimer = 0;
+	public float Test_carsPerStartPoint= 0;
+	public float Test_numTrials= 20;
+	private float Test_currentTrial= 1;
 
     float normalFixedDeltaTime;
 
@@ -58,24 +73,31 @@ public class Optimizer : MonoBehaviour {
             NUM_OUTPUTS = 2; //Weight stregnth + bias
         }
 
-		System.Console.WriteLine("From optimizer.");
+
 		simController = GameObject.Find ("SimulationController").GetComponent<SimulationController> ();
+		simController.setup ();
+		champFileSavePath = string.Format ("/{0}.champ.xml", "NEAT_Controller");
+		popFileSavePath = string.Format ("/{0}.pop.xml", "NEAT_Controller");
+		superChampFileSavePath = string.Format ("/{0}.SUPERchamp.xml", "NEAT_Controller");
+		normalFixedDeltaTime = Time.fixedDeltaTime;
 
-        Utility.DebugLog = true;
-        experiment = new SimpleExperiment();
-        XmlDocument xmlConfig = new XmlDocument();
-        TextAsset textAsset = (TextAsset)Resources.Load("experiment.config");
-        xmlConfig.LoadXml(textAsset.text);
-        experiment.SetOptimizer(this);
 
-        experiment.Initialize("NEAT Experiment", xmlConfig.DocumentElement, NUM_INPUTS, NUM_OUTPUTS);
+		Utility.DebugLog = true;
+		experiment = new SimpleExperiment ();
+		XmlDocument xmlConfig = new XmlDocument ();
+		TextAsset textAsset = (TextAsset)Resources.Load ("experiment.config");
+		xmlConfig.LoadXml (textAsset.text);
+		experiment.SetOptimizer (this);
 
-		champFileSavePath = string.Format("/{0}.champ.xml", "NEAT_Controller");
-		popFileSavePath = string.Format("/{0}.pop.xml", "NEAT_Controller");
-        superChampFileSavePath = string.Format("/{0}.SUPERchamp.xml", "NEAT_Controller");
-        normalFixedDeltaTime = Time.fixedDeltaTime;
-        //print(champFileSavePath);
+		experiment.Initialize ("NEAT Experiment", xmlConfig.DocumentElement, NUM_INPUTS, NUM_OUTPUTS);
+
+		if (runType == RunType.TEST)
+		{
+			test_currentGroupController = testController (test_currentRun);
+		}
+
 		browser = new FileBrowser (string.Format (UnityEngine.Application.dataPath + "/Resources/"), 1, new Rect(new Vector2(0,0), new Vector2(300,300)));
+
 		if (Config.NEAT)
 		{
 			mode = "NEAT";
@@ -86,6 +108,10 @@ public class Optimizer : MonoBehaviour {
 		}
 
 		}
+
+	private GameObject test_currentGroupController;
+	public int test_currentRun = 1;
+	public int test_numRuns = 20;
 
     // Update is called once per frame
     void Update()
@@ -110,15 +136,45 @@ public class Optimizer : MonoBehaviour {
             }
         }
 
-		if (Generation >= StoppingGeneration)
+		if (runType == RunType.EVOLVE) {
+			
+			if (Generation >= StoppingGeneration) {
+				StopEA ();
+			}
+
+			if (guiForm != null) {
+				guiForm.RefreshView ();
+			}
+		}
+		else
 		{
-			StopEA();
+			Test_trialDurationTimer += Time.deltaTime;
+			if(Test_trialDurationTimer >= Test_trialDuration)
+			{
+				Test_trialDurationTimer = 0;
+				test_currentGroupController.GetComponent<NEAT_GroupController> ().record ();
+				GameObject.DestroyImmediate (test_currentGroupController);
+				print ("completed evaluating champ of run " + test_currentRun + "for trial "+Test_currentTrial);
+				Test_currentTrial++;
+				if (Test_currentTrial > Test_numTrials)
+				{
+					test_currentRun++;
+					Test_currentTrial = 1;
+					if (test_currentRun > test_numRuns) {
+						#if UNITY_EDITOR
+						UnityEditor.EditorApplication.isPlaying = false;
+						#else
+					Application.Quit();
+						#endif
+					}
+				}
+			
+				test_currentGroupController = testController (test_currentRun);
+
+			}
 		}
 
-		if(guiForm != null)
-		{
-			guiForm.RefreshView ();
-		}
+
     }
 
     public void StartEA()
@@ -150,6 +206,63 @@ public class Optimizer : MonoBehaviour {
 
     
     }
+
+	public GameObject testController(int path)
+	{
+		Time.timeScale = runBestSpeed;
+
+		NeatGenome genome = null;
+
+		try
+		{
+			if (Config.NEAT)
+			{
+				using (XmlReader xr = XmlReader.Create(Application.dataPath+"/saves/"+test_currentRun+champFileSavePath))
+					genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, (NeatGenomeFactory)experiment.CreateGenomeFactory())[0];
+			}
+			else 
+			{
+				using (XmlReader xr = XmlReader.Create(Application.dataPath+"/saves/"+test_currentRun+champFileSavePath))
+					genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, true, (CppnGenomeFactory)experiment.CreateGenomeFactory())[0];
+			}
+
+		}
+		catch (Exception e1)
+		{
+			print("Error loading genome from save file. ("+Application.dataPath+"/saves/"+test_currentRun+champFileSavePath+")\nLoading aborted.\n"
+				+ e1.Message);
+			return null;
+		}
+
+		// Get a genome decoder that can convert genomes to phenomes.
+		var genomeDecoder = experiment.CreateGenomeDecoder();
+
+		// Decode the genome into a phenome (neural network).
+		var phenome = genomeDecoder.Decode(genome);
+
+
+
+		//guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView(), genome);
+
+
+		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
+		UnitController controller = groupController.GetComponent<UnitController>();
+		((NEAT_GroupController)controller).setPathManager (simController.getCurrentTrack ().GetComponentInChildren<PathManager> ());
+		((NEAT_GroupController)controller).optimizer = this;
+
+		if (!ControllerMap.ContainsKey (phenome))
+		{
+			ControllerMap.Add (phenome, controller);
+		}
+		else
+		{
+			ControllerMap [phenome] = controller;
+		}
+
+		controller.Activate(phenome);
+
+		return groupController;
+	}
 
     void ea_PauseEvent(object sender, EventArgs e)
     {
@@ -248,11 +361,11 @@ public class Optimizer : MonoBehaviour {
 		//Time.fixedDeltaTime = normalFixedDeltaTime * (1/runBestSpeed);
         NeatGenome genome = null;
 
-
         try
         {
 			if (Config.NEAT)
 			{
+				print(xmlPath);
 				using (XmlReader xr = XmlReader.Create(xmlPath))
                 genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, (NeatGenomeFactory)experiment.CreateGenomeFactory())[0];
 			}
@@ -284,6 +397,7 @@ public class Optimizer : MonoBehaviour {
 		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
 		UnitController controller = groupController.GetComponent<UnitController>();
 		((NEAT_GroupController)controller).setPathManager (simController.getCurrentTrack ().GetComponentInChildren<PathManager> ());
+		((NEAT_GroupController)controller).optimizer = this;
 
 		if (!ControllerMap.ContainsKey (phenome))
 		{
@@ -308,40 +422,37 @@ public class Optimizer : MonoBehaviour {
 
     void OnGUI()
     {
-        if (GUI.Button(new Rect(10, 10, 100, 40), "Start EA"))
-        {
-            StartEA();
-        }
-        if (GUI.Button(new Rect(10, 60, 100, 40), "Stop EA"))
-        {
-            StopEA();
-        }
-        if (GUI.Button(new Rect(10, 110, 100, 40), "Open File"))
-        {
-			showFileBrowser ();
-        }
-
-		if(fileBrowserOpen)
+		if (runType == RunType.EVOLVE)
 		{
-			if (browser.draw ())
-			{
-				if (browser.outputFile != null) {
-					xmlPath = browser.outputFile.ToString ();
-					RunBest ();
-					browser.outputFile = null;
-					fileBrowserOpen = false;
-				}
-				else
-				{
-					fileBrowserOpen = false;
+			if (GUI.Button (new Rect (10, 10, 100, 40), "Start EA")) {
+				StartEA ();
+			}
+			if (GUI.Button (new Rect (10, 60, 100, 40), "Stop EA")) {
+				StopEA ();
+			}
+			if (GUI.Button (new Rect (10, 110, 100, 40), "Open File")) {
+				showFileBrowser ();
+			}
+
+			if (fileBrowserOpen) {
+				if (browser.draw ()) {
+					if (browser.outputFile != null) {
+						xmlPath = browser.outputFile.ToString ();
+						RunBest ();
+						browser.outputFile = null;
+						fileBrowserOpen = false;
+					} else {
+						fileBrowserOpen = false;
+					}
 				}
 			}
+
+
+
+			GUI.Button (new Rect (10, Screen.height - 140, 150, 90), string.Format ("Generation: {0}\nFitness: {1:0.00}\nSuperFitness: {3:0.00}\nCurrent Run: {5}\nTimeScale: {2}\n{4}", Generation, Fitness, Time.timeScale, superFitness, mode, currentRun));
 		}
 
-
-
-		GUI.Button(new Rect(10, Screen.height - 140, 150, 90), string.Format("Generation: {0}\nFitness: {1:0.00}\nSuperFitness: {3:0.00}\nCurrent Run: {5}\nTimeScale: {2}\n{4}", Generation, Fitness, Time.timeScale, superFitness, mode, currentRun));
-	}
+		}
 
 	bool fileBrowserOpen = false;
 	private void showFileBrowser()
