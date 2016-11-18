@@ -28,5 +28,5 @@
 **Track 9: One Way Merge With Connecting Road**
 
 ![Tenth Track](track10.png)
-**Track 10: Custom Intersection (Newlands Avenue, Cape Town) **
+**Track 10: Custom Intersection (Newlands Avenue, Cape Town)**
 
