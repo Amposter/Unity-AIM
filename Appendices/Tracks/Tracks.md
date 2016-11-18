@@ -1,4 +1,5 @@
 Reference-style: 
-![alt text][track1.png]
+
+![First Track](track1.png)
 
 *hey*
