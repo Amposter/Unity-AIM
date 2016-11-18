@@ -147,7 +147,7 @@ public class NEAT_GroupController : UnitController
 
 		string[][] output = new string[][]  
 		{ 
-			new string[]{throughPut + "", avgSpeed + "", collisionCount + "", idleTime + "", carsSpawned + ""} 
+			new string[]{throughPut + "", avgSpeed + "", collisionCount/2 + "", idleTime + "", carsSpawned + ""} 
 		}; 
 
 

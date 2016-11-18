@@ -63,6 +63,18 @@ namespace SharpNeat.View.Graph
                 ioGraph.InputNodeList.Add(node);
             }
 
+			// Loop hidden nodes.
+			for(int i = 0; i<hiddenCount; i++,idx++)
+			{   // Create node, assign it a tag and add it to the node dictionary and the
+				// hidden node list of the IOGraph.
+				uint innovationId = nodeList[idx].Id;
+				GraphNode node = new GraphNode(innovationId.ToString());
+				node.AuxData = CreateGraphNodeAuxData(nodeList[idx]);
+				node.Depth = depthInfo._nodeDepthArr[idx];
+				nodeDict.Add(innovationId, node);
+				ioGraph.HiddenNodeList.Add(node);
+			}
+
             // Loop output nodes.
             for(int i=0; i<outputCount; i++, idx++)
             {   // Create node, assign it a tag and add it to the node dictionary and the
@@ -75,17 +87,7 @@ namespace SharpNeat.View.Graph
                 ioGraph.OutputNodeList.Add(node);
             }
 
-            // Loop hidden nodes.
-            for(; idx<nodeCount; idx++)
-            {   // Create node, assign it a tag and add it to the node dictionary and the
-                // hidden node list of the IOGraph.
-                uint innovationId = nodeList[idx].Id;
-                GraphNode node = new GraphNode(innovationId.ToString());
-                node.AuxData = CreateGraphNodeAuxData(nodeList[idx]);
-                node.Depth = depthInfo._nodeDepthArr[idx];
-                nodeDict.Add(innovationId, node);
-                ioGraph.HiddenNodeList.Add(node);
-            }
+
 
             // Loop connections. Build GraphConnection objects and connect them to their source
             // and target nodes.

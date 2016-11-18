@@ -60,6 +60,7 @@ namespace SharpNeat.View.Graph
             int outputNodeCount = graph.OutputNodeList.Count;
             state._nodeStateDict = new Dictionary<GraphNode,ConnectionPointInfo>(hiddenNodeCount + inputNodeCount + outputNodeCount);
 
+			UnityEngine.Debug.Log ("Hey");
             // Paint all connections. We do this first and paint nodes on top of the connections. This allows the 
             // slightly messy ends of the connections to be painted over by the nodes.
             PaintConnections(graph.InputNodeList, state);

@@ -7,7 +7,7 @@ public class Config {
 	public static bool NEAT = false;
 	public static bool HyperNEAT = true;
 
-	public static bool substrateVis = false;
+	public static bool substrateVis = true;
 
 	public static bool substrateHiddenNodes = true;
 

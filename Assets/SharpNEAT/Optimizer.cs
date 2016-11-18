@@ -147,6 +147,10 @@ public class Optimizer : MonoBehaviour {
 			if (guiForm != null) {
 				guiForm.RefreshView ();
 			}
+
+			if (guiForm2 != null) {
+				guiForm2.RefreshView ();
+			}
 		}
 		else
 		{
@@ -357,6 +361,7 @@ public class Optimizer : MonoBehaviour {
     }
 
 	SharpNeatGUI.GenomeForm guiForm;
+	SharpNeatGUI.GenomeForm guiForm2;
     public void RunBest()
     {
 		Time.timeScale = runBestSpeed;
@@ -396,10 +401,8 @@ public class Optimizer : MonoBehaviour {
 			guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (), genome);
 		else 
 		{
-			if (Config.substrateVis)
-				guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.CppnGenomeView (DefaultActivationFunctionLibrary.CreateLibraryCppn ()), genome);
-			else
-				guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (hDecoder.GetNetworkDefinition(genome)), genome);
+			guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.CppnGenomeView (DefaultActivationFunctionLibrary.CreateLibraryCppn ()), genome);
+			guiForm2 = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (hDecoder.GetNetworkDefinition(genome)), genome);
 		}
 
 		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
