@@ -8,6 +8,8 @@ using SharpNeat.Genomes.Neat;
 using System;
 using System.Xml;
 using System.IO;
+using SharpNeat.Network;
+using SharpNeat.Decoders.HyperNeat;
 
 public class Optimizer : MonoBehaviour {
 
@@ -385,14 +387,20 @@ public class Optimizer : MonoBehaviour {
 
         // Get a genome decoder that can convert genomes to phenomes.
         var genomeDecoder = experiment.CreateGenomeDecoder();
-
+		HyperNeatDecoder hDecoder = (HyperNeatDecoder)experiment.CreateGenomeDecoder();
         // Decode the genome into a phenome (neural network).
         var phenome = genomeDecoder.Decode(genome);
 
 
-
-		guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView(), genome);
-
+		if (Config.NEAT)
+			guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (), genome);
+		else 
+		{
+			if (Config.substrateVis)
+				guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.CppnGenomeView (DefaultActivationFunctionLibrary.CreateLibraryCppn ()), genome);
+			else
+				guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (hDecoder.GetNetworkDefinition(genome)), genome);
+		}
 
 		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
 		UnitController controller = groupController.GetComponent<UnitController>();

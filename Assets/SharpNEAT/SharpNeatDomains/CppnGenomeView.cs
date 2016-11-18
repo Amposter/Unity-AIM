@@ -22,6 +22,7 @@ namespace SharpNeat.Domains
     {
         NetworkGraphFactory _graphFactory = new NetworkGraphFactory();
         IOGraphViewportPainter _viewportPainter;
+		INetworkDefinition _networkDefinition;
 
         #region Constructor
 
@@ -34,6 +35,14 @@ namespace SharpNeat.Domains
             InitializeComponent();
             graphControl1.ViewportPainter = _viewportPainter = new IOGraphViewportPainter(new CppnGraphPainter(actFnLib));
         }
+
+		public CppnGenomeView(IActivationFunctionLibrary actFnLib, INetworkDefinition definition)
+		{
+			InitializeComponent();
+			graphControl1.ViewportPainter = _viewportPainter = new IOGraphViewportPainter(new CppnGraphPainter(actFnLib));
+			_networkDefinition = definition;
+		}
+
 
         #endregion
 
@@ -49,7 +58,11 @@ namespace SharpNeat.Domains
                 return;
             }
 
-            IOGraph graph = _graphFactory.CreateGraph(neatGenome);
+			IOGraph graph;
+			if (Config.substrateVis)
+				graph = _graphFactory.CreateGraph(neatGenome);
+			else
+				graph = _graphFactory.CreateGraph(_networkDefinition);
             _viewportPainter.IOGraph = graph;
             graphControl1.RefreshImage();
         }

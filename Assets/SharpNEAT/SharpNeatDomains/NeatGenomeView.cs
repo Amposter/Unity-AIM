@@ -11,6 +11,7 @@
  */
 using SharpNeat.View.Graph;
 using SharpNeat.Genomes.Neat;
+using SharpNeat.Network;
 
 namespace SharpNeat.Domains
 {
@@ -19,6 +20,8 @@ namespace SharpNeat.Domains
     /// </summary>
     public partial class NeatGenomeView : AbstractGenomeView
     {
+
+		INetworkDefinition def;
         NetworkGraphFactory _graphFactory = new NetworkGraphFactory();
         IOGraphViewportPainter _viewportPainter;
 
@@ -33,6 +36,13 @@ namespace SharpNeat.Domains
             graphControl1.ViewportPainter = _viewportPainter = new IOGraphViewportPainter(new IOGraphPainter());
         }
 
+		public NeatGenomeView(INetworkDefinition definition)
+		{
+			InitializeComponent();
+			def = definition;
+			graphControl1.ViewportPainter = _viewportPainter = new IOGraphViewportPainter(new IOGraphPainter());
+		}
+
         #endregion
 
         #region Public Methods
@@ -46,8 +56,11 @@ namespace SharpNeat.Domains
             if(null == neatGenome) {
                 return;
             }
-
-            IOGraph graph = _graphFactory.CreateGraph(neatGenome);
+			IOGraph graph;
+			if (Config.HyperNEAT)
+            	graph = _graphFactory.CreateGraph(def);
+			else
+				graph = _graphFactory.CreateGraph(neatGenome);
             _viewportPainter.IOGraph = graph;
             graphControl1.RefreshImage();
         }

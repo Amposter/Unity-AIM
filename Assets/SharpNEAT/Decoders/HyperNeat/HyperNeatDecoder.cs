@@ -80,6 +80,15 @@ namespace SharpNeat.Decoders.HyperNeat
 
         #region IGenomeDecoder Members
 
+		public INetworkDefinition GetNetworkDefinition(NeatGenome genome)
+		{
+			// Decode the CPPN.
+			IBlackBox cppn = _decodeCppnMethod(genome);
+
+			// Generate a network definition from the CPPN and Substrate.
+			return _substrate.CreateNetworkDefinition(cppn, _lengthCppnInput);
+		}
+
         /// <summary>
         /// Decodes a CPPN NeatGenome to a concrete network instance via a HyperNEAT substrate.
         /// </summary>
