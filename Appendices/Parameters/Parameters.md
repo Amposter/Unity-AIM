@@ -2,6 +2,8 @@
 
 ## Neuro-evolution parameters
 
+| Category                                        | Value             |
+|-------------------------------------------------|-------------------|
 | Simulation Runs                                 | 20                |
 | Number of Trials                                | 3                 |
 | Trial Duration                                  | 40 seconds        |
