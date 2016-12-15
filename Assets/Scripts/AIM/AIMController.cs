@@ -67,8 +67,8 @@ public class AIMController : SimpleHeuristicController {
         //public BezierCurve[] getCurvesFromPathNodes(TrackWayPoint[] waypointList)
         wayPoints = GameObject.Find("PathManager").GetComponent<PathManager>().getRandomPathNodesFromStartNode(start);//.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val + 1]); //
         path = GameObject.Find("PathManager").GetComponent<PathManager>().getCurvesFromPathNodes(wayPoints); debugIM.debugSpawnCounter += 2;
-        Vector3 startPoint = path[0].GetPointAt(0.0f);
-        startPoint.y = 0.5f;
+        Vector2 startPoint = path[0].GetPointAt(0.0f);
+        startPoint.z = -10f; //so it appears in front of the 3d objects in scene, i.e., the tracks and ground
         transform.position = startPoint;
         transform.LookAt(startPoint);
         setCurve(path[nextDir]);
