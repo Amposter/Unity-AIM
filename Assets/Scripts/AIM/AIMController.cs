@@ -44,6 +44,7 @@ public class AIMController : SimpleHeuristicController {
 	float updateInterval = 0.2f;
 	float updateTimer = 0;
 	public CarSpawner carSpawner;
+	public Vector2 sp; //Remove!
 
     // Use this for initialization
     protected override void Start ()
@@ -67,15 +68,15 @@ public class AIMController : SimpleHeuristicController {
         //public BezierCurve[] getCurvesFromPathNodes(TrackWayPoint[] waypointList)
         wayPoints = GameObject.Find("PathManager").GetComponent<PathManager>().getRandomPathNodesFromStartNode(start);//.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val + 1]); //
         path = GameObject.Find("PathManager").GetComponent<PathManager>().getCurvesFromPathNodes(wayPoints); debugIM.debugSpawnCounter += 2;
-        Vector2 startPoint = path[0].GetPointAt(0.0f);
+        Vector3 startPoint = path[0].GetPointAt(0.0f);
         startPoint.z = -10f; //so it appears in front of the 3d objects in scene, i.e., the tracks and ground
         transform.position = startPoint;
-        transform.LookAt(startPoint);
+		transform.LookAt(new Vector2(startPoint.x, startPoint.y));
         setCurve(path[nextDir]);
         path[nextDir].incr();
         nextDir++;
         controller = Controller.HEURISTIC;
-        StartCoroutine("Drive");
+       // StartCoroutine("Drive");
 
         //To auto drive:  comment out StartCoroutine("Drive") and uncomment these below, need to handle pausing differently ofc
         /*setCurves(path);
