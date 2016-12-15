@@ -71,9 +71,13 @@ public class AIMController : SimpleHeuristicController {
         Vector3 startPoint = path[0].GetPointAt(0.0f);
         startPoint.z = -10f; //so it appears in front of the 3d objects in scene, i.e., the tracks and ground
         transform.position = startPoint;
-		transform.LookAt(new Vector2(startPoint.x, startPoint.y));
-        setCurve(path[nextDir]);
-        path[nextDir].incr();
+		setCurve(path[nextDir]);
+
+		Vector3 dir = path [0].GetPointAt (0.1f) - path [0].GetPointAt (0);
+		float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
+		transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
+       
+		path[nextDir].incr();
         nextDir++;
         controller = Controller.HEURISTIC;
        // StartCoroutine("Drive");
