@@ -68,23 +68,24 @@ public class AIMController : SimpleHeuristicController {
         //public BezierCurve[] getCurvesFromPathNodes(TrackWayPoint[] waypointList)
         wayPoints = GameObject.Find("PathManager").GetComponent<PathManager>().getRandomPathNodesFromStartNode(start);//.getDebugPathCurves(debugIM.debugSpawnLocations[val], debugIM.debugSpawnLocations[val + 1]); //
         path = GameObject.Find("PathManager").GetComponent<PathManager>().getCurvesFromPathNodes(wayPoints); debugIM.debugSpawnCounter += 2;
-        Vector3 startPoint = path[0].GetPointAt(0.0f);
-        startPoint.z = -10f; //so it appears in front of the 3d objects in scene, i.e., the tracks and ground
+        Vector2 startPoint = path[0].GetPointAt(0f);
+        //startPoint.z = -10f; //so it appears in front of the 3d objects in scene, i.e., the tracks and ground
         transform.position = startPoint;
 		setCurve(path[nextDir]);
 
-		Vector3 dir = path [0].GetPointAt (0.1f) - path [0].GetPointAt (0);
-		float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
-		transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
+		//Vector3 dir = path [0].GetPointAt (0.1f) - path [0].GetPointAt (0);
+		//float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
+		//transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
        
 		path[nextDir].incr();
         nextDir++;
         controller = Controller.HEURISTIC;
-       // StartCoroutine("Drive");
+        //StartCoroutine("Drive");
 
         //To auto drive:  comment out StartCoroutine("Drive") and uncomment these below, need to handle pausing differently ofc
-        /*setCurves(path);
-        StartCoroutine("AutoDrive");*/
+		//Debug.DrawLine(transform.position,transform.position+transform.up.normalized*5,Color.red,10f);
+		setCurves(path);
+        StartCoroutine("AutoDrive");
     }
 
     // Update is called once per frame
