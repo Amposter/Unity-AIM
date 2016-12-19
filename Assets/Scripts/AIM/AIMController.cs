@@ -71,6 +71,8 @@ public class AIMController : SimpleHeuristicController {
         Vector2 startPoint = path[0].GetPointAt(0f);
         //startPoint.z = -10f; //so it appears in front of the 3d objects in scene, i.e., the tracks and ground
         transform.position = startPoint;
+		float angle = 360 - Vector2.Angle (transform.up, (Vector2)(path[0].GetPointAt(0.1f) - path[0].GetPointAt(0f))); //If the rotation goes wonky, these 2 lines might be why
+		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
 		setCurve(path[nextDir]);
 
 		//Vector3 dir = path [0].GetPointAt (0.1f) - path [0].GetPointAt (0);

@@ -45,7 +45,6 @@ public class SimpleHeuristicController : VehicleController
         {
             int offset = 1;
             Vector2 toPoint = curve.GetPointAt(offset / (float)resolution);
-            //transform.LookAt(toPoint);
 
             while (offset <= resolution)
             {
@@ -61,15 +60,9 @@ public class SimpleHeuristicController : VehicleController
 				{ 
 					++offset;
 					toPoint = curve.GetPointAt((float)offset/resolution);
-					//rotate
-					transform.rotation = Quaternion.FromToRotation(transform.up, dir);
+					transform.rotation *= Quaternion.FromToRotation(transform.up, dir);
 				}
 				transform.position = newPos; 
-
-				//float angle = Vector2.Angle (transform.up, dir);
-				//float angle = Mathf.Atan2 (dir.y, dir.x) * Mathf.Rad2Deg;
-				//transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
-
 				yield return new WaitForFixedUpdate();
             }
         }
@@ -78,8 +71,6 @@ public class SimpleHeuristicController : VehicleController
     {
         int offset = 1;
         Vector2 toPoint = curve.GetPointAt(offset /(float)resolution);
-        //toPoint.y = transform.position.y;
-        //transform.LookAt(toPoint);
 
         while (offset <= resolution)
         {
@@ -87,9 +78,6 @@ public class SimpleHeuristicController : VehicleController
             {
 				yield return new WaitForFixedUpdate();
             }
-			//Vector2 newPos = Vector2.MoveTowards(transform.position, toPoint, speed * Time.fixedDeltaTime);
-            //transform.LookAt(newPos);
-			//*********
 			Vector2 travelVector = (toPoint - (Vector2)transform.position);
 			Vector2 dir = travelVector.normalized;
 			Vector2 newPos = (Vector2)transform.position + speed * dir * Time.fixedDeltaTime;
@@ -98,16 +86,9 @@ public class SimpleHeuristicController : VehicleController
 			{ 
 				++offset;
 				toPoint = curve.GetPointAt((float)offset/resolution);
+				transform.rotation *= Quaternion.FromToRotation(transform.up, dir);
 			} 
-			//***********
             transform.position = newPos; 
-/*			if ((Vector2)transform.position == toPoint)
-            {         
-                ++offset;
-                toPoint = curve.GetPointAt((float)offset/resolution);
-               //toPoint.y = transform.position.y;
-                //transform.LookAt(toPoint);
-            }*/
 			yield return new WaitForFixedUpdate();
         }
     }
