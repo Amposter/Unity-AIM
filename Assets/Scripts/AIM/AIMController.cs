@@ -218,7 +218,7 @@ public class AIMController : SimpleHeuristicController {
             }
             else //We're entering the intersection
             {
-                KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = SimulatePath();
+                KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>[] requestPath = SimulatePath();
                 object[] parameters = new object[] { requestPath, nextIM};
                 StartCoroutine("MakeRequest", parameters);
             }
@@ -230,7 +230,6 @@ public class AIMController : SimpleHeuristicController {
     //Compare the next path against 'curve'
     public bool ComparePath(BezierCurve curve)
     {
-        Debug.Log(gameObject.name);
         if (controller == Controller.AIM)
             return curve == path[nextDir];
         else
@@ -300,79 +299,13 @@ public class AIMController : SimpleHeuristicController {
             }
         }
         Act();
-        //Debug.Log("Positions correct: " + debugCorectPositions);
     }
+		
 
-    /*   KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] SimulatePath()
-       {
-           KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] output = new KeyValuePair<float, KeyValuePair< Vector3, Quaternion >>[steps];
-
-           BezierCurve curve = path[nextDir]; 
-
-           float initialTime = (float)Time.time;
-           float distance = 0;
-           //Debug.Log("Initial time simulation: " + initialTime);
-          /* 
-           Vector3 simulatedCar = transform.position;
-           int counter = 1;
-           Vector3 toPoint = curve.GetPointAt(counter / (float)steps);
-           toPoint.y = simulatedCar.y;
-           while (counter <= steps)
-           {
-               Vector3 travelVector = (toPoint - simulatedCar);
-               Vector3 dir = travelVector.normalized;
-               Vector3 newPos = simulatedCar + speed * dir;
-               float incrDistance = speed;
-               float distanceToTravel = travelVector.magnitude;
-               if (distanceToTravel <= speed)
-               {
-                   // Debug.Log(speed*Time.deltaTime + " " + distanceToTravel);
-                   newPos = toPoint;
-                   incrDistance = distanceToTravel;
-               }
-               //Vector3 newPos = Vector3.MoveTowards(transform.position, toPoint, speed * Time.deltaTime);
-               simulatedCar = newPos;
-               distance += incrDistance;
-               if (simulatedCar == toPoint)
-               {
-                   output[counter - 1] = new KeyValuePair<float, Vector3>((float)Math.Round(time, 1), simulatedCar);
-                   Debug.Log("Predicted time: " + time);//output[s-1].Key);
-                   ++counter;
-                   incrDistance = 0f;
-                   toPoint = curve.GetPointAt((float)counter / steps);
-                   toPoint.y = simulatedCar.y;
-               }
-           }
-           return output;*/
-    /*  Vector3 curr = transform.position;
-      Vector3 next;
-      for (int s = 1; s < steps+1; ++s)
-      {
-
-          float segment = (s/ (float)steps);
-          Vector3 point = curve.GetPointAt(segment); 
-          point.y = transform.position.y;
-
-          next = curve.GetPointAt(segment);
-          next.y = curr.y;
-          Quaternion rotation = Quaternion.LookRotation(next - curr);
-          distance += (next - curr).magnitude;
-          curr = next;
-
-          float elapsedTime = distance / speed;
-          float totalTime = initialTime + elapsedTime;
-          output[s - 1] = new KeyValuePair<float, KeyValuePair<Vector3,Quaternion>>((float)Math.Round(totalTime, 1), new KeyValuePair<Vector3, Quaternion>(point,rotation));
-          debugTime[s - 1] = output[s - 1].Key;
-          Debug.Log("Predicted time: " + output[s-1].Key);
-      }
-      Debug.Log("*******************");
-      return output;
-  } */
-
-    KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] SimulatePath()
+    KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>[] SimulatePath()
     {
         Color colour = new Color(UnityEngine.Random.Range(0f, 1.0f), UnityEngine.Random.Range(0f, 1.0f), UnityEngine.Random.Range(0f, 1.0f));
-        List<KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>> output = new List<KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>>();
+        List<KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>> output = new List<KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>>();
         List<BezierCurve> curves = new List<BezierCurve>();
         int temp = nextDir;
         curves.Add(path[temp++]);
@@ -384,19 +317,19 @@ public class AIMController : SimpleHeuristicController {
         float timeOffset = reservationOffset;
         float distToTimeStep = timeOffset * speed;
         float time = (float)Math.Round(Time.time, decimalRound);
-        Vector3 simulatedPos = transform.position;
-        simulatedPos.y = 0.5f;
+        Vector2 simulatedPos = transform.position;
+        //simulatedPos.y = 0.5f;
 
         foreach (BezierCurve curve in curves)
         {
             int counter = 1;
-            Vector3 toPoint = curve.GetPointAt(counter / (float)steps);
-            toPoint.y = simulatedPos.y;
+            Vector2 toPoint = curve.GetPointAt(counter / (float)steps);
+            //toPoint.y = simulatedPos.y;
 
             while (counter <= steps)
             {
-                Vector3 travelVector = (toPoint - simulatedPos);
-                Vector3 dir = travelVector.normalized;
+                Vector2 travelVector = (toPoint - simulatedPos);
+                Vector2 dir = travelVector.normalized;
                 float distToPointStep = travelVector.magnitude;
 
                 if (distToTimeStep <= distToPointStep) //The position we are looking for is in this segment of the curve
@@ -408,7 +341,7 @@ public class AIMController : SimpleHeuristicController {
                     //distToPointStep -= distToTimeStep;
                     distToTimeStep = timeOffset * speed;
                     //Debug.Log(time);
-                    output.Add(new KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>(time, new KeyValuePair<Vector3, Quaternion>(simulatedPos, rotation)));
+                    output.Add(new KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>(time, new KeyValuePair<Vector2, Quaternion>(simulatedPos, rotation)));
                  /*   GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.transform.position = simulatedPos;
                     cube.transform.rotation = rotation;
@@ -424,7 +357,7 @@ public class AIMController : SimpleHeuristicController {
                     distToTimeStep = (distToTimeStep - distToPointStep);
                     ++counter;
                     toPoint = curve.GetPointAt(counter / (float)steps);
-                    toPoint.y = simulatedPos.y;
+                    //toPoint.y = simulatedPos.y;
                 }
             }
         }
@@ -432,7 +365,7 @@ public class AIMController : SimpleHeuristicController {
         _times = new float[output.Count];
         _positions = new Vector3[output.Count];
         int i = 0;
-        foreach (KeyValuePair<float, KeyValuePair<Vector3, Quaternion>> item in output)
+        foreach (KeyValuePair<float, KeyValuePair<Vector2, Quaternion>> item in output)
         {
             _times[i] = item.Key;
             _positions[i] = item.Value.Key;
@@ -450,7 +383,7 @@ public class AIMController : SimpleHeuristicController {
             ++offset;
 
 
-        KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[] requestPath = (KeyValuePair<float, KeyValuePair<Vector3, Quaternion>>[])parameters[0];
+        KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>[] requestPath = (KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>[])parameters[0];
         IntersectionManager im = (IntersectionManager)parameters[1];
 
         while (true)
