@@ -82,12 +82,12 @@ public class AIMController : SimpleHeuristicController {
 		path[nextDir].incr();
         nextDir++;
         controller = Controller.HEURISTIC;
-        //StartCoroutine("Drive");
+        StartCoroutine("Drive");
 
         //To auto drive:  comment out StartCoroutine("Drive") and uncomment these below, need to handle pausing differently ofc
 		//Debug.DrawLine(transform.position,transform.position+transform.up.normalized*5,Color.red,10f);
-		setCurves(path);
-        StartCoroutine("AutoDrive");
+		//setCurves(path);
+        //StartCoroutine("AutoDrive");
     }
 
     // Update is called once per frame
@@ -115,8 +115,9 @@ public class AIMController : SimpleHeuristicController {
 		}
     }
 
-    void OnTriggerEnter(Collider col)
+    void OnTriggerEnter2D(Collider2D col)
     {
+		Debug.Log (col.gameObject.tag);
         if (col.gameObject.tag == "Vehicle" && controller != Controller.AIM)
         {
             Vector3 otherPosCentre = col.gameObject.transform.position;
