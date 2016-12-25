@@ -111,7 +111,7 @@ public class CarSpawner : MonoBehaviour
 			{
 				if(carsSpawnedPerStartPoint[pointIndex] < carsPerStartPoint)
 				{
-					Collider[] colliders = Physics.OverlapSphere(startPoints[pointIndex].transform.position, 2);
+					Collider[] colliders = Physics2D.OverlapCircle(startPoints[pointIndex].transform.position, 2);
 					bool full = false;
 					foreach (Collider col in colliders)
 					{

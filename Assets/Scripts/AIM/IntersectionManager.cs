@@ -79,38 +79,40 @@ public class IntersectionManager : MonoBehaviour {
             Vector2 pos = positions[i].Value.Key;
             Quaternion rot = positions[i].Value.Value;
 
-            //if (!reservations.ContainsKey(time)) //Check if there are any bookings for the time
-              //  continue;
+            if (!reservations.ContainsKey(time)) //Check if there are any bookings for the time
+                continue;
 
-			List<KeyValuePair<Vector2,Quaternion>> reservedPositions; //= reservations[time];
+			List<KeyValuePair<Vector2,Quaternion>> reservedPositions = reservations[time];
 			GameObject bounds = GameObject.Instantiate(carPlaceholder);
-            //bounds.SetActive(false);
             bounds.transform.position = pos;
-			//bounds.GetComponent<BoxCollider2D> ().size = carDimensions;
-            //bounds.transform.rotation = rot;
+            bounds.transform.rotation = rot;
             bounds.name = "bounds #" + i;
 
             //Check the requested position against all other position that were booked already
-     /*       for (int j = 0; j < reservedPositions.Count; ++j)
+            for (int j = 0; j < reservedPositions.Count; ++j)
             {
                 Vector2 otherPos = reservedPositions[j].Key;
                 Quaternion otherRot = reservedPositions[j].Value;
-                GameObject otherBounds = GameObject.CreatePrimitive(PrimitiveType.Cube);
+				GameObject otherBounds = GameObject.Instantiate(carPlaceholder);
+				otherBounds.transform.position = otherPos;
+				bounds.transform.rotation = otherRot;
+				bounds.name = "bounds #" + i;
+            /*    GameObject otherBounds = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 otherBounds.transform.position = otherPos;
                 otherBounds.GetComponent<MeshRenderer>().material.color = Color.black;
                 otherBounds.name = "otherBounds #" + j;
                 otherBounds.transform.rotation = otherRot;
-                otherBounds.transform.localScale = carDimensions;
+                otherBounds.transform.localScale = carDimensions;*/
 
                 if (bounds.GetComponent<Collider>().bounds.Intersects(otherBounds.GetComponent<Collider>().bounds))
                 {
                     Destroy(otherBounds);
-                    //Destroy(bounds);
+                    Destroy(bounds);
                     return false;
                 }
                 Destroy(otherBounds);
-                //Destroy(bounds);
-            }*/
+                Destroy(bounds);
+            }
             
         }
         return true;
