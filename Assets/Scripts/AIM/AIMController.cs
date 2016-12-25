@@ -117,7 +117,6 @@ public class AIMController : SimpleHeuristicController {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-		Debug.Log (col.gameObject.tag);
         if (col.gameObject.tag == "Vehicle" && controller != Controller.AIM)
         {
             Vector3 otherPosCentre = col.gameObject.transform.position;
@@ -252,49 +251,29 @@ public class AIMController : SimpleHeuristicController {
         {
             int counter = 1;
             //Debug.Log("Initial Time Actual: " + Time.time);
-            Vector3 toPoint = curve.GetPointAt(counter / (float)steps);
-            toPoint.y = transform.position.y;
-            transform.LookAt(toPoint);
+            Vector2 toPoint = curve.GetPointAt(counter / (float)steps);
+			transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
+
+
             while (counter <= steps)
             {
-                Vector3 travelVector = (toPoint - transform.position);
-                Vector3 dir = travelVector.normalized;
-				Vector3 newPos = transform.position + speed * dir * Time.fixedDeltaTime;
+				Vector2 travelVector = (toPoint - (Vector2)transform.position);
+                Vector2 dir = travelVector.normalized;
+				Vector2 newPos = (Vector2)transform.position + speed * dir * Time.fixedDeltaTime;
                 /*   if (Mathf.Approximately((float)Math.Round(Time.time,2), (float)Math.Round(t + tOffset,2)))
                    {
                        Debug.Log(t + tOffset + " and " + Time.time);
                        t = (float)Math.Round(t+tOffset,1);
 
                    }*/
-                float distanceToTravel = travelVector.magnitude;
-                if (distanceToTravel <= speed * Time.fixedDeltaTime)
-                {
-                    /*  if (distanceToTravel / (speed * Time.deltaTime) > 0.75)
-                      { }
-                      else*/
-                    {
-                        newPos = toPoint;
-                    }
-                }
-                else
-                {
-                    if ((distanceToTravel - speed * Time.fixedDeltaTime) < speed * Time.fixedDeltaTime * 0.2f)
-                    {
-                        if (Mathf.Approximately(debugTime[counter - 1], (float)Math.Round(Time.time, decimalRound)))
-                            newPos = toPoint;
-                    }
-                }
-                transform.LookAt(newPos);
-                transform.position = newPos;
-                if (transform.position == toPoint)
-                {
-                    //Debug.Log("CurrTime: " + Math.Round(Time.time,1) + " " + transform.position);
-                    // Debug.Log(debugTime[counter - 1] + " " + (float)Math.Round(Time.time,1));
-                    ++counter;
-                    toPoint = curve.GetPointAt((float)counter / steps);
-                    toPoint.y = transform.position.y;
-                    transform.LookAt(toPoint);
-                }
+				float distanceToTravel = travelVector.magnitude;
+				if (distanceToTravel <= speed * Time.fixedDeltaTime) //Newpos oversteps the next waypoint
+				{ 
+					++counter;
+					toPoint = curve.GetPointAt((float)counter/steps);
+					transform.rotation *= Quaternion.FromToRotation(transform.up, dir);
+				}
+				transform.position = newPos; 
 				yield return new WaitForFixedUpdate();
             }
         }
@@ -317,6 +296,7 @@ public class AIMController : SimpleHeuristicController {
         float timeOffset = reservationOffset;
         float distToTimeStep = timeOffset * speed;
         float time = (float)Math.Round(Time.time, decimalRound);
+		GameObject bounds = GameObject.Instantiate(gameObject);
         Vector2 simulatedPos = transform.position;
         //simulatedPos.y = 0.5f;
 
@@ -334,14 +314,15 @@ public class AIMController : SimpleHeuristicController {
 
                 if (distToTimeStep <= distToPointStep) //The position we are looking for is in this segment of the curve
                 {
-                    Quaternion rotation = Quaternion.LookRotation(toPoint - simulatedPos);
+					bounds.transform.rotation *= Quaternion.FromToRotation(bounds.transform.up, dir);// Quaternion.LookRotation(toPoint - simulatedPos);
                     simulatedPos += dir * distToTimeStep; //Move to the point of interest
                     time = (float)Math.Round(time + timeOffset, decimalRound);
-                    //Debug.Log(time);
+					bounds.transform.position = simulatedPos;
+					//Debug.Log(time);
                     //distToPointStep -= distToTimeStep;
                     distToTimeStep = timeOffset * speed;
                     //Debug.Log(time);
-                    output.Add(new KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>(time, new KeyValuePair<Vector2, Quaternion>(simulatedPos, rotation)));
+					output.Add(new KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>(time, new KeyValuePair<Vector2, Quaternion>(simulatedPos, bounds.transform.rotation)));
                  /*   GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.transform.position = simulatedPos;
                     cube.transform.rotation = rotation;
@@ -354,6 +335,7 @@ public class AIMController : SimpleHeuristicController {
                 else
                 {
                     simulatedPos = toPoint;
+					bounds.transform.position = simulatedPos;
                     distToTimeStep = (distToTimeStep - distToPointStep);
                     ++counter;
                     toPoint = curve.GetPointAt(counter / (float)steps);
@@ -361,6 +343,7 @@ public class AIMController : SimpleHeuristicController {
                 }
             }
         }
+		Destroy (bounds);
         _bookedPositions = output.Count;
         _times = new float[output.Count];
         _positions = new Vector3[output.Count];

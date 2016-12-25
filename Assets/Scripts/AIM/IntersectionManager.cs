@@ -10,7 +10,7 @@ public class IntersectionManager : MonoBehaviour {
     public float cleanOffset = 5.0f;
     public int debugSpawnCounter = 0;
     private Dictionary<float, List<KeyValuePair<Vector2, Quaternion>>> reservations;
-    public Vector2 carDimensions = new Vector2(2.39f,3.51f); //with padding
+    private Vector2 carDimensions = new Vector2(2.39f,3.51f); //with padding
 
     // Use this for initialization
     void Start ()
@@ -72,28 +72,28 @@ public class IntersectionManager : MonoBehaviour {
     //Check if a reservation can be made - i.e. the list of times and positions do not clash with those booked already
     bool CheckReservation(KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>[] positions)
     {
-        
+		Debug.Log ("Checking");
         for (int i = 0; i < positions.Length; ++i)
         {
             float time = positions[i].Key;
             Vector2 pos = positions[i].Value.Key;
             Quaternion rot = positions[i].Value.Value;
 
-            if (!reservations.ContainsKey(time)) //Check if there are any bookings for the time
-                continue;
+            //if (!reservations.ContainsKey(time)) //Check if there are any bookings for the time
+              //  continue;
 
-            List<KeyValuePair<Vector2,Quaternion>> reservedPositions = reservations[time];
-            GameObject bounds = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			List<KeyValuePair<Vector2,Quaternion>> reservedPositions; //= reservations[time];
+			GameObject bounds = GameObject.Instantiate(carPlaceholder);
             //bounds.SetActive(false);
             bounds.transform.position = pos;
-            bounds.transform.rotation = rot;
-            bounds.transform.localScale = carDimensions;
+			//bounds.GetComponent<BoxCollider2D> ().size = carDimensions;
+            //bounds.transform.rotation = rot;
             bounds.name = "bounds #" + i;
 
             //Check the requested position against all other position that were booked already
-            for (int j = 0; j < reservedPositions.Count; ++j)
+     /*       for (int j = 0; j < reservedPositions.Count; ++j)
             {
-                Vector3 otherPos = reservedPositions[j].Key;
+                Vector2 otherPos = reservedPositions[j].Key;
                 Quaternion otherRot = reservedPositions[j].Value;
                 GameObject otherBounds = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 otherBounds.transform.position = otherPos;
@@ -105,12 +105,12 @@ public class IntersectionManager : MonoBehaviour {
                 if (bounds.GetComponent<Collider>().bounds.Intersects(otherBounds.GetComponent<Collider>().bounds))
                 {
                     Destroy(otherBounds);
-                    Destroy(bounds);
+                    //Destroy(bounds);
                     return false;
                 }
                 Destroy(otherBounds);
-                Destroy(bounds);
-            }
+                //Destroy(bounds);
+            }*/
             
         }
         return true;
