@@ -72,7 +72,6 @@ public class IntersectionManager : MonoBehaviour {
     //Check if a reservation can be made - i.e. the list of times and positions do not clash with those booked already
     bool CheckReservation(KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>[] positions)
     {
-		Debug.Log ("Checking");
         for (int i = 0; i < positions.Length; ++i)
         {
             float time = positions[i].Key;
