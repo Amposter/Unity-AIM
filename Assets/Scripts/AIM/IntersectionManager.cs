@@ -72,6 +72,7 @@ public class IntersectionManager : MonoBehaviour {
     //Check if a reservation can be made - i.e. the list of times and positions do not clash with those booked already
     bool CheckReservation(KeyValuePair<float, KeyValuePair<Vector2, Quaternion>>[] positions)
     {
+
         for (int i = 0; i < positions.Length; ++i)
         {
             float time = positions[i].Key;
@@ -94,25 +95,18 @@ public class IntersectionManager : MonoBehaviour {
                 Quaternion otherRot = reservedPositions[j].Value;
 				GameObject otherBounds = GameObject.Instantiate(carPlaceholder);
 				otherBounds.transform.position = otherPos;
-				bounds.transform.rotation = otherRot;
-				bounds.name = "bounds #" + i;
-            /*    GameObject otherBounds = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                otherBounds.transform.position = otherPos;
-                otherBounds.GetComponent<MeshRenderer>().material.color = Color.black;
-                otherBounds.name = "otherBounds #" + j;
-                otherBounds.transform.rotation = otherRot;
-                otherBounds.transform.localScale = carDimensions;*/
-
-                if (bounds.GetComponent<Collider>().bounds.Intersects(otherBounds.GetComponent<Collider>().bounds))
+				otherBounds.transform.rotation = otherRot;
+				otherBounds.name = "bounds #" + i;
+				UnityEditor.EditorApplication.isPaused = true;
+				if (bounds.GetComponent<Bounds>().collided())
                 {
                     Destroy(otherBounds);
                     Destroy(bounds);
                     return false;
                 }
-                Destroy(otherBounds);
-                Destroy(bounds);
+				Destroy(otherBounds);
             }
-            
+			Destroy(bounds);      
         }
         return true;
     }
