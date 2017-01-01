@@ -74,6 +74,7 @@ public class NEAT_Controller : SimpleHeuristicController
 		counter = 0;
 		this.curve = curves[counter];
 		offset = 1;
+		updateResolution (curve.length);
 		toPoint = curve.GetPointAt(offset / (float)resolution);
 		//transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
 

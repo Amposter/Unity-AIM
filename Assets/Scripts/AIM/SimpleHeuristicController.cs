@@ -32,7 +32,19 @@ public class SimpleHeuristicController : VehicleController
 		base.Update ();
 	}
 		
-
+	public void updateResolution(float length)
+	{
+		int val = 0;
+		if (length < 5)
+			val = 3;
+		else if (length < 10)
+			val = 6;
+		else if (length < 26)
+			val = 8;
+		else
+			val = 15;
+		resolution = val;
+	}
 	public void updatePosition()
 	{		
 
@@ -46,6 +58,7 @@ public class SimpleHeuristicController : VehicleController
 			if (counter > curves.Length - 1)
 				return;
 			this.curve = curves [counter];
+			updateResolution (this.curve.length);
 			toPoint = curve.GetPointAt (offset / (float)resolution);
 			transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
 		}
