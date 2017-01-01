@@ -38,31 +38,32 @@ public class SimpleHeuristicController : VehicleController
 	{		
 		resolution = 25;
 
-
-		if (offset <= resolution) {
-			if (paused) { //Do nothing
-				return;
-			}
-
-			Vector3 newPos = Vector3.MoveTowards (transform.position, toPoint, speedWeight * speed * Time.fixedDeltaTime);
-			transform.position = newPos;
-			//GetComponent<Rigidbody>().MovePosition(newPos);
-			if (transform.position == toPoint) {
-				++offset;
-				toPoint = curve.GetPointAt ((float)offset / resolution);
-				toPoint.y = transform.position.y;
-				transform.LookAt (toPoint);
-			}
-		} else if (counter < curves.Length - 1) {
-			++counter;
-			this.curve = curves [counter];
-			offset = 1;
-			toPoint = curve.GetPointAt (offset / (float)resolution);
-			toPoint.y = transform.position.y;
-			transform.LookAt (toPoint);
-		} else {
+		if ((counter > curves.Length - 1) || paused)
 			return;
+
+		if (offset > resolution) 
+		{
+			++counter;
+			offset = 1;
+			if (counter > curves.Length - 1)
+				return;
+			this.curve = curves [counter];
+			toPoint = curve.GetPointAt (offset / (float)resolution);
+			transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
 		}
+
+		Vector2 travelVector = (toPoint - (Vector2)transform.position);
+		Vector2 dir = travelVector.normalized;
+		Vector2 newPos = (Vector2)transform.position + speed * dir * Time.fixedDeltaTime;
+		float distanceToTravel = travelVector.magnitude;
+		if (distanceToTravel <= speed * Time.fixedDeltaTime) //Newpos oversteps the next waypoint
+		{ 
+			++offset;
+			toPoint = curve.GetPointAt((float)offset/resolution);
+			transform.rotation *= Quaternion.FromToRotation(transform.up, dir);
+		} 
+		transform.position = newPos;  
+
 	}
 
 	public void setCurve(BezierCurve curve)

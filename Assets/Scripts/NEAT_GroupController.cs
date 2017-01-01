@@ -30,6 +30,7 @@ public class NEAT_GroupController : UnitController
 	void Start ()
 	{
         groupFitness = 0;
+
 	}
 
 	public void setPathManager(PathManager pathManager)
@@ -87,10 +88,11 @@ public class NEAT_GroupController : UnitController
 
 	protected IEnumerator spawnCars ()
 	{
-
+		optimizer = GameObject.Find ("Optimizer").GetComponent<Optimizer> ();
 		List<TrackWayPoint> startPoints = GameObject.Find ("PathManager").GetComponent<PathManager> ().startPoints;
 	
 		int[] carsSpawnedPerStartPoint = new int[startPoints.Count];
+
 
 		do {
 			for (int pointIndex = 0; pointIndex < startPoints.Count; pointIndex++)
