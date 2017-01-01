@@ -51,7 +51,7 @@ public class NEAT_GroupController : UnitController
 					NEAT_Vehicle.SetActive (false);
 				} else if (NEAT_Vehicle.activeInHierarchy) {
 
-					neatController.updateSensors ();
+			/*		neatController.updateSensors ();
 
 					box.InputSignalArray [0] = neatController.getSensorInputs () [0];
 					box.InputSignalArray [1] = neatController.getSensorInputs () [1];
@@ -64,9 +64,9 @@ public class NEAT_GroupController : UnitController
 					box.InputSignalArray [8] = neatController.getSensorInputs () [8];
 					box.InputSignalArray [9] = neatController.getSensorInputs () [9];
 
-					box.Activate ();
+					box.Activate ();*/
  
-					neatController.setSpeedWeight (Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1));
+					neatController.setSpeedWeight (1);//Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1));
 					neatController.updatePosition ();
 				}
 			}
@@ -108,7 +108,8 @@ public class NEAT_GroupController : UnitController
 					}
 					if (!full)
 					{
-						GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoints[pointIndex].transform.position, startPoints[pointIndex].transform.rotation) as GameObject;
+						GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab) as GameObject;
+						//NEAT_Vehicle.transform.position = (Vector2)startPoints[pointIndex].transform.position;
 						NEAT_Vehicle.transform.parent = transform;
 						NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
 						NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoints[pointIndex])));

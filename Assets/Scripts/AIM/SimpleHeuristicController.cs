@@ -15,7 +15,7 @@ public class SimpleHeuristicController : VehicleController
 	protected int counter;
 
 	protected int offset;
-	protected Vector3 toPoint;
+	protected Vector2 toPoint;
 
 	protected int resolution; //Number of points to sample on each path curve
 
@@ -24,7 +24,6 @@ public class SimpleHeuristicController : VehicleController
 	{
 		base.Start();
 		paused = false;
-		resolution = 25;
 	}
 
 	// Update is called once per frame
@@ -36,7 +35,6 @@ public class SimpleHeuristicController : VehicleController
 
 	public void updatePosition()
 	{		
-		resolution = 25;
 
 		if ((counter > curves.Length - 1) || paused)
 			return;
@@ -52,6 +50,7 @@ public class SimpleHeuristicController : VehicleController
 			transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
 		}
 
+		//TODO: Fix multiple over steps. For now, use small enough amount of sampling steps
 		Vector2 travelVector = (toPoint - (Vector2)transform.position);
 		Vector2 dir = travelVector.normalized;
 		Vector2 newPos = (Vector2)transform.position + speed * dir * Time.fixedDeltaTime;
@@ -74,6 +73,7 @@ public class SimpleHeuristicController : VehicleController
 	public void setCurves(BezierCurve[] curves)
 	{
 		this.curves = curves;
+
 	}
 
 

@@ -25,7 +25,7 @@ public class NEAT_Controller : SimpleHeuristicController
 	public float prevDistance = float.MaxValue;
 	public float prevMinObstacleDistance = float.MaxValue;
 	public float initialDistanceToTarget = 1;
-	public Vector3 prevPos;
+	public Vector2 prevPos;
 
 	// Update is called once per frame
 	protected override void Update()
@@ -61,16 +61,25 @@ public class NEAT_Controller : SimpleHeuristicController
 		setCurve (curves [0]);
 		setCurves (curves);
 
-		resolution = 25;
+		Vector2 startPoint = curves[0].GetPointAt(0f);
+		transform.position = startPoint;
+		float angle = 360 - Vector2.Angle (transform.up, (Vector2)(curves[0].GetPointAt(0.1f) - curves[0].GetPointAt(0f))); //If the rotation goes wonky, these 2 lines might be why
+		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
+		
+		string name = GameObject.FindGameObjectWithTag("Track").name;
+		name = (name[name.Length - 2].ToString() + name[name.Length - 1]);
+		int level = int.Parse(name);
+		resolution = Config.samplingSteps[level-1];
+
 		counter = 0;
 		this.curve = curves[counter];
 		offset = 1;
 		toPoint = curve.GetPointAt(offset / (float)resolution);
-		toPoint.y = transform.position.y;
-		transform.LookAt(toPoint);
+		//transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
+
 	}
 
-	public void OnTriggerEnter(Collider other)
+	public void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.gameObject.GetComponent<TrackWayPoint> () == null)
 		{
@@ -83,7 +92,7 @@ public class NEAT_Controller : SimpleHeuristicController
 		}
     }
 
-    public void OnCollisionEnter(Collision other)
+    public void OnCollisionEnter2D(Collision2D other)
 	{
 		groupController.collisionCount++;
 		finishedRoute = true;
