@@ -63,8 +63,6 @@ public class NEAT_Controller : SimpleHeuristicController
 
 		Vector2 startPoint = curves[0].GetPointAt(0f);
 		transform.position = startPoint;
-		//float angle = 360 - Vector2.Angle (transform.up, (Vector2)(curves[0].GetPointAt(0.1f) - curves[0].GetPointAt(0f))); //If the rotation goes wonky, these 2 lines might be why
-		//transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
 
 		string name = GameObject.FindGameObjectWithTag("Track").name;
 		name = (name[name.Length - 2].ToString() + name[name.Length - 1]);
@@ -76,22 +74,7 @@ public class NEAT_Controller : SimpleHeuristicController
 		offset = 1;
 		updateResolution (curve.length);
 		toPoint = curve.GetPointAt(offset / (float)resolution);
-		//transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
-
 	}
-
-	public void OnTriggerEnter2D(Collider2D other)
-	{
-		if (other.gameObject.GetComponent<TrackWayPoint> () == null)
-		{
-			return;
-		}
-		if(other.gameObject.GetComponent<TrackWayPoint>().type == TrackWayPoint.Type.END)
-		{
-			finishedRoute = true;
-			groupController.carsThrough++;
-		}
-    }
 
     public void OnCollisionEnter2D(Collision2D other)
 	{

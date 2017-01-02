@@ -47,13 +47,15 @@ public class NEAT_GroupController : UnitController
 			{
 				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller>();
 
-				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute) {
+				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute) 
+				{
 					NEAT_Vehicle.SetActive (false);
-				} else if (NEAT_Vehicle.activeInHierarchy) {
+				}
+				else if (NEAT_Vehicle.activeInHierarchy) {
 
-			/*		neatController.updateSensors ();
+					neatController.updateSensors ();
 
-					box.InputSignalArray [0] = neatController.getSensorInputs () [0];
+				/*	box.InputSignalArray [0] = neatController.getSensorInputs () [0];
 					box.InputSignalArray [1] = neatController.getSensorInputs () [1];
 					box.InputSignalArray [2] = neatController.getSensorInputs () [2];
 					box.InputSignalArray [3] = neatController.getSensorInputs () [3];

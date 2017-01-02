@@ -43,15 +43,19 @@ public class SimpleHeuristicController : VehicleController
 			val = 2.6f;
 			
 		resolution = (int)(length / val);
-		//resolution = 4;
-		//resolution = 3;
-		//Debug.Log ("len: " + length + " res: " + resolution);
 	}
+
 	public void updatePosition()
 	{		
 
-		if ((counter > curves.Length - 1) || paused)
+		if (paused)
 			return;
+		
+		if ((counter > curves.Length - 1)) 
+		{
+			gameObject.GetComponent<NEAT_Controller> ().finishedRoute = true;
+			gameObject.GetComponent<NEAT_Controller> ().groupController.carsThrough++;
+		}
 
 		if (offset > resolution) 
 		{
@@ -76,6 +80,7 @@ public class SimpleHeuristicController : VehicleController
 
 		} 
 
+		//Debug.DrawLine (transform.position, (Vector2)transform.position + dir * 10, Color.green);
 		//Update rotation
 		float angle = Vector2.Angle (transform.up, dir); 
 		angle = Vector3.Cross(transform.up, dir).z < 0 ? 360 - angle : angle;
