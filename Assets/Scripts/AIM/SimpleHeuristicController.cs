@@ -34,16 +34,18 @@ public class SimpleHeuristicController : VehicleController
 		
 	public void updateResolution(float length)
 	{
-		int val = 0;
-		if (length < 5)
-			val = 3;
-		else if (length < 10)
-			val = 6;
-		else if (length < 26)
-			val = 8;
-		else
-			val = 15;
-		resolution = val;
+		float val = 0;
+		if (length < 6)
+			val = 1.6f;
+		else if (length < 20)
+			val = 2.2f;
+		else 
+			val = 2.6f;
+			
+		resolution = (int)(length / val);
+		//resolution = 4;
+		//resolution = 3;
+		//Debug.Log ("len: " + length + " res: " + resolution);
 	}
 	public void updatePosition()
 	{		
@@ -59,9 +61,7 @@ public class SimpleHeuristicController : VehicleController
 				return;
 			this.curve = curves [counter];
 			updateResolution (this.curve.length);
-			toPoint = curve.GetPointAt (offset / (float)resolution);
-			transform.rotation *= Quaternion.FromToRotation(transform.up, (toPoint - (Vector2)transform.position).normalized);
-		}
+			toPoint = curve.GetPointAt (offset / (float)resolution);		}
 
 		//TODO: Fix multiple over steps. For now, use small enough amount of sampling steps
 		Vector2 travelVector = (toPoint - (Vector2)transform.position);
@@ -72,9 +72,18 @@ public class SimpleHeuristicController : VehicleController
 		{ 
 			++offset;
 			toPoint = curve.GetPointAt((float)offset/resolution);
-			transform.rotation *= Quaternion.FromToRotation(transform.up, dir);
+			dir = (toPoint - (Vector2)transform.position).normalized;
+
 		} 
-		transform.position = newPos;  
+
+		//Update rotation
+		float angle = Vector2.Angle (transform.up, dir); 
+		angle = Vector3.Cross(transform.up, dir).z < 0 ? 360 - angle : angle;
+		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
+
+		//Update position
+		transform.position = newPos;
+
 
 	}
 

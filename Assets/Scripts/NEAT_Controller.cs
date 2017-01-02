@@ -63,9 +63,9 @@ public class NEAT_Controller : SimpleHeuristicController
 
 		Vector2 startPoint = curves[0].GetPointAt(0f);
 		transform.position = startPoint;
-		float angle = 360 - Vector2.Angle (transform.up, (Vector2)(curves[0].GetPointAt(0.1f) - curves[0].GetPointAt(0f))); //If the rotation goes wonky, these 2 lines might be why
-		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
-		
+		//float angle = 360 - Vector2.Angle (transform.up, (Vector2)(curves[0].GetPointAt(0.1f) - curves[0].GetPointAt(0f))); //If the rotation goes wonky, these 2 lines might be why
+		//transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
+
 		string name = GameObject.FindGameObjectWithTag("Track").name;
 		name = (name[name.Length - 2].ToString() + name[name.Length - 1]);
 		int level = int.Parse(name);
