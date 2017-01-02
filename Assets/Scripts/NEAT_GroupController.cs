@@ -45,13 +45,17 @@ public class NEAT_GroupController : UnitController
 		{
             foreach (GameObject NEAT_Vehicle in NEAT_VehiclesList)
 			{
+				if (NEAT_Vehicle == null)
+					continue;
+				
 				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller>();
 
 				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute) 
 				{
-					NEAT_Vehicle.SetActive (false);
+					Destroy(NEAT_Vehicle);
 				}
-				else if (NEAT_Vehicle.activeInHierarchy) {
+				else if (NEAT_Vehicle.activeInHierarchy) 
+				{
 
 					neatController.updateSensors ();
 

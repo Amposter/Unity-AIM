@@ -5,7 +5,7 @@ public class SimpleHeuristicController : VehicleController
 {
 
 	//Public variabes
-	public static float speed = 8f;
+	public static float speed = 10f;
 	public bool paused;
     public float speedWeight;
 
@@ -55,9 +55,10 @@ public class SimpleHeuristicController : VehicleController
 		{
 			gameObject.GetComponent<NEAT_Controller> ().finishedRoute = true;
 			gameObject.GetComponent<NEAT_Controller> ().groupController.carsThrough++;
+			return;
 		}
 
-		if (offset > resolution) 
+		if (offset >= resolution) 
 		{
 			++counter;
 			offset = 1;
