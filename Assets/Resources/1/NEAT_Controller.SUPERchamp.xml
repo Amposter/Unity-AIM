@@ -7,7 +7,7 @@
     <Fn id="3" name="Sine" prob="0.25" />
   </ActivationFunctions>
   <Networks>
-    <Network id="96" birthGen="0" fitness="3000">
+    <Network id="24" birthGen="0" fitness="1">
       <Nodes>
         <Node type="bias" id="0" fnId="0" />
         <Node type="in" id="1" fnId="0" />
@@ -18,7 +18,7 @@
         <Node type="out" id="6" fnId="0" />
       </Nodes>
       <Connections>
-        <Con id="13" src="3" tgt="5" wght="-4.7745835734531283" />
+        <Con id="16" src="4" tgt="6" wght="4.8729052254930139" />
       </Connections>
     </Network>
   </Networks>

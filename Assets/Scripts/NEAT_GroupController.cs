@@ -14,6 +14,7 @@ public class NEAT_GroupController : UnitController
 	public GameObject NEAT_VehiclePrefab;
     public float groupFitness;
 	private List<GameObject> NEAT_VehiclesList = new List<GameObject>();
+	private PedestrianSpawner2D[] pedestrianSpawners;
 	public int totalTriggered = 0;
 	public int speedCheckCount = 0;
 	public float totalSpeedAccumulator = 0;
@@ -59,7 +60,7 @@ public class NEAT_GroupController : UnitController
 
 					neatController.updateSensors ();
 
-				/*	box.InputSignalArray [0] = neatController.getSensorInputs () [0];
+					box.InputSignalArray [0] = neatController.getSensorInputs () [0];
 					box.InputSignalArray [1] = neatController.getSensorInputs () [1];
 					box.InputSignalArray [2] = neatController.getSensorInputs () [2];
 					box.InputSignalArray [3] = neatController.getSensorInputs () [3];
@@ -70,12 +71,15 @@ public class NEAT_GroupController : UnitController
 					box.InputSignalArray [8] = neatController.getSensorInputs () [8];
 					box.InputSignalArray [9] = neatController.getSensorInputs () [9];
 
-					box.Activate ();*/
+					box.Activate ();
  
-					neatController.setSpeedWeight (1);//Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1));
+					neatController.setSpeedWeight (Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1));
 					neatController.updatePosition ();
 				}
 			}
+
+			foreach (PedestrianSpawner2D p in pedestrianSpawners)
+				p.UpdatePedestrians ();
 
 		}
 	}
@@ -94,12 +98,18 @@ public class NEAT_GroupController : UnitController
 
 	protected IEnumerator spawnCars ()
 	{
+
 		optimizer = GameObject.Find ("Optimizer").GetComponent<Optimizer> ();
 		List<TrackWayPoint> startPoints = GameObject.Find ("PathManager").GetComponent<PathManager> ().startPoints;
 	
 		int[] carsSpawnedPerStartPoint = new int[startPoints.Count];
 
-
+		pedestrianSpawners = FindObjectsOfType (typeof(PedestrianSpawner2D)) as PedestrianSpawner2D[];
+		foreach (PedestrianSpawner2D p in pedestrianSpawners)
+		{
+			p.SetUp ();
+			StartCoroutine(p.SpawnPedestrians());
+		}
 		do {
 			for (int pointIndex = 0; pointIndex < startPoints.Count; pointIndex++)
 			{

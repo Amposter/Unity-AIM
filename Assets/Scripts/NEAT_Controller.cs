@@ -76,6 +76,14 @@ public class NEAT_Controller : SimpleHeuristicController
 		toPoint = curve.GetPointAt(offset / (float)resolution);
 	}
 
+	public void OnTriggerEnter2D(Collider2D other)
+	{
+		if (other.gameObject.tag == "Pedestrian") 
+		{
+			groupController.collisionCount++;
+			finishedRoute = true;
+		}
+	}
     public void OnCollisionEnter2D(Collision2D other)
 	{
 		groupController.collisionCount++;

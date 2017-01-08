@@ -5,7 +5,7 @@ public class SimpleHeuristicController : VehicleController
 {
 
 	//Public variabes
-	public static float speed = 10f;
+	public static float speed = 8f;
 	public bool paused;
     public float speedWeight;
 
@@ -66,9 +66,10 @@ public class SimpleHeuristicController : VehicleController
 				return;
 			this.curve = curves [counter];
 			updateResolution (this.curve.length);
-			toPoint = curve.GetPointAt (offset / (float)resolution);		}
+			toPoint = curve.GetPointAt (offset / (float)resolution);		
+		}
 
-		//TODO: Fix multiple over steps. For now, use small enough amount of sampling steps
+		//TODO: Fix multiple over steps. For now, use small enough amount of sampling steps (set dynamically)
 		Vector2 travelVector = (toPoint - (Vector2)transform.position);
 		Vector2 dir = travelVector.normalized;
 		Vector2 newPos = (Vector2)transform.position + speed * dir * Time.fixedDeltaTime;
