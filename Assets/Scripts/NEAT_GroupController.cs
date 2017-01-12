@@ -87,6 +87,7 @@ public class NEAT_GroupController : UnitController
 	public override void Stop()
 	{
 		this.IsRunning = false;
+
 	}
 
 	public override void Activate(SharpNeat.Phenomes.IBlackBox box)
@@ -181,6 +182,11 @@ public class NEAT_GroupController : UnitController
 
 	public void cleanUp()
 	{
+		foreach (PedestrianSpawner2D p in pedestrianSpawners) 
+		{
+			StopCoroutine (p.SpawnPedestrians());
+			p.Clean ();
+		}
 		DestroyImmediate (this.gameObject);
 	}
 

@@ -13,9 +13,11 @@ public class VehicleController : MonoBehaviour
 	protected int finalLayerMask;
 	public bool proximityWarning = false;
 	bool isObstacleDetected = false;
+	protected float minObstacleRange = 0;
+	protected float minAngle;
 
     //sensors
-	RaycastHit2D sensor0; //THis is the left sensor
+	//RaycastHit2D sensor0; //THis is the left sensor
 	RaycastHit2D sensor1;
 	RaycastHit2D sensor2;
 	RaycastHit2D sensor3; 
@@ -23,8 +25,8 @@ public class VehicleController : MonoBehaviour
 	RaycastHit2D sensor5;
 	RaycastHit2D sensor6; 
 	RaycastHit2D sensor7; 
-	RaycastHit2D sensor8; //this is the right sensor
-	RaycastHit2D sensor9; //This is the backwards sensor
+	//RaycastHit2D sensor8; //this is the right sensor
+	//RaycastHit2D sensor9; //This is the backwards sensor
 
 
 	protected int boundaryMask = 1 << 9;
@@ -35,11 +37,9 @@ public class VehicleController : MonoBehaviour
 	// Use this for initialization
 	protected virtual void Start ()
     {
-		finalLayerMask = vehicleMask; //build a layermask that only checks the vehicle physics layers
+		finalLayerMask = vehicleMask | pedestrianMask; //build a layermask that only checks the vehicle and pedestrian physics layers
 	}
-
-
-	protected float minObstacleRange = 0;
+		
 
 	// Update is called once per frame
 	protected virtual void Update ()
@@ -65,6 +65,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [4] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [4];
+				minAngle = 0f;
 			}
 			if (showSensorsDebug)
 			{
@@ -80,7 +81,7 @@ public class VehicleController : MonoBehaviour
 			}
 		}
 			
-		sensor0 = Physics2D.Raycast (transform.position, -transform.right, sensorRange, finalLayerMask);
+		/*sensor0 = Physics2D.Raycast (transform.position, -transform.right, sensorRange, finalLayerMask);
 		if (sensor0)
 		{
 			sensorInputs [0] = (float)Math.Round(1f-((Vector2)transform.position - sensor0.point).magnitude/sensorRange,4);
@@ -106,7 +107,7 @@ public class VehicleController : MonoBehaviour
 			{
 				Debug.DrawLine (transform.position, transform.position + -transform.right * sensorRange, Color.green);
 			}
-		}
+		}*/
 		sensor1 = Physics2D.Raycast (transform.position, Quaternion.Euler (0, 0, -22.5f) * -transform.right, sensorRange, finalLayerMask);
 		if (sensor1)
 		{
@@ -119,7 +120,8 @@ public class VehicleController : MonoBehaviour
 
 			if (sensorInputs [1] > minObstacleRange)
 			{
-
+				minObstacleRange = sensorInputs [1];
+				minAngle = -1f;
 			}
 			if (showSensorsDebug)
 			{
@@ -148,6 +150,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [2] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [2];
+				minAngle = -0.67f;
 			}
 			if (showSensorsDebug)
 			{
@@ -176,6 +179,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [3] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [3];
+				minAngle = -0.33f;
 			}
 			if (showSensorsDebug)
 			{
@@ -204,6 +208,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [5] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [5];
+				minAngle = 0.33f;
 			}
 			if (showSensorsDebug)
 			{
@@ -231,6 +236,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [6] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [6];
+				minAngle = 0.67f;
 			}
 			if (showSensorsDebug)
 			{
@@ -259,6 +265,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [7] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [7];
+				minAngle = 1f;
 			}
 			if (showSensorsDebug)
 			{
@@ -274,7 +281,7 @@ public class VehicleController : MonoBehaviour
 			}
 		}
 
-		sensor8 = Physics2D.Raycast (transform.position, transform.right, sensorRange, finalLayerMask);
+	/*	sensor8 = Physics2D.Raycast (transform.position, transform.right, sensorRange, finalLayerMask);
 		if (sensor8)
 		{
 			sensorInputs [8] = (float)Math.Round(1f-((Vector2)transform.position - sensor8.point).magnitude/sensorRange,4);
@@ -328,7 +335,7 @@ public class VehicleController : MonoBehaviour
 			{
 				Debug.DrawLine (transform.position, transform.position + -transform.up * sensorRange, Color.green);
 			}
-		}
+		}*/
 
 
 

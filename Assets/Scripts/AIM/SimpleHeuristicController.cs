@@ -18,6 +18,9 @@ public class SimpleHeuristicController : VehicleController
 	protected Vector2 toPoint;
 
 	protected int resolution; //Number of points to sample on each path curve
+	protected float distToWayPoint;
+	protected float angleToWayPoint;
+	protected float wayPointDist;
 
 	// Use this for initialization
 	protected override void Start ()
@@ -66,7 +69,8 @@ public class SimpleHeuristicController : VehicleController
 				return;
 			this.curve = curves [counter];
 			updateResolution (this.curve.length);
-			toPoint = curve.GetPointAt (offset / (float)resolution);		
+			toPoint = curve.GetPointAt (offset / (float)resolution);
+			wayPointDist = (toPoint - (Vector2)curve.GetPointAt (0)).magnitude;
 		}
 
 		//TODO: Fix multiple over steps. For now, use small enough amount of sampling steps (set dynamically)
@@ -86,11 +90,15 @@ public class SimpleHeuristicController : VehicleController
 		//Update rotation
 		float angle = Vector2.Angle (transform.up, dir); 
 		angle = Vector3.Cross(transform.up, dir).z < 0 ? 360 - angle : angle;
+		angle = angle >= 360 ? angle - 360 : angle;
 		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
 
 		//Update position
 		transform.position = newPos;
-
+		distToWayPoint = 1.0f - Mathf.Clamp (((toPoint - newPos).magnitude / wayPointDist),0f,1f);
+		angleToWayPoint = angle;
+		Debug.Log (distToWayPoint + " angle: " + Vector3.Cross(transform.up, dir).z);
+		//Debug.Log ("1.0f - " + distToWayPoint + " = " + (1f-distToWayPoint));
 
 	}
 

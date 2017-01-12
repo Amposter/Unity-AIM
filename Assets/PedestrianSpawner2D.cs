@@ -8,7 +8,7 @@ public class PedestrianSpawner2D : MonoBehaviour {
 	private float speed = 2f;
 	private int numPedestrians = 4;
 	private float deniedRefreshInterval = 0.5f;
-	private float spawnInterval = 7.5f;
+	private float spawnInterval = 5f;
 	private float baseSpawnTime = 1f;
 	private float randomInterval = 2f;
 	public GameObject pedestrian;
@@ -19,6 +19,9 @@ public class PedestrianSpawner2D : MonoBehaviour {
 		startPoint = transform.GetChild (0).transform.position;
 		direction = ((Vector2)transform.GetChild (1).transform.position - startPoint);
 		pedestrians = new GameObject[numPedestrians];
+		spawnInterval += Random.Range (0f, 12f);
+		numPedestrians += Random.Range (-2, 3);
+
 	}
 
 	public void UpdatePedestrians()
@@ -44,7 +47,7 @@ public class PedestrianSpawner2D : MonoBehaviour {
 
 	public void Clean()
 	{
-		foreach (Pedestrian2D p in pedestrians)
+		foreach (GameObject p in pedestrians)
 			Destroy (p);
 	}
 	public IEnumerator SpawnPedestrians()

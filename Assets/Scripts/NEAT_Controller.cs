@@ -74,6 +74,7 @@ public class NEAT_Controller : SimpleHeuristicController
 		offset = 1;
 		updateResolution (curve.length);
 		toPoint = curve.GetPointAt(offset / (float)resolution);
+		wayPointDist = (toPoint - startPoint).magnitude;
 	}
 
 	public void OnTriggerEnter2D(Collider2D other)
