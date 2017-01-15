@@ -15,7 +15,7 @@ public class Config {
 	{
 		StopGo, SimpleDeviatePath, ComplexDeviatePath, SingleObstacleInput, ComplexStopGo
 	};
-	public static HyperNEATSubstrateSetup substrateSetup = HyperNEATSubstrateSetup.ComplexStopGo;
+	public static HyperNEATSubstrateSetup substrateSetup = HyperNEATSubstrateSetup.SingleObstacleInput;
 
 	public static int lastVIN = 0;
 
