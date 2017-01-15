@@ -91,5 +91,23 @@ public class NEAT_Controller : SimpleHeuristicController
 		finishedRoute = true;
 	}
 
+	public float getDistToWayPoint()
+	{
+		return distToWayPoint;
+	}
 
+	public float getAngleToWayPoint()
+	{
+		return angleToWayPoint;
+	}
+
+	public float getMinObstacleRange()
+	{
+		return minObstacleRange;
+	}
+
+	public float getMinObstacleAngle()
+	{
+		return minAngle;
+	}
 }

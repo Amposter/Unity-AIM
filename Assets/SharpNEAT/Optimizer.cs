@@ -66,13 +66,13 @@ public class Optimizer : MonoBehaviour {
 	{
         if (Config.NEAT)
         {
-            NUM_INPUTS = 10; //Sensors
+            NUM_INPUTS = 4; //Sensors
             NUM_OUTPUTS = 1; //Speed
         }
         else if (Config.HyperNEAT)
         {
             NUM_INPUTS = 4;  //Two substrate nodes (x1,y1,x2,y2) 
-            NUM_OUTPUTS = 2; //Weight stregnth + bias
+            NUM_OUTPUTS = 2; //Weight strength + bias
         }
 
 

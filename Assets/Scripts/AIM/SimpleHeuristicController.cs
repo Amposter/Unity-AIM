@@ -37,13 +37,13 @@ public class SimpleHeuristicController : VehicleController
 		
 	public void updateResolution(float length)
 	{
-		float val = 0;
-		if (length < 6)
+		float val = 1.6f;
+		/*if (length < 6)
 			val = 1.6f;
 		else if (length < 20)
 			val = 2.2f;
 		else 
-			val = 2.6f;
+			val = 2.6f;*/
 			
 		resolution = (int)(length / val);
 	}
@@ -91,13 +91,16 @@ public class SimpleHeuristicController : VehicleController
 		float angle = Vector2.Angle (transform.up, dir); 
 		angle = Vector3.Cross(transform.up, dir).z < 0 ? 360 - angle : angle;
 		angle = angle >= 360 ? angle - 360 : angle;
-		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
+
 
 		//Update position
 		transform.position = newPos;
+
 		distToWayPoint = 1.0f - Mathf.Clamp (((toPoint - newPos).magnitude / wayPointDist),0f,1f);
-		angleToWayPoint = angle;
-		Debug.Log (distToWayPoint + " angle: " + Vector3.Cross(transform.up, dir).z);
+		angleToWayPoint = Mathf.Clamp((Vector3.Cross(transform.up, dir).z < 0 ? Vector2.Angle (transform.up, dir) : -Vector2.Angle (transform.up, dir))/90,-1,1);
+		//Debug.Log (minObstacleRange + " angle: " + minAngle);
+
+		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
 		//Debug.Log ("1.0f - " + distToWayPoint + " = " + (1f-distToWayPoint));
 
 	}

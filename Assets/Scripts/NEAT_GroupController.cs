@@ -60,16 +60,11 @@ public class NEAT_GroupController : UnitController
 
 					neatController.updateSensors ();
 
-					box.InputSignalArray [0] = neatController.getSensorInputs () [0];
-					box.InputSignalArray [1] = neatController.getSensorInputs () [1];
-					box.InputSignalArray [2] = neatController.getSensorInputs () [2];
-					box.InputSignalArray [3] = neatController.getSensorInputs () [3];
-					box.InputSignalArray [4] = neatController.getSensorInputs () [4];
-					box.InputSignalArray [5] = neatController.getSensorInputs () [5];
-					box.InputSignalArray [6] = neatController.getSensorInputs () [6];
-					box.InputSignalArray [7] = neatController.getSensorInputs () [7];
-					box.InputSignalArray [8] = neatController.getSensorInputs () [8];
-					box.InputSignalArray [9] = neatController.getSensorInputs () [9];
+					box.InputSignalArray [0] = neatController.getAngleToWayPoint();
+					box.InputSignalArray [1] = neatController.getMinObstacleAngle;
+					box.InputSignalArray [2] = neatController.getMinObstacleRange;
+					box.InputSignalArray [3] = neatController.getDistToWayPoint;
+
 
 					box.Activate ();
  

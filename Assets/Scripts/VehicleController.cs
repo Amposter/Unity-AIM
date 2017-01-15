@@ -50,6 +50,7 @@ public class VehicleController : MonoBehaviour
 	public virtual void updateSensors()
 	{
 		minObstacleRange = 0;
+		minAngle = 0;
 		isObstacleDetected = false;
 		//perform a raycast for each sensor
 		sensor4 = Physics2D.Raycast (transform.position, transform.up, sensorRange, finalLayerMask);
@@ -121,7 +122,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [1] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [1];
-				minAngle = -1f;
+				minAngle = -0.75f;
 			}
 			if (showSensorsDebug)
 			{
@@ -150,7 +151,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [2] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [2];
-				minAngle = -0.67f;
+				minAngle = -0.5f;
 			}
 			if (showSensorsDebug)
 			{
@@ -179,7 +180,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [3] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [3];
-				minAngle = -0.33f;
+				minAngle = -0.25f;
 			}
 			if (showSensorsDebug)
 			{
@@ -208,7 +209,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [5] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [5];
-				minAngle = 0.33f;
+				minAngle = 0.25f;
 			}
 			if (showSensorsDebug)
 			{
@@ -236,7 +237,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [6] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [6];
-				minAngle = 0.67f;
+				minAngle = 0.5f;
 			}
 			if (showSensorsDebug)
 			{
@@ -265,7 +266,7 @@ public class VehicleController : MonoBehaviour
 			if (sensorInputs [7] > minObstacleRange)
 			{
 				minObstacleRange = sensorInputs [7];
-				minAngle = 1f;
+				minAngle = 0.75f;
 			}
 			if (showSensorsDebug)
 			{
