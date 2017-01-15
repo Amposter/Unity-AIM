@@ -137,7 +137,7 @@ public class SimpleExperiment : INeatExperiment
 
 				uint inputID = 1;
 				uint hidID = 5;
-				uint outputID = 6;
+				uint outputID = 10;
 
 				if (!Config.substrateHiddenNodes) {
 					outputID = 5;
