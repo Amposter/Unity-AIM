@@ -61,9 +61,9 @@ public class NEAT_GroupController : UnitController
 					neatController.updateSensors ();
 
 					box.InputSignalArray [0] = neatController.getAngleToWayPoint();
-					box.InputSignalArray [1] = neatController.getMinObstacleAngle;
-					box.InputSignalArray [2] = neatController.getMinObstacleRange;
-					box.InputSignalArray [3] = neatController.getDistToWayPoint;
+					box.InputSignalArray [1] = neatController.getMinObstacleAngle();
+					box.InputSignalArray [2] = neatController.getMinObstacleRange();
+					box.InputSignalArray [3] = neatController.getDistToWayPoint();
 
 
 					box.Activate ();
@@ -145,10 +145,10 @@ public class NEAT_GroupController : UnitController
 	public override float GetFitness()
 	{
 		return Mathf.Clamp(
-							((totalSpeedAccumulator / speedCheckCount) * 2000)
-							+((totalDistanceAccumulator / minDistanceCheckCount) * 1000)
-							-(spawnBlockedCount*100)
-							-(collisionCount*250)
+							((totalSpeedAccumulator / speedCheckCount) * 2500)
+							//+((totalDistanceAccumulator / minDistanceCheckCount) * 1000)
+							-(spawnBlockedCount*50)
+							-(collisionCount*125)
 							,1, float.MaxValue);
 	}
 
