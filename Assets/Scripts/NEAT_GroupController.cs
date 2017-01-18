@@ -61,14 +61,16 @@ public class NEAT_GroupController : UnitController
 					neatController.updateSensors ();
 
 					box.InputSignalArray [0] = neatController.getAngleToWayPoint();
-					box.InputSignalArray [1] = neatController.getMinObstacleAngle;
-					box.InputSignalArray [2] = neatController.getMinObstacleRange;
-					box.InputSignalArray [3] = neatController.getDistToWayPoint;
+					box.InputSignalArray [1] = neatController.getMinObstacleAngle();
+					box.InputSignalArray [2] = neatController.getMinObstacleRange();
+					box.InputSignalArray [3] = neatController.getDistToWayPoint();
 
 
 					box.Activate ();
  
-					neatController.setSpeedWeight (Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1));
+					float output = Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1);
+					Debug.Log (output);
+					neatController.setSpeedWeight (output);
 					neatController.updatePosition ();
 				}
 			}
@@ -111,9 +113,11 @@ public class NEAT_GroupController : UnitController
 			{
 				if (carsSpawnedPerStartPoint [pointIndex] < optimizer.Test_carsPerStartPoint)
 				{
-					Collider[] colliders = Physics.OverlapSphere (startPoints [pointIndex].transform.position, 2);
+					Vector3 point = startPoints [pointIndex].transform.position;
+					point.z = 0;
+					Collider2D[] colliders = Physics2D.OverlapCircleAll (point, 2);
 					bool full = false;
-					foreach (Collider col in colliders)
+					foreach (Collider2D col in colliders)
 					{
 						if (col.gameObject.tag == "Vehicle")
 							full = true;

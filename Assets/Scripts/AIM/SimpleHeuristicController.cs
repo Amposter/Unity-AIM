@@ -76,9 +76,9 @@ public class SimpleHeuristicController : VehicleController
 		//TODO: Fix multiple over steps. For now, use small enough amount of sampling steps (set dynamically)
 		Vector2 travelVector = (toPoint - (Vector2)transform.position);
 		Vector2 dir = travelVector.normalized;
-		Vector2 newPos = (Vector2)transform.position + speed * dir * Time.fixedDeltaTime;
+		Vector2 newPos = (Vector2)transform.position + (speed*speedWeight) * dir * Time.fixedDeltaTime;
 		float distanceToTravel = travelVector.magnitude;
-		if (distanceToTravel <= speed * Time.fixedDeltaTime) //Newpos oversteps the next waypoint
+		if (distanceToTravel <= (speed * speedWeight) * Time.fixedDeltaTime) //Newpos oversteps the next waypoint
 		{ 
 			++offset;
 			toPoint = curve.GetPointAt((float)offset/resolution);
@@ -222,5 +222,7 @@ public class SimpleHeuristicController : VehicleController
     {
         return speedWeight;
     }
+
+
 }
 
