@@ -131,7 +131,7 @@ public class Optimizer : MonoBehaviour {
             accum = 0.0f;
             frames = 0;
             //   print("FPS: " + fps);
-            if (fps < 10)
+            if (fps < 3)
             {
                 Time.timeScale = Time.timeScale - 1;
                 print("Lowering time scale to " + Time.timeScale);
@@ -194,7 +194,7 @@ public class Optimizer : MonoBehaviour {
         _ea.PausedEvent += new EventHandler(ea_PauseEvent);
 
      //   Time.fixedDeltaTime = 0.045f;
-        Time.timeScale = evoSpeed;       
+		Time.timeScale = evoSpeed;       
         _ea.StartContinue();
         EARunning = true;
     }
