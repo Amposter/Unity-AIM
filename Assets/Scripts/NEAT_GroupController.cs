@@ -69,7 +69,6 @@ public class NEAT_GroupController : UnitController
 					box.Activate ();
  
 					float output = Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1);
-					Debug.Log (output);
 					neatController.setSpeedWeight (output);
 					neatController.updatePosition ();
 				}
@@ -96,6 +95,10 @@ public class NEAT_GroupController : UnitController
 
 	protected IEnumerator spawnCars ()
 	{
+		totalSpeedAccumulator = 0;
+		speedCheckCount = 0;
+		collisionCount = 0;
+		spawnBlockedCount = 0;
 
 		optimizer = GameObject.Find ("Optimizer").GetComponent<Optimizer> ();
 		List<TrackWayPoint> startPoints = GameObject.Find ("PathManager").GetComponent<PathManager> ().startPoints;
@@ -148,14 +151,29 @@ public class NEAT_GroupController : UnitController
 
 	public override float GetFitness()
 	{
-		return Mathf.Clamp(
-							((totalSpeedAccumulator / speedCheckCount) * 2500)
-							//+((totalDistanceAccumulator / minDistanceCheckCount) * 1000)
-							-(spawnBlockedCount*50)
-							-(collisionCount*125)
-							,1, float.MaxValue);
-	}
 
+		float fitness = 0;
+		if (collisionCount > 0) 
+		{
+			fitness =  Mathf.Clamp(
+				((totalSpeedAccumulator / speedCheckCount) * 1250)
+				+((totalDistanceAccumulator / minDistanceCheckCount) * 500)
+				-(spawnBlockedCount*15)
+				-(collisionCount*75)
+				,1, float.MaxValue);
+		}
+		else 
+		{
+			fitness =  Mathf.Clamp(
+				((totalSpeedAccumulator / speedCheckCount) * 3500)
+				+((totalDistanceAccumulator / minDistanceCheckCount) * 1500)
+				-(spawnBlockedCount*25)
+				,1, float.MaxValue);
+		}
+		Debug.Log (totalSpeedAccumulator + "/" + speedCheckCount + " col " + collisionCount + " block " + spawnBlockedCount + " = fit " + fitness);
+		return fitness;
+	}
+	
 	public void record() 
 	{ 
 		string delimiter = ","; 

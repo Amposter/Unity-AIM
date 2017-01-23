@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
     <Config>
-      <PopulationSize>300</PopulationSize>
-      <SpecieCount>5</SpecieCount>
+      <PopulationSize>150</PopulationSize>
+      <SpecieCount>3</SpecieCount>
       <Activation>
         <Scheme>Acyclic</Scheme>
       </Activation>

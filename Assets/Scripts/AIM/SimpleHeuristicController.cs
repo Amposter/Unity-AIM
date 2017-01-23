@@ -29,6 +29,10 @@ public class SimpleHeuristicController : VehicleController
 		paused = false;
 	}
 
+	public void FixedUpdate()
+	{
+
+	}
 	// Update is called once per frame
 	protected override void Update ()
 	{
@@ -50,7 +54,6 @@ public class SimpleHeuristicController : VehicleController
 
 	public void updatePosition()
 	{		
-
 		if (paused)
 			return;
 		

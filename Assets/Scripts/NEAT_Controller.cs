@@ -28,26 +28,20 @@ public class NEAT_Controller : SimpleHeuristicController
 	public Vector2 prevPos;
 
 	// Update is called once per frame
-	protected override void Update()
+	void FixedUpdate()
 	{
-		base.Update ();
 
-		rewardTimer += Time.deltaTime;
 
 		if (getSpeedWeight () < 0.015)
 		{
 			groupController.idleTime += Time.deltaTime;
 		}
 
-		if (rewardTimer >= rewardTimeInterval)
-		{
-			rewardTimer = 0;
 
-			groupController.speedCheckCount++;
-			groupController.totalSpeedAccumulator += getSpeedWeight ();
-			groupController.minDistanceCheckCount++;
-			groupController.totalDistanceAccumulator += (1f-minObstacleRange);
-		}
+		groupController.speedCheckCount++;
+		groupController.totalSpeedAccumulator += getSpeedWeight ();
+		groupController.minDistanceCheckCount++;
+		groupController.totalDistanceAccumulator += (1f-minObstacleRange);
 
 	}
 

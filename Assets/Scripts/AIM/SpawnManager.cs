@@ -19,7 +19,7 @@ public class SpawnManager : MonoBehaviour {
 	void Start ()
     {
         startPoints = new List<TrackWayPoint>();
-        Collider[] colliders = Physics.OverlapBox(transform.position, transform.GetComponent<BoxCollider>().size * 0.5f, transform.rotation, 1 << 8);
+		Collider[] colliders = new Collider[0];// = Physics.OverlapBox(transform.position, transform.GetComponent<BoxCollider>().size * 0.5f, transform.rotation, 1 << 8);
         foreach (Collider col in colliders)
             startPoints.Add(col.gameObject.GetComponent<TrackWayPoint>());
         StartCoroutine("Spawn");
