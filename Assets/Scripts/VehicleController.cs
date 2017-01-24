@@ -44,7 +44,7 @@ public class VehicleController : MonoBehaviour
 	// Update is called once per frame
 	protected virtual void Update ()
     {
-		
+
 	}
 
 	public virtual void updateSensors()

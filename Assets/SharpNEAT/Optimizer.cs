@@ -183,11 +183,7 @@ public class Optimizer : MonoBehaviour {
 
 
     }
-
-	void FixedUpdate()
-	{
-		//Time.timeScale = evoSpeed;
-	}
+	
     public void StartEA()
     {        
         Utility.DebugLog = true;
@@ -475,6 +471,11 @@ public class Optimizer : MonoBehaviour {
 		}
 
 		}
+
+	public uint generation()
+	{
+		return Generation;
+	}
 
 	bool fileBrowserOpen = false;
 	private void showFileBrowser()

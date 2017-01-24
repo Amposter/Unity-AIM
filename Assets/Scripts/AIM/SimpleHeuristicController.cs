@@ -25,7 +25,7 @@ public class SimpleHeuristicController : VehicleController
 	// Use this for initialization
 	protected override void Start ()
 	{
-		base.Start();
+		base.Start ();
 		paused = false;
 	}
 

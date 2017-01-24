@@ -153,24 +153,30 @@ public class NEAT_GroupController : UnitController
 	{
 
 		float fitness = 0;
-		if (collisionCount > 0) 
-		{
-			fitness =  Mathf.Clamp(
+		if (optimizer.generation () > 125) {
+			if (collisionCount > 0) {
+				fitness = Mathf.Clamp (
 				((totalSpeedAccumulator / speedCheckCount) * 1250)
-				+((totalDistanceAccumulator / minDistanceCheckCount) * 500)
-				-(spawnBlockedCount*15)
-				-(collisionCount*75)
-				,1, float.MaxValue);
-		}
-		else 
-		{
-			fitness =  Mathf.Clamp(
+					- (spawnBlockedCount * 15)
+					- (collisionCount * 75)
+				, 1, float.MaxValue); 
+			} else {
+				fitness = Mathf.Clamp (
 				((totalSpeedAccumulator / speedCheckCount) * 3500)
-				+((totalDistanceAccumulator / minDistanceCheckCount) * 1500)
-				-(spawnBlockedCount*25)
-				,1, float.MaxValue);
+					- (spawnBlockedCount * 25)
+				, 1, float.MaxValue);
+			}
 		}
-		Debug.Log (totalSpeedAccumulator + "/" + speedCheckCount + " col " + collisionCount + " block " + spawnBlockedCount + " = fit " + fitness);
+		 else
+			{
+				fitness = Mathf.Clamp (
+					((totalSpeedAccumulator / speedCheckCount) * 3500)
+					- (spawnBlockedCount * 25)
+					- (collisionCount * 150)
+					, 1, float.MaxValue); 
+			}
+		//Debug.Log (totalSpeedAccumulator + "/" + speedCheckCount + " col " + collisionCount + " block " + spawnBlockedCount + " = fit " + fitness);
+		Debug.Log ("cars " + carsThrough + " = fit " + fitness);
 		return fitness;
 	}
 	
