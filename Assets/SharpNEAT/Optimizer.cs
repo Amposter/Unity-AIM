@@ -382,6 +382,7 @@ public class Optimizer : MonoBehaviour {
 			}
 			else 
 			{
+				print ("hhheyy");
 				using (XmlReader xr = XmlReader.Create(xmlPath))
 					genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, true, (CppnGenomeFactory)experiment.CreateGenomeFactory())[0];
 			}
@@ -399,7 +400,7 @@ public class Optimizer : MonoBehaviour {
 
 		HyperNeatDecoder hDecoder = null;
 		if (Config.HyperNEAT)
-			hDecoder = (HyperNeatDecoder)experiment.CreateGenomeDecoder();
+			genomeDecoder = (HyperNeatDecoder)experiment.CreateGenomeDecoder();
         // Decode the genome into a phenome (neural network).
         var phenome = genomeDecoder.Decode(genome);
 
