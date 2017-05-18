@@ -1,2 +1,3 @@
 # UnityAIM
-####  A simulation of virtual sensory based agents that use neurevolution (NEAT and HyperNEAT) to learn to navigate populated intersections of varying complexity. A simplified version of FCFS-AIM is also implemented.
+
+Autonomous vehicles are a popular area of study in machine learning that has seen great interest due to the increased funding by prominent companies. This study investigates ways to automatically produce decentralised car control-systems for future autonomous vehicle applications by using machine learning. The project tests of efficacy using a deterministic approach called Autonomous Intersection Management (AIM) for coordinated driving against two decetralised approaches that uses neuro-evolution (NEAT and HyperNEAT). Each approach was evaluated by its ability to coordinate a group of vehicles through 10 different tracks that were modelled off real road networks.
