@@ -2,12 +2,12 @@
 
     <Config>
       <PopulationSize>150</PopulationSize>
-      <SpecieCount>3</SpecieCount>
+      <SpecieCount>5</SpecieCount>
       <Activation>
         <Scheme>Acyclic</Scheme>
       </Activation>
       <ComplexityRegulationStrategy>Absolute</ComplexityRegulationStrategy>
-      <ComplexityThreshold>25</ComplexityThreshold>
-      <Description>H/NEAT</Description>
+      <ComplexityThreshold>33</ComplexityThreshold>
+      <Description>NEAT Autonomous Vehicle Obstacle Avoidance</Description>
 
     </Config>

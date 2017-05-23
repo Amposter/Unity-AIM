@@ -15,97 +15,54 @@ public class SimpleHeuristicController : VehicleController
 	protected int counter;
 
 	protected int offset;
-	protected Vector2 toPoint;
+	protected Vector3 toPoint;
 
 	protected int resolution; //Number of points to sample on each path curve
-	protected float distToWayPoint;
-	protected float angleToWayPoint;
-	protected float wayPointDist;
 
 	// Use this for initialization
 	protected override void Start ()
 	{
-		base.Start ();
+		base.Start();
 		paused = false;
+		resolution = 25;
 	}
 
-	public void FixedUpdate()
-	{
-
-	}
 	// Update is called once per frame
 	protected override void Update ()
 	{
 		base.Update ();
 	}
 		
-	public void updateResolution(float length)
-	{
-		float val = 1.6f;
-		/*if (length < 6)
-			val = 1.6f;
-		else if (length < 20)
-			val = 2.2f;
-		else 
-			val = 2.6f;*/
-			
-		resolution = (int)(length / val);
-	}
 
 	public void updatePosition()
 	{		
-		if (paused)
-			return;
-		
-		if ((counter > curves.Length - 1)) 
-		{
-			gameObject.GetComponent<NEAT_Controller> ().finishedRoute = true;
-			gameObject.GetComponent<NEAT_Controller> ().groupController.carsThrough++;
-			return;
-		}
+		resolution = 25;
 
-		if (offset >= resolution) 
-		{
-			++counter;
-			offset = 1;
-			if (counter > curves.Length - 1)
+
+		if (offset <= resolution) {
+			if (paused) { //Do nothing
 				return;
+			}
+
+			Vector3 newPos = Vector3.MoveTowards (transform.position, toPoint, speedWeight * speed * Time.fixedDeltaTime);
+			transform.position = newPos;
+			//GetComponent<Rigidbody>().MovePosition(newPos);
+			if (transform.position == toPoint) {
+				++offset;
+				toPoint = curve.GetPointAt ((float)offset / resolution);
+				toPoint.y = transform.position.y;
+				transform.LookAt (toPoint);
+			}
+		} else if (counter < curves.Length - 1) {
+			++counter;
 			this.curve = curves [counter];
-			updateResolution (this.curve.length);
+			offset = 1;
 			toPoint = curve.GetPointAt (offset / (float)resolution);
-			wayPointDist = (toPoint - (Vector2)curve.GetPointAt (0)).magnitude;
+			toPoint.y = transform.position.y;
+			transform.LookAt (toPoint);
+		} else {
+			return;
 		}
-
-		//TODO: Fix multiple over steps. For now, use small enough amount of sampling steps (set dynamically)
-		Vector2 travelVector = (toPoint - (Vector2)transform.position);
-		Vector2 dir = travelVector.normalized;
-		Vector2 newPos = (Vector2)transform.position + (speed*speedWeight) * dir * Time.fixedDeltaTime;
-		float distanceToTravel = travelVector.magnitude;
-		if (distanceToTravel <= (speed * speedWeight) * Time.fixedDeltaTime) //Newpos oversteps the next waypoint
-		{ 
-			++offset;
-			toPoint = curve.GetPointAt((float)offset/resolution);
-			dir = (toPoint - (Vector2)transform.position).normalized;
-
-		} 
-
-		//Debug.DrawLine (transform.position, (Vector2)transform.position + dir * 10, Color.green);
-		//Update rotation
-		float angle = Vector2.Angle (transform.up, dir); 
-		angle = Vector3.Cross(transform.up, dir).z < 0 ? 360 - angle : angle;
-		angle = angle >= 360 ? angle - 360 : angle;
-
-
-		//Update position
-		transform.position = newPos;
-
-		distToWayPoint = 1.0f - Mathf.Clamp (((toPoint - newPos).magnitude / wayPointDist),0f,1f);
-		angleToWayPoint = Mathf.Clamp((Vector3.Cross(transform.up, dir).z < 0 ? Vector2.Angle (transform.up, dir) : -Vector2.Angle (transform.up, dir))/90,-1,1);
-		//Debug.Log (minObstacleRange + " angle: " + minAngle);
-
-		transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, Vector3.forward);
-		//Debug.Log ("1.0f - " + distToWayPoint + " = " + (1f-distToWayPoint));
-
 	}
 
 	public void setCurve(BezierCurve curve)
@@ -116,7 +73,6 @@ public class SimpleHeuristicController : VehicleController
 	public void setCurves(BezierCurve[] curves)
 	{
 		this.curves = curves;
-
 	}
 
 
@@ -225,7 +181,5 @@ public class SimpleHeuristicController : VehicleController
     {
         return speedWeight;
     }
-
-
 }
 

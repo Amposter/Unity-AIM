@@ -66,13 +66,13 @@ public class Optimizer : MonoBehaviour {
 	{
         if (Config.NEAT)
         {
-            NUM_INPUTS = 4; //Sensors
+            NUM_INPUTS = 10; //Sensors
             NUM_OUTPUTS = 1; //Speed
         }
         else if (Config.HyperNEAT)
         {
             NUM_INPUTS = 4;  //Two substrate nodes (x1,y1,x2,y2) 
-            NUM_OUTPUTS = 2; //Weight strength + bias
+            NUM_OUTPUTS = 2; //Weight stregnth + bias
         }
 
 
@@ -80,7 +80,6 @@ public class Optimizer : MonoBehaviour {
 		simController.setup ();
 		champFileSavePath = string.Format ("/{0}.champ.xml", "NEAT_Controller");
 		popFileSavePath = string.Format ("/{0}.pop.xml", "NEAT_Controller");
-		Debug.Log (popFileSavePath);
 		superChampFileSavePath = string.Format ("/{0}.SUPERchamp.xml", "NEAT_Controller");
 		normalFixedDeltaTime = Time.fixedDeltaTime;
 
@@ -132,7 +131,7 @@ public class Optimizer : MonoBehaviour {
             accum = 0.0f;
             frames = 0;
             //   print("FPS: " + fps);
-            if (fps < 3)
+            if (fps < 5)
             {
                 Time.timeScale = Time.timeScale - 1;
                 print("Lowering time scale to " + Time.timeScale);
@@ -183,19 +182,19 @@ public class Optimizer : MonoBehaviour {
 
 
     }
-	
+
     public void StartEA()
     {        
         Utility.DebugLog = true;
         Utility.Log("Starting NEAT Training");
-		_ea = experiment.CreateEvolutionAlgorithm(Application.dataPath+"/Resources/"+test_currentRun+popFileSavePath);
+        _ea = experiment.CreateEvolutionAlgorithm();
         startTime = DateTime.Now;
 
         _ea.UpdateEvent += new EventHandler(ea_UpdateEvent);
         _ea.PausedEvent += new EventHandler(ea_PauseEvent);
 
      //   Time.fixedDeltaTime = 0.045f;
-		Time.timeScale = evoSpeed;       
+        Time.timeScale = evoSpeed;       
         _ea.StartContinue();
         EARunning = true;
     }
@@ -224,8 +223,6 @@ public class Optimizer : MonoBehaviour {
 		{
 			if (Config.NEAT)
 			{
-				Debug.Log(Application.dataPath+"/saves/"+test_currentRun+champFileSavePath);
-
 				using (XmlReader xr = XmlReader.Create(Application.dataPath+"/saves/"+test_currentRun+champFileSavePath))
 					genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, (NeatGenomeFactory)experiment.CreateGenomeFactory())[0];
 			}
@@ -375,14 +372,12 @@ public class Optimizer : MonoBehaviour {
         {
 			if (Config.NEAT)
 			{
-
-			print(xmlPath);
+				print(xmlPath);
 				using (XmlReader xr = XmlReader.Create(xmlPath))
                 genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, (NeatGenomeFactory)experiment.CreateGenomeFactory())[0];
 			}
 			else 
 			{
-				print ("hhheyy");
 				using (XmlReader xr = XmlReader.Create(xmlPath))
 					genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, true, (CppnGenomeFactory)experiment.CreateGenomeFactory())[0];
 			}
@@ -397,21 +392,18 @@ public class Optimizer : MonoBehaviour {
 
         // Get a genome decoder that can convert genomes to phenomes.
         var genomeDecoder = experiment.CreateGenomeDecoder();
-
-		HyperNeatDecoder hDecoder = null;
-		if (Config.HyperNEAT)
-			genomeDecoder = (HyperNeatDecoder)experiment.CreateGenomeDecoder();
+//		HyperNeatDecoder hDecoder = (HyperNeatDecoder)experiment.CreateGenomeDecoder();
         // Decode the genome into a phenome (neural network).
         var phenome = genomeDecoder.Decode(genome);
 
-		//No dlls
-/*		if (Config.NEAT)
+
+		if (Config.NEAT)
 			guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (), genome);
 		else 
 		{
-			guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.CppnGenomeView (DefaultActivationFunctionLibrary.CreateLibraryCppn ()), genome);
-			guiForm2 = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (hDecoder.GetNetworkDefinition(genome)), genome);
-		}*/
+	//		guiForm = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.CppnGenomeView (DefaultActivationFunctionLibrary.CreateLibraryCppn ()), genome);
+		//	guiForm2 = new SharpNeatGUI.GenomeForm ("GUI", new SharpNeat.Domains.NeatGenomeView (hDecoder.GetNetworkDefinition(genome)), genome);
+		}
 
 		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
 		UnitController controller = groupController.GetComponent<UnitController>();
@@ -472,11 +464,6 @@ public class Optimizer : MonoBehaviour {
 		}
 
 		}
-
-	public uint generation()
-	{
-		return Generation;
-	}
 
 	bool fileBrowserOpen = false;
 	private void showFileBrowser()

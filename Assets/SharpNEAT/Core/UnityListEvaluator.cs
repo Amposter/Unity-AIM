@@ -106,6 +106,7 @@ namespace SharpNEAT.Core
 				}
 				var fit = fitness;
 				fitness /= _optimizer.Trials; // Averaged fitness
+
 				genome.EvaluationInfo.SetFitness(fitness);
 				genome.EvaluationInfo.AuxFitnessArr = fitnessDict[genome][0]._auxFitnessArr;
 				//Debug.Log ("Final fitness for genome "+genomeNum+": "+fitness);

@@ -14,7 +14,6 @@ public class NEAT_GroupController : UnitController
 	public GameObject NEAT_VehiclePrefab;
     public float groupFitness;
 	private List<GameObject> NEAT_VehiclesList = new List<GameObject>();
-	private PedestrianSpawner2D[] pedestrianSpawners;
 	public int totalTriggered = 0;
 	public int speedCheckCount = 0;
 	public float totalSpeedAccumulator = 0;
@@ -31,7 +30,6 @@ public class NEAT_GroupController : UnitController
 	void Start ()
 	{
         groupFitness = 0;
-
 	}
 
 	public void setPathManager(PathManager pathManager)
@@ -46,36 +44,31 @@ public class NEAT_GroupController : UnitController
 		{
             foreach (GameObject NEAT_Vehicle in NEAT_VehiclesList)
 			{
-				if (NEAT_Vehicle == null)
-					continue;
-				
 				NEAT_Controller neatController = NEAT_Vehicle.GetComponent<NEAT_Controller>();
 
-				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute) 
-				{
-					Destroy(NEAT_Vehicle);
-				}
-				else if (NEAT_Vehicle.activeInHierarchy) 
-				{
+				if (NEAT_Vehicle.activeInHierarchy && neatController.finishedRoute) {
+					NEAT_Vehicle.SetActive (false);
+				} else if (NEAT_Vehicle.activeInHierarchy) {
 
 					neatController.updateSensors ();
 
-					box.InputSignalArray [0] = neatController.getAngleToWayPoint();
-					box.InputSignalArray [1] = neatController.getMinObstacleAngle();
-					box.InputSignalArray [2] = neatController.getMinObstacleRange();
-					box.InputSignalArray [3] = neatController.getDistToWayPoint();
-
+					box.InputSignalArray [0] = neatController.getSensorInputs () [0];
+					box.InputSignalArray [1] = neatController.getSensorInputs () [1];
+					box.InputSignalArray [2] = neatController.getSensorInputs () [2];
+					box.InputSignalArray [3] = neatController.getSensorInputs () [3];
+					box.InputSignalArray [4] = neatController.getSensorInputs () [4];
+					box.InputSignalArray [5] = neatController.getSensorInputs () [5];
+					box.InputSignalArray [6] = neatController.getSensorInputs () [6];
+					box.InputSignalArray [7] = neatController.getSensorInputs () [7];
+					box.InputSignalArray [8] = neatController.getSensorInputs () [8];
+					box.InputSignalArray [9] = neatController.getSensorInputs () [9];
 
 					box.Activate ();
  
-					float output = Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1);
-					neatController.setSpeedWeight (output);
+					neatController.setSpeedWeight (Mathf.Clamp ((float)(box.OutputSignalArray [0]), 0, 1));
 					neatController.updatePosition ();
 				}
 			}
-
-			foreach (PedestrianSpawner2D p in pedestrianSpawners)
-				p.UpdatePedestrians ();
 
 		}
 	}
@@ -83,7 +76,6 @@ public class NEAT_GroupController : UnitController
 	public override void Stop()
 	{
 		this.IsRunning = false;
-
 	}
 
 	public override void Activate(SharpNeat.Phenomes.IBlackBox box)
@@ -95,40 +87,26 @@ public class NEAT_GroupController : UnitController
 
 	protected IEnumerator spawnCars ()
 	{
-		totalSpeedAccumulator = 0;
-		speedCheckCount = 0;
-		collisionCount = 0;
-		spawnBlockedCount = 0;
 
-		optimizer = GameObject.Find ("Optimizer").GetComponent<Optimizer> ();
 		List<TrackWayPoint> startPoints = GameObject.Find ("PathManager").GetComponent<PathManager> ().startPoints;
 	
 		int[] carsSpawnedPerStartPoint = new int[startPoints.Count];
 
-		pedestrianSpawners = FindObjectsOfType (typeof(PedestrianSpawner2D)) as PedestrianSpawner2D[];
-		foreach (PedestrianSpawner2D p in pedestrianSpawners)
-		{
-			p.SetUp ();
-			StartCoroutine(p.SpawnPedestrians());
-		}
 		do {
 			for (int pointIndex = 0; pointIndex < startPoints.Count; pointIndex++)
 			{
 				if (carsSpawnedPerStartPoint [pointIndex] < optimizer.Test_carsPerStartPoint)
 				{
-					Vector3 point = startPoints [pointIndex].transform.position;
-					point.z = 0;
-					Collider2D[] colliders = Physics2D.OverlapCircleAll (point, 2);
+					Collider[] colliders = Physics.OverlapSphere (startPoints [pointIndex].transform.position, 2);
 					bool full = false;
-					foreach (Collider2D col in colliders)
+					foreach (Collider col in colliders)
 					{
 						if (col.gameObject.tag == "Vehicle")
 							full = true;
 					}
 					if (!full)
 					{
-						GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab) as GameObject;
-						//NEAT_Vehicle.transform.position = (Vector2)startPoints[pointIndex].transform.position;
+						GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoints[pointIndex].transform.position, startPoints[pointIndex].transform.rotation) as GameObject;
 						NEAT_Vehicle.transform.parent = transform;
 						NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
 						NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoints[pointIndex])));
@@ -151,38 +129,14 @@ public class NEAT_GroupController : UnitController
 
 	public override float GetFitness()
 	{
-
-		float fitness = 0;
-	/*	if (optimizer.generation () > 125) {
-			if (collisionCount > 0) {
-				fitness = Mathf.Clamp (
-				((totalSpeedAccumulator / speedCheckCount) * 1250)
-					- (spawnBlockedCount * 15)
-					- (collisionCount * 75)
-				, 1, float.MaxValue); 
-			} else {
-				fitness = Mathf.Clamp (
-				((totalSpeedAccumulator / speedCheckCount) * 3500)
-					- (spawnBlockedCount * 25)
-				, 1, float.MaxValue);
-			}
-		}
-		 else
-			{*/
-
-				fitness = Mathf.Clamp (
-					((totalSpeedAccumulator / speedCheckCount) * 3000)
-					+((totalDistanceAccumulator/minDistanceCheckCount) * 500)
-					- (spawnBlockedCount * 50)
-					- (collisionCount * 200)
-					, 1, float.MaxValue); 
-
-		Debug.Log (totalSpeedAccumulator + "/" + speedCheckCount + " col " + collisionCount + " block " + spawnBlockedCount + " = fit " + fitness);
-		//fitness = Mathf.Clamp (((float)carsThrough / 48 * 3500) - collisionCount * 100, 1, float.MaxValue);
-		Debug.Log (carsThrough + " = fit " + fitness);
-		return fitness;
+		return Mathf.Clamp(
+							((totalSpeedAccumulator / speedCheckCount) * 2000)
+							+((totalDistanceAccumulator / minDistanceCheckCount) * 1000)
+							-(spawnBlockedCount*100)
+							-(collisionCount*250)
+							,1, float.MaxValue);
 	}
-	
+
 	public void record() 
 	{ 
 		string delimiter = ","; 
@@ -208,11 +162,6 @@ public class NEAT_GroupController : UnitController
 
 	public void cleanUp()
 	{
-		foreach (PedestrianSpawner2D p in pedestrianSpawners) 
-		{
-			StopCoroutine (p.SpawnPedestrians());
-			p.Clean ();
-		}
 		DestroyImmediate (this.gameObject);
 	}
 

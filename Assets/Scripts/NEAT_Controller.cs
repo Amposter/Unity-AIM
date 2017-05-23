@@ -25,23 +25,29 @@ public class NEAT_Controller : SimpleHeuristicController
 	public float prevDistance = float.MaxValue;
 	public float prevMinObstacleDistance = float.MaxValue;
 	public float initialDistanceToTarget = 1;
-	public Vector2 prevPos;
+	public Vector3 prevPos;
 
 	// Update is called once per frame
-	void FixedUpdate()
+	protected override void Update()
 	{
+		base.Update ();
 
+		rewardTimer += Time.deltaTime;
 
 		if (getSpeedWeight () < 0.015)
 		{
 			groupController.idleTime += Time.deltaTime;
 		}
 
+		if (rewardTimer >= rewardTimeInterval)
+		{
+			rewardTimer = 0;
 
-		groupController.speedCheckCount++;
-		groupController.totalSpeedAccumulator += getSpeedWeight ();
-		groupController.minDistanceCheckCount++;
-		groupController.totalDistanceAccumulator += (1f-minObstacleRange);
+			groupController.speedCheckCount++;
+			groupController.totalSpeedAccumulator += getSpeedWeight ();
+			groupController.minDistanceCheckCount++;
+			groupController.totalDistanceAccumulator += (1f-minObstacleRange);
+		}
 
 	}
 
@@ -55,53 +61,33 @@ public class NEAT_Controller : SimpleHeuristicController
 		setCurve (curves [0]);
 		setCurves (curves);
 
-		Vector2 startPoint = curves[0].GetPointAt(0f);
-		transform.position = startPoint;
-
-		string name = GameObject.FindGameObjectWithTag("Track").name;
-		name = (name[name.Length - 2].ToString() + name[name.Length - 1]);
-		int level = int.Parse(name);
-		resolution = Config.samplingSteps[level-1];
-
+		resolution = 25;
 		counter = 0;
 		this.curve = curves[counter];
 		offset = 1;
-		updateResolution (curve.length);
 		toPoint = curve.GetPointAt(offset / (float)resolution);
-		wayPointDist = (toPoint - startPoint).magnitude;
+		toPoint.y = transform.position.y;
+		transform.LookAt(toPoint);
 	}
 
-	public void OnTriggerEnter2D(Collider2D other)
+	public void OnTriggerEnter(Collider other)
 	{
-		if (other.gameObject.tag == "Pedestrian") 
+		if (other.gameObject.GetComponent<TrackWayPoint> () == null)
 		{
-			groupController.collisionCount++;
-			finishedRoute = true;
+			return;
 		}
-	}
-    public void OnCollisionEnter2D(Collision2D other)
+		if(other.gameObject.GetComponent<TrackWayPoint>().type == TrackWayPoint.Type.END)
+		{
+			finishedRoute = true;
+			groupController.carsThrough++;
+		}
+    }
+
+    public void OnCollisionEnter(Collision other)
 	{
 		groupController.collisionCount++;
 		finishedRoute = true;
 	}
 
-	public float getDistToWayPoint()
-	{
-		return distToWayPoint;
-	}
 
-	public float getAngleToWayPoint()
-	{
-		return angleToWayPoint;
-	}
-
-	public float getMinObstacleRange()
-	{
-		return minObstacleRange;
-	}
-
-	public float getMinObstacleAngle()
-	{
-		return minAngle;
-	}
 }
