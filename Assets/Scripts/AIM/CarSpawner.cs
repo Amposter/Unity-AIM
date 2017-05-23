@@ -111,14 +111,14 @@ public class CarSpawner : MonoBehaviour
 			{
 				if(carsSpawnedPerStartPoint[pointIndex] < carsPerStartPoint)
 				{
-					Collider2D col = Physics2D.OverlapCircle(startPoints[pointIndex].transform.position, 2, (1<<10));
-			/*		bool full = false;
-					foreach (Collider2D col in colliders)
+					Collider[] colliders = Physics.OverlapSphere(startPoints[pointIndex].transform.position, 2);
+					bool full = false;
+					foreach (Collider col in colliders)
 					{
 						if (col.gameObject.tag == "Vehicle")
 							full = true;
-					}*/
-					if (!col)
+					}
+					if (!full)
 					{
 						GameObject instance = Instantiate(car);
 						instance.GetComponent<AIMController>().carSpawner = this;
