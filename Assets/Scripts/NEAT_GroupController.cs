@@ -108,6 +108,12 @@ public class NEAT_GroupController : UnitController
 					{
 						GameObject NEAT_Vehicle = Instantiate (NEAT_VehiclePrefab, startPoints[pointIndex].transform.position, startPoints[pointIndex].transform.rotation) as GameObject;
 						NEAT_Vehicle.transform.parent = transform;
+
+						MeshRenderer[] meshes = NEAT_Vehicle.GetComponentsInChildren<MeshRenderer>();
+						Color colour = new Color(UnityEngine.Random.Range(0f, 1.0f), UnityEngine.Random.Range(0f, 1.0f), UnityEngine.Random.Range(0f, 1.0f));
+						foreach (MeshRenderer mesh in meshes)
+							mesh.material.color = colour;
+						
 						NEAT_Vehicle.GetComponent<NEAT_Controller> ().groupController = this;
 						NEAT_Vehicle.GetComponent<NEAT_Controller> ().startDriving (_pathManager.getCurvesFromPathNodes (_pathManager.getRandomPathNodesFromStartNode (startPoints[pointIndex])));
 						NEAT_VehiclesList.Add (NEAT_Vehicle);
