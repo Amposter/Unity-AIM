@@ -124,6 +124,12 @@ public class CarSpawner : MonoBehaviour
 						instance.GetComponent<AIMController>().carSpawner = this;
 						AimControllers.Add(instance.GetComponent<AIMController>());
 						instance.GetComponent<AIMController>().start = startPoints[pointIndex];
+
+						MeshRenderer[] meshes = instance.GetComponentsInChildren<MeshRenderer>();
+						Color colour = new Color(UnityEngine.Random.Range(0f, 1.0f), UnityEngine.Random.Range(0f, 1.0f), UnityEngine.Random.Range(0f, 1.0f));
+						foreach (MeshRenderer mesh in meshes)
+							mesh.material.color = colour;
+						
 						carsSpawnedPerStartPoint[pointIndex]++;
 						carsSpawned++;
 					}
