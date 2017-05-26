@@ -41,8 +41,5 @@ This is the population of evolved controllers after 150 generation. As this is n
 
 Once you've chosen the controller you want to test, the simulation will start and each car spawned will use utilize the selected controller to navigate. You might again need to adjust the camera position for certain tracks. 
 
-##### For more information about simulating NEAT to develop your own controllers or if you're keen to contribute or maybe just want to find out more, feel free to drop us an email:
-
-geoffnitschke@gmail.com
-PRKAAS003@myuct.ac.za
+##### For more information about simulating NEAT to develop your own controllers or if you're keen to contribute or maybe just want to find out more, feel free to drop us an email: geoffnitschke@gmail.com (Geoff Nitschke) or PRKAAS003@myuct.ac.za (Aashiq Parker)
 
