@@ -254,7 +254,8 @@ public class Optimizer : MonoBehaviour {
 		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
 		UnitController controller = groupController.GetComponent<UnitController>();
 		((NEAT_GroupController)controller).setPathManager (simController.getCurrentTrack ().GetComponentInChildren<PathManager> ());
-		((NEAT_GroupController)controller).optimizer = this;
+		((NEAT_GroupController)controller).setOptimizer(this);
+
 
 		if (!ControllerMap.ContainsKey (phenome))
 		{
@@ -408,7 +409,7 @@ public class Optimizer : MonoBehaviour {
 		GameObject groupController = Instantiate(Unit, Vector3.zero, Quaternion.identity) as GameObject;
 		UnitController controller = groupController.GetComponent<UnitController>();
 		((NEAT_GroupController)controller).setPathManager (simController.getCurrentTrack ().GetComponentInChildren<PathManager> ());
-		((NEAT_GroupController)controller).optimizer = this;
+		((NEAT_GroupController)controller).setOptimizer(this);
 
 		if (!ControllerMap.ContainsKey (phenome))
 		{

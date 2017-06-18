@@ -21,7 +21,7 @@ public class NEAT_GroupController : UnitController
 	public float totalDistanceAccumulator = 0;
 	public int collisionCount = 0;
 	private int spawnBlockedCount = 0;
-	public Optimizer optimizer;
+	private Optimizer optimizer;
 	private int carsSpawned = 0;
 	public int carsThrough = 0;
 	public float idleTime = 0;
@@ -35,6 +35,11 @@ public class NEAT_GroupController : UnitController
 	public void setPathManager(PathManager pathManager)
 	{
 		_pathManager = pathManager;
+	}
+
+	public void setOptimizer(Optimizer op)
+	{
+		optimizer = op;
 	}
 
 	// Update is called once per frame
@@ -88,6 +93,7 @@ public class NEAT_GroupController : UnitController
 	protected IEnumerator spawnCars ()
 	{
 
+		optimizer = GameObject.Find ("Optimizer").GetComponent<Optimizer> ();
 		List<TrackWayPoint> startPoints = GameObject.Find ("PathManager").GetComponent<PathManager> ().startPoints;
 	
 		int[] carsSpawnedPerStartPoint = new int[startPoints.Count];
