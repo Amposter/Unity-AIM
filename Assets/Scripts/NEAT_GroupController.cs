@@ -20,11 +20,13 @@ public class NEAT_GroupController : UnitController
 	public int minDistanceCheckCount = 0;
 	public float totalDistanceAccumulator = 0;
 	public int collisionCount = 0;
+	public int pedestrianCollisionCount = 0;
 	private int spawnBlockedCount = 0;
 	private Optimizer optimizer;
 	private int carsSpawned = 0;
 	public int carsThrough = 0;
 	public float idleTime = 0;
+	private PedestrianManager pedestrianManager;
 
 	// Use this for initialization
 	void Start ()
@@ -88,6 +90,15 @@ public class NEAT_GroupController : UnitController
 		this.box = box;
 		this.IsRunning = true;
 		StartCoroutine ("spawnCars");
+		try
+		{
+			pedestrianManager = GameObject.Find ("PedestrianManager").GetComponent<PedestrianManager> ();
+			pedestrianManager.Activate ();
+		}
+		catch (Exception ex) 
+		{
+			Debug.Log ("No pedestrian manager found and hence no pedestrians will be spawned.");
+		}
 	}
 
 	protected IEnumerator spawnCars ()
@@ -174,6 +185,8 @@ public class NEAT_GroupController : UnitController
 
 	public void cleanUp()
 	{
+		if (pedestrianManager != null)
+			pedestrianManager.Deactivate ();
 		DestroyImmediate (this.gameObject);
 	}
 

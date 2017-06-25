@@ -85,8 +85,17 @@ public class NEAT_Controller : SimpleHeuristicController
 
     public void OnCollisionEnter(Collision other)
 	{
-		groupController.collisionCount++;
-		finishedRoute = true;
+		if (other.gameObject.tag == "Pedestrian") 
+		{
+			Debug.Log ("Hit pedestrian");
+			groupController.pedestrianCollisionCount++; //Just for tracking purposes for now, not actually used in fitness function (main collision count is used)
+			groupController.collisionCount++;
+			Destroy (other.gameObject);
+		} else 
+		{
+			groupController.collisionCount++;
+			finishedRoute = true;
+		}
 	}
 
 
